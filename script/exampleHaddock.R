@@ -17,7 +17,7 @@ conf_l = defConf(years = 1994:2020, # years to use, use all years with data by d
                  stratasystem = list(dsn="shapefiles/Vintertokt_strata_system", layer = "Vintertoktet_nye_strata"),
                  minDepth=100,maxDepth=500,
                  applyALK = 1,
-                 cutoff = 90, cbound = 130)
+                 cutoff = 100, cbound = 130)
 
 #Define configurations age part
 conf_alk = defConf_alk(maxAge = 10,
@@ -54,6 +54,18 @@ for(year in 1994:2020){
 #Extract ad-reported values
 rl = as.list(run$rep,what = "Est", report = TRUE)
 rlSd = as.list(run$rep, "Std", report = TRUE)
+
+#Extract indices
+minAge = 3
+nYears = length(conf_l$years)
+ageLogIndex = rl$logAgeIndex[,minAge:conf_alk$maxAge]
+ageLogIndexSd = rlSd$logAgeIndex[,minAge:conf_alk$maxAge]
+
+ageIndexUse = round(as.data.frame(cbind(rep(1,dim(exp(ageLogIndex))[1]),exp(ageLogIndex))),3)
+ageLogIndexSdUse = round(as.data.frame(ageLogIndexSd),3)
+write.table(ageIndexUse, file = "index.txt", row.names = FALSE)
+write.table(ageLogIndexSdUse, file = "indexSd.txt", row.names = FALSE)
+
 
 
 
@@ -92,9 +104,9 @@ for(year in 1:nYears){
   }
   breaks = c(-1,seq(0,zlim[2],by  = 1))
   image(x,y, z,col =  colorRampPalette(c("white","yellow", "red"))(length(breaks)-1),
-             legend.width = 2, cex = 1.6,zlim = zlim,
-             axis.args = list(cex.axis = 1.3),yaxt = yaxt[year],xaxt = xaxt[year],
-             main = "")
+        legend.width = 2, cex = 1.6,zlim = zlim,
+        axis.args = list(cex.axis = 1.3),yaxt = yaxt[year],xaxt = xaxt[year],
+        main = "")
 
   title(1993 + year,line = -2,cex.main=2)
   newmap <- maps::map("world", c("Norway","Sweden","Finland","Russia"),fill = TRUE,plot = FALSE, col = "transparent")
@@ -154,7 +166,7 @@ for(year in 1:nYears){
     yC = 1
     for(yy in y){
       if(length(which(run$data$xInt ==xx & run$data$yInt ==yy))>0){
- #       z[xC,yC] = sum(alk[l,1:age,which(run$data$xInt ==xx & run$data$yInt ==yy),year])
+        #       z[xC,yC] = sum(alk[l,1:age,which(run$data$xInt ==xx & run$data$yInt ==yy),year])
         z[xC,yC] = alk[l,age,which(run$data$xInt ==xx & run$data$yInt ==yy),year]
       }
       yC = yC+1
@@ -236,9 +248,9 @@ for(age in 3:10){
     }
     breaks = c(-1,seq(0,zlim[2],by  = 1))
     image(x,y, z,col =  colorRampPalette(c("white","yellow", "red"))(length(breaks)-1),
-               legend.width = 2, cex = 1.6,zlim = zlim,
-               axis.args = list(cex.axis = 1.3),yaxt = yaxt[year],xaxt = xaxt[year],
-               main = "")
+          legend.width = 2, cex = 1.6,zlim = zlim,
+          axis.args = list(cex.axis = 1.3),yaxt = yaxt[year],xaxt = xaxt[year],
+          main = "")
     title(1993 + year,line = -2,cex.main=2)
 
     newmap <- maps::map("world", c("Norway","Sweden","Finland","Russia"),fill = TRUE,plot = FALSE, col = "transparent")
@@ -272,20 +284,10 @@ for(age in 3:10){
 }
 
 
-minAge = 3
-nYears = length(conf_l$years)
-ageLogIndex = rl$logAgeIndex[,minAge:conf_alk$maxAge]
-ageLogIndexSd = rlSd$logAgeIndex[,minAge:conf_alk$maxAge]
 
-ageIndexUse = round(as.data.frame(cbind(rep(1,dim(exp(ageLogIndex))[1]),exp(ageLogIndex))),3)
-ageLogIndexSdUse = round(as.data.frame(ageLogIndexSd),3)
-write.table(ageIndexUse, file = "index.txt", row.names = FALSE)
-write.table(ageLogIndexSdUse, file = "tmpSd.txt", row.names = FALSE)
 
-ageLogIndex[which(ageLogIndex<(-20))] = NA
 
 reduce = 1.5
-
 #Cohort plot
 plot(rep(1, dim(ageLogIndex)[2]),minAge:run$data$ageRange[2],cex = (ageLogIndex[1,]-reduce*min(ageLogIndex, na.rm = TRUE))/reduce, xlim =c(1,dim(ageLogIndex)[1]))
 for(i in 2:nYears){

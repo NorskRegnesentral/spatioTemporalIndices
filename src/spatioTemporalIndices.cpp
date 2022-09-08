@@ -57,8 +57,6 @@ Type objective_function<Type>::operator() ()
   DATA_INTEGER(rwBeta0); dat.rwBeta0 = rwBeta0;
   DATA_IVECTOR(idxStrata); dat.idxStrata = idxStrata;
   DATA_VECTOR(areas); dat.areas = areas;
-  DATA_INTEGER(doDetailtedADREPORT); //If 1, report uncertainty in stratas, if 2: can apply bias correction on indices
-
 
 
   //ALK stuff----------------
@@ -241,11 +239,6 @@ Type objective_function<Type>::operator() ()
 
   if(dat.applyALK==0){//Do not adreport length if calculating index per length to reduce computation time.
     ADREPORT(logLengthIndex);
-    if(doDetailtedADREPORT ==1){
-      ADREPORT(logLengthIndexStrata);
-    }else if(doDetailtedADREPORT ==2){
-      ADREPORT(lengthIndex);//For bias-correction
-    }
   }
 
 
@@ -253,9 +246,6 @@ Type objective_function<Type>::operator() ()
   if(dat.applyALK==1){
     logAgeIndex = log(ageIndex);
     ADREPORT(logAgeIndex);
-    if(doDetailtedADREPORT ==2){
-      ADREPORT(ageIndex);
-    }
   }
 
 
@@ -282,8 +272,8 @@ Type objective_function<Type>::operator() ()
     }
 
     REPORT(ageIndexDetailed);//For plotting
-    ADREPORT(COGAgeX);
-    ADREPORT(COGAgeY);
+//    ADREPORT(COGAgeX);
+//    ADREPORT(COGAgeY);
     REPORT(ALK_int);
   }
 

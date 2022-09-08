@@ -21,7 +21,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
       setMKLthreads(1) #not profiting much by using more cores
     },
     error=function(cond) {
-      message("MKL library not used, couputation will be time consuming")
+      message("MKL library not used, couputation time may be reduced by using MLK library")
       return(NA)
     }
   )

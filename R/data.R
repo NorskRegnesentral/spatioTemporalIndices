@@ -210,8 +210,7 @@ setupData = function(dataLength,conf,confPred){
                rwBeta0 = conf$rwBeta0,
                applyALK = conf$applyALK,
                lengthGroups = conf$lengthGroups,
-               dL = conf$dLength,
-               doDetailtedADREPORT = conf$doDetailtedADREPORT)
+               dL = conf$dLength)
 
   #Configurations used on C-side
   data$spatial=conf$spatial

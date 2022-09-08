@@ -31,7 +31,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
                     maxLength = NULL,dLength = 1, minLength = NULL,reduceLength = 3,
                     cutoff = 100, cbound = 200,
                     pcPriorRange = c(100,0.1),pcPriorsd = c(1,0.1), usePcPriors = 0, zeroInflated = 0,
-                    obsModel = 2,rwBeta0 = 1,applyALK = 0,doDetailtedADREPORT = 0,
+                    obsModel = 2,rwBeta0 = 1,applyALK = 0,
                     mapRhoL = c(0,1,2), simulateProcedure = 1,
                     stratasystem = list(),
                     minDepth=50,maxDepth=600,trawlWidth=1,
@@ -87,8 +87,6 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$simulateProcedure = simulateProcedure
   conf$rwBeta0 = rwBeta0
   conf$applyALK = applyALK
-
-  conf$doDetailtedADREPORT = doDetailtedADREPORT
 
   conf$trawlWidth = trawlWidth
 
