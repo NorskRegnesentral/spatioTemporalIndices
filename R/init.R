@@ -29,7 +29,7 @@ setPar <- function(data,conf){
                      log_kappa =c(-5,-5),
                      logSize =0.2,
                      tan_rho_t =0,
-                     tan_rho_l =rep(1,3),
+                     tan_rho_l =rep(0,3),
                      delta_z = rep(0,9),
                      xS = xS,
                      xST  = xST,

@@ -27,13 +27,13 @@ conf_alk = defConf_alk(maxAge = 10,
 
 confPred = defConfPred(conf=conf_l,Depth="Data",nInt=2000)
 
-
 # run model
 start_time <- Sys.time()
 run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE)
 end_time <- Sys.time()
 timeUsed = end_time - start_time
 timeUsed
+
 
 
 #Plot covariate effects
@@ -67,7 +67,30 @@ write.table(ageIndexUse, file = "index.txt", row.names = FALSE)
 write.table(ageLogIndexSdUse, file = "indexSd.txt", row.names = FALSE)
 
 
+#Extract yearly covariance matrices
+minAge = 3
+id = which(names(run$rep$value)=="logAgeIndex")
+cov = run$rep$cov[id,id]
 
+covYears = list()
+for(i in 1:length(conf_l$years)){
+  id = i + (0:(conf_alk$maxAge-1))*length(conf_l$years)
+  covYears[[i]] = cov[id,id]
+  covYears[[i]] = covYears[[i]][minAge:conf_alk$maxAge,minAge:conf_alk$maxAge]
+}
+save(covYears,file = "covYears.Rda") #Can be directly utilized by SAM
+
+#Illustrate yearly correlation
+library(ellipse)
+ccolors <- c("#A50F15","#DE2D26","#FB6A4A","#FCAE91","#FEE5D9","white",
+             "#EFF3FF","#BDD7E7","#6BAED6","#3182BD","#08519C")
+
+x11()
+par(mfrow = c(5,6))
+for(i in 1:length(covYears)){
+  xx = cov2cor(covYears[[i]])
+  plotcorr(xx, col = ccolors[5*xx+6],main = paste0("Year ", 1993 + i))
+}
 
 
 #Contour plot length#############################

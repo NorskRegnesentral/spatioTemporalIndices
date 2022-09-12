@@ -96,7 +96,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
                 control = list(trace = 1,iter.max = 1000, eval.max = 1000),
                 lower = lower, upper = upper)
 
-  rep <- sdreport(obj, getReportCovariance = FALSE,...)
+  rep <- sdreport(obj,...)
   pl = as.list(rep,"Est")
   plSd = as.list(rep,"Std")
 
