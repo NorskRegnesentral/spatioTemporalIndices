@@ -90,7 +90,6 @@ Type objective_function<Type>::operator() ()
   PARAMETER_ARRAY(xS); par.xS = xS;
   PARAMETER_ARRAY(xST); par.xST = xST;
   PARAMETER_ARRAY(nugget); par.nugget = nugget;
-  PARAMETER_ARRAY(nuggetIndex); par.nuggetIndex = nuggetIndex;
   PARAMETER_VECTOR(log_sigma_beta0); par.log_sigma_beta0 = log_sigma_beta0;
 
   //ALK stuff-------------------
@@ -168,8 +167,7 @@ Type objective_function<Type>::operator() ()
           covariatesConvexW*timeInDayEffectIntLow(0) + (1-covariatesConvexW)*timeInDayEffectIntHigh(0)+
           covariatesConvexW*depthEffectInt1(i) + (1-covariatesConvexW)*depthEffectInt2(i)+
           deltaPredS(i)/sqrt(scaleS)*sigma(0)+
-          deltaPredST(i)/sqrt(scaleST)*sigma(1)+
-          nuggetIndex.col(i)(l)*sigma(2));
+          deltaPredST(i)/sqrt(scaleST)*sigma(1));
       }
     }
   }

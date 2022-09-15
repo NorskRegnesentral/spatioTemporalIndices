@@ -93,8 +93,6 @@ template <class Type>
       for(int i = 0; i< dat.xInt.size(); ++i){
         Q_nuggetIIDI.coeffRef(i,i)=1;
       }
-      nll += SEPARABLE(GMRF(Q_nuggetIIDI),AR1(rho_l(2)))(par.nuggetIndex);
-
     }
 
     //p-spline

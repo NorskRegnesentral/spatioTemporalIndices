@@ -91,6 +91,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$trawlWidth = trawlWidth
 
   conf$plusGroup =plusGroup
+  conf$smartStart = NULL #TODO
   return(conf)
 }
 

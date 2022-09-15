@@ -92,6 +92,5 @@ struct paraSet{
   array<Type> xS;
   array<Type> xST;
   array<Type> nugget;
-  array<Type> nuggetIndex;
 
 };

@@ -16,16 +16,13 @@ setPar <- function(data,conf){
 
   nugget = array(0.0, dim = c(dim(data$fishObsMatrix)[2],dim(data$fishObsMatrix)[1]))
 
-
-  nuggetIndex = array(0.0, dim = c(dim(data$fishObsMatrix)[2],length(data$xInt)))
-
   beta0 = array(0,dim=c(length(conf$years), length(conf$lengthGroups)))
 
   parameters <- list(beta0 = beta0,
                      betaSun =rep(0,max(1,conf$sunAlt[1])*4),
                      betaDepth = rep(0,data$Sdim*2),
-                     log_lambda =c(5,5),
-                     log_sigma =c(0,0,0),
+                     log_lambda =c(2,2),
+                     log_sigma =c(2,1,1),
                      log_kappa =c(-5,-5),
                      logSize =0.2,
                      tan_rho_t =0,
@@ -34,11 +31,23 @@ setPar <- function(data,conf){
                      xS = xS,
                      xST  = xST,
                      nugget = nugget,
-                     nuggetIndex = nuggetIndex,
                      log_sigma_beta0 = 0)
 
   if(conf$applyALK==0){
     parameters = includeDummyPar(parameters)
+  }
+  if(!is.null(conf$smartStart)){
+    load(conf$smartStart)
+    parameters$beta0 = pl$beta0
+    parameters$log_sigma = pl$log_sigma
+    parameters$log_kappa = pl$log_kappa
+    parameters$betaSun = pl$betaSun
+    parameters$log_sigma_beta0 = pl$log_sigma_beta0
+    parameters$log_lambda = pl$log_lambda
+    parameters$tan_rho_t = pl$tan_rho_t
+    parameters$tan_rho_l = pl$tan_rho_l
+
+    print("Use good inital values")
   }
   return(parameters)
 }
