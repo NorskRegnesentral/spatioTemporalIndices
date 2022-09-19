@@ -57,6 +57,9 @@ struct dataSet{
   vector<Type> pcPriorsRange;
   vector<Type> pcPriorsSD;
   int usePCpriors;
+  int usePCpriorsALK;
+  vector<Type> pcPriorsALKRange;
+  vector<Type> pcPriorsALKSD;
   int simulateProcedure;
   int rwBeta0;
   int maxAge;

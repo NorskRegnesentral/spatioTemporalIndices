@@ -76,6 +76,10 @@ Type objective_function<Type>::operator() ()
   DATA_INTEGER(rwBeta0_alk); dat.rwBeta0_alk = rwBeta0_alk;//Indicator if including AR1-structure on beta0
   DATA_INTEGER(maxAge); dat.maxAge = maxAge;
   DATA_INTEGER(minAge); dat.minAge = minAge;
+  DATA_VECTOR(pcPriorsALKRange); dat.pcPriorsALKRange = pcPriorsALKRange;
+  DATA_VECTOR(pcPriorsALKSD); dat.pcPriorsALKSD = pcPriorsALKSD;
+  DATA_INTEGER(usePCpriorsALK); dat.usePCpriorsALK = usePCpriorsALK;
+
   //-----------------------------
 
   paraSet<Type> par;

@@ -33,6 +33,15 @@ template <class Type>
 
     nll += SEPARABLE(GMRF(Q_age),SEPARABLE(AR1(rho),GMRF(Q)))(par.xST_alk); //Opposite order than on R side
 
+    Type d = 2; //Part of spatial pc-prior
+    Type rhoP;
+    Type R = -log(dat.pcPriorsALKRange(1))*pow(dat.pcPriorsALKRange(0),d/2);
+    Type S = -log(dat.pcPriorsALKSD(1))/dat.pcPriorsALKSD(0);
+    if(dat.usePCpriorsALK==1){
+      rhoP = sqrt(8)/kappa;
+      nll -= log( d/2 * R *S * pow(rhoP,(-1-d/2))* exp(-R* pow(rhoP,(-d/2)) -S* sigma)); //pc-prior contribution
+    }
+
     Type scaleST = Type(1)/((4*3.14159265)*kappa*kappa); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
 
     matrix<Type> linPredMatrix(nObs, nAges-1);
