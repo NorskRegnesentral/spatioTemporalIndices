@@ -36,19 +36,7 @@ setPar <- function(data,conf){
   if(conf$applyALK==0){
     parameters = includeDummyPar(parameters)
   }
-  if(!is.null(conf$smartStart)){
-    load(conf$smartStart)
-    parameters$beta0 = pl$beta0
-    parameters$log_sigma = pl$log_sigma
-    parameters$log_kappa = pl$log_kappa
-    parameters$betaSun = pl$betaSun
-    parameters$log_sigma_beta0 = pl$log_sigma_beta0
-    parameters$log_lambda = pl$log_lambda
-    parameters$tan_rho_t = pl$tan_rho_t
-    parameters$tan_rho_l = pl$tan_rho_l
 
-    print("Use good inital values")
-  }
   return(parameters)
 }
 

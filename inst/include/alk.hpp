@@ -26,8 +26,8 @@ template <class Type>
     Type rho =2*invlogit(par.transRho_alk(0))-1;
 
     SparseMatrix<Type> Q = Q_spde(spdeMatricesST_alk,kappa);
-    SparseMatrix<Type> Q_age(nAges,nAges);
-    for(int a = 0; a< nAges; ++a){
+    SparseMatrix<Type> Q_age(nAges-1,nAges-1);
+    for(int a = 0; a< (nAges-1); ++a){
       Q_age.coeffRef(a,a)=1;
     }
 
@@ -74,14 +74,14 @@ template <class Type>
         nll -= log(ALK(s,dat.age(s)- minAge));
         break;
       case 5:
-        if(dat.age(s) <(nAges-1)){
+        if(dat.ageNotTruncated(s) < dat.maxAge){
           nll -= log(ALK(s,dat.age(s)- minAge) + ALK(s,dat.age(s)- minAge + 1) );
         }else{
           nll -= log(ALK(s,dat.age(s)- minAge));
         }
         break;
       case 6:
-        if(dat.ageNotTruncated(s) < (nAges)){
+        if( (dat.ageNotTruncated(s) <= dat.maxAge) &  (dat.ageNotTruncated(s) >= dat.minAge) ){
           nll -= log(ALK(s,dat.age(s)- minAge) + ALK(s,dat.age(s)- minAge - 1) );
         }else{
           nll -= log(ALK(s,dat.age(s)- minAge));

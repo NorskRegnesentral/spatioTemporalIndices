@@ -173,6 +173,8 @@ includeDummyAge = function(data){
   data$lengthGroups = c(1,2,3)
   data$dL = c(1,2,3)
   data$rwBeta0_alk = 0
+  data$maxAge = 99
+  data$minAge = 0
 
 
   return(data)

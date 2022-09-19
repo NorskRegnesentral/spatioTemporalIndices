@@ -57,6 +57,29 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
   }
   print("Start inference")
 
+
+  if(!is.null(conf_l$smartStart)){
+    load(conf_l$smartStart)
+    par$beta0 = pl$beta0
+    par$log_sigma = pl$log_sigma
+    par$log_kappa = pl$log_kappa
+    par$betaSun = pl$betaSun
+    par$log_sigma_beta0 = pl$log_sigma_beta0
+    par$log_lambda = pl$log_lambda
+    par$tan_rho_t = pl$tan_rho_t
+    par$tan_rho_l = pl$tan_rho_l
+    par$betaDepth = pl$betaDepth
+    if(conf_l$applyALK==1){
+      par$log_sigma_beta0_alk = pl$log_sigma_beta0_alk
+      par$betaLength_alk = pl$betaLength_alk
+      par$logSigma_alk = pl$logSigma_alk
+      par$logKappa_alk = pl$logKappa_alk
+      par$transRho_alk = pl$transRho_alk
+    }
+
+    print("Use good inital values")
+  }
+
   if(!is.null(parPrior)){par = parPrior}
 
 

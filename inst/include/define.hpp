@@ -59,6 +59,8 @@ struct dataSet{
   int usePCpriors;
   int simulateProcedure;
   int rwBeta0;
+  int maxAge;
+  int minAge;
   int applyALK;
   vector<int> idxStrata;
   vector<Type> areas;

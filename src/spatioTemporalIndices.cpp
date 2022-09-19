@@ -74,6 +74,8 @@ Type objective_function<Type>::operator() ()
   DATA_VECTOR(dL);dat.dL = dL;
   DATA_INTEGER(applyALK);dat.applyALK = applyALK;
   DATA_INTEGER(rwBeta0_alk); dat.rwBeta0_alk = rwBeta0_alk;//Indicator if including AR1-structure on beta0
+  DATA_INTEGER(maxAge); dat.maxAge = maxAge;
+  DATA_INTEGER(minAge); dat.minAge = minAge;
   //-----------------------------
 
   paraSet<Type> par;
