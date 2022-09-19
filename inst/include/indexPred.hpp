@@ -4,8 +4,9 @@ template <class Type>
   void indexPred(dataSet<Type> dat, paraSet<Type> par, objective_function<Type> *of){
 
     array<Type> ALK_int;
-    ALK_int = ALK(dat,par); //ALKs at for integration points
-
+    if(dat.applyALK==1){
+      ALK_int = ALK(dat,par); //ALKs at for integration points
+    }
     int numberOfLengthGroups =dat.numberOfLengthGroups;
 
     //Calculate indices-----------------------------------

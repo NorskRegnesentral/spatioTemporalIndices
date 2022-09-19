@@ -175,7 +175,9 @@ includeDummyAge = function(data){
   data$rwBeta0_alk = 0
   data$maxAge = 99
   data$minAge = 0
-
+  data$pcPriorsALKRange = c(200,0.1)
+  data$pcPriorsALKSD = c(1,0.1)
+  data$usePCpriorsALK = 0
 
   return(data)
 }
