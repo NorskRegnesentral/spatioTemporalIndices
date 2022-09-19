@@ -1,4 +1,16 @@
 
+
+#define ADREPORT_F(name,F) F->reportvector.push(name,#name);
+
+#define REPORT_F(name,F)					                               \
+if(isDouble<Type>::value && F->current_parallel_region<0) {	\
+  Rf_defineVar(Rf_install(#name),					                      \
+               PROTECT(asSEXP(name)),F->report);			         \
+  UNPROTECT(1);						                                       \
+}
+
+
+
 /* List of sparse matrices */
 template<class Type>
 struct LOSM_t : vector<SparseMatrix<Type> > {

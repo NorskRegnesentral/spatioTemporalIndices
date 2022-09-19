@@ -7,6 +7,7 @@ using namespace tmbutils;
 #include "../inst/include/define.hpp"
 #include "../inst/include/alk.hpp"
 #include "../inst/include/index.hpp"
+#include "../inst/include/indexPred.hpp"
 
 
 template<class Type>
@@ -108,193 +109,18 @@ Type objective_function<Type>::operator() ()
   PARAMETER_ARRAY(xST_alk); par.xST_alk = xST_alk;// Ordering: xST.col(age).col(year).col(spatial)
   //----------------------------
 
-  Type nll = 0.0;
 
+  Type nll = 0.0;
+  //Likelihood contribution from length part
   nll += nllIndex(dat,par,spdeMatricesS,spdeMatricesST,A_ListS,A_ListST, keep);
 
-  array<Type> ALK_int;
+  //Likelihood contribution from ALK part
   if(dat.applyALK==1){
     nll += nllALK(dat,par,spdeMatricesST_alk,A_alk_list);
-    ALK_int = ALK(dat,par); //Calcualate ALKs at for integration points
   }
 
-  //Calculate indices-----------------------------------
-  int nYears = dat.nStationsEachYear.size();
-  int nInt = dat.xInt.size();
-  vector<Type> sigma = exp(par.log_sigma);
-  vector<Type> kappa = exp(par.log_kappa);
-
-  Type scaleS = Type(1)/((4*3.14159265)*kappa[0]*kappa[0]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
-  Type scaleST = Type(1)/((4*3.14159265)*kappa[1]*kappa[1]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
-
-
-  array<Type>  lengthIndex(nYears,numberOfLengthGroups);
-  array<Type>  lengthIndexDetailed(nYears,numberOfLengthGroups, nInt);
-  lengthIndex.setZero();
-  lengthIndexDetailed.setZero();
-
-  vector<Type> deltaPredST;
-  vector<Type> deltaPredS;
-
-  int nSplineDepth = par.betaDepth.size()/2;
-  vector<Type> parDepth1(nSplineDepth);
-  vector<Type> parDepth2(nSplineDepth);
-  for(int i =0; i<nSplineDepth; ++i){
-    parDepth1(i) = par.betaDepth(i);
-    parDepth2(i) = par.betaDepth(i + nSplineDepth);
-  }
-
-  vector<Type> betaSunLow(dat.nBasisSunAlt*2);
-  vector<Type> betaSunHigh(dat.nBasisSunAlt*2);
-  for(int i =0; i<(dat.nBasisSunAlt*2); ++i){
-    betaSunLow(i) = par.betaSun(i);
-    betaSunHigh(i) = par.betaSun(i + dat.nBasisSunAlt*2);
-  }
-
-  vector<Type> depthEffectInt1=X_depth_int*parDepth1;
-  vector<Type> depthEffectInt2=X_depth_int*parDepth2;
-  vector<Type> timeInDayEffectIntLow = X_sunAltIntegrate*betaSunLow;
-  vector<Type> timeInDayEffectIntHigh = X_sunAltIntegrate*betaSunHigh;
-
-  for(int y=0; y<nYears; ++y){
-    for(int l =0; l<numberOfLengthGroups; ++l){
-      Type covariatesConvexW = (numberOfLengthGroups-l-1)/(numberOfLengthGroups-1);
-      if(lengthGroupsReduced(0)==lengthGroupsReduced(1)){
-        deltaPredS = weigthLength(l)*ApredS * xS.col(lengthGroupsReduced(l)).matrix()+
-          (1-weigthLength(l))*ApredS * xS.col(lengthGroupsReduced(l)+1).matrix();
-        deltaPredST = weigthLength(l)*ApredST * xST.col(lengthGroupsReduced(l)).col(y).matrix()+
-          (1-weigthLength(l))*ApredST * xST.col(lengthGroupsReduced(l)+1).col(y).matrix();
-      }else{
-        deltaPredS = ApredS * xS.col(lengthGroupsReduced(l)).matrix();
-        deltaPredST = ApredST * xST.col(lengthGroupsReduced(l)).col(y).matrix();
-      }
-      for(int i =0; i<nInt; ++i){
-        lengthIndexDetailed(y,l,i) =  exp(beta0.row(y)(l) +
-          covariatesConvexW*timeInDayEffectIntLow(0) + (1-covariatesConvexW)*timeInDayEffectIntHigh(0)+
-          covariatesConvexW*depthEffectInt1(i) + (1-covariatesConvexW)*depthEffectInt2(i)+
-          deltaPredS(i)/sqrt(scaleS)*sigma(0)+
-          deltaPredST(i)/sqrt(scaleST)*sigma(1));
-      }
-    }
-  }
-
-  int nAges = 2;//Dummy-number
-  if(dat.applyALK==1){
-    nAges = dat.ageRange(1) - dat.ageRange(0) + 1;
-  }
-  array<Type> ageIndexDetailed(nYears,nAges, nInt);
-  array<Type> ageIndex(nYears,nAges);
-  ageIndexDetailed.setZero();
-  ageIndex.setZero();
-
-  int nStrata = 0;
-  for(int i=0; i<idxStrata.size(); ++i){
-    if(nStrata<idxStrata(i)){
-      nStrata = idxStrata(i);
-    }
-  }
-  array<Type> lengthIndexStrata(nYears,numberOfLengthGroups,nStrata);
-  lengthIndexStrata.setZero();
-
-  vector<Type> nIntStrata(nStrata);
-  nIntStrata.setZero();
-  for(int i=0; i<nInt; ++i){
-    nIntStrata(idxStrata(i)-1) = nIntStrata(idxStrata(i)-1) +1;
-  }
-
-
-  for(int y=0; y<nYears; ++y){
-    for(int l = 0; l<numberOfLengthGroups; ++l){
-      for(int i=0; i<nInt; ++i){
-        if(dat.applyALK==1){
-          for(int a = 0; a<nAges; ++a){
-            ageIndex(y,a) = ageIndex(y,a) + lengthIndexDetailed(y,l,i)* ALK_int(l,a,i,y);
-            ageIndexDetailed(y,a,i) = ageIndexDetailed(y,a,i) +  lengthIndexDetailed(y,l,i)*ALK_int(l,a,i,y);
-          }
-        }
-        lengthIndex(y,l) = lengthIndex(y,l) + lengthIndexDetailed(y,l,i);
-        lengthIndexStrata(y,l, idxStrata(i)-1) = lengthIndexStrata(y,l, idxStrata(i)-1) + lengthIndexDetailed(y,l,i);
-      }
-    }
-  }
-
-  for(int y=0; y<nYears; ++y){
-    for(int l = 0; l<numberOfLengthGroups; ++l){
-      for(int s=0; s<nStrata; ++s){
-        lengthIndexStrata(y,l,s) = lengthIndexStrata(y,l,s)*areas(s)/nIntStrata(s);
-      }
-      lengthIndex(y,l) = lengthIndex(y,l) *areas.sum()/nInt;
-    }
-    if(dat.applyALK==1){
-      for(int a = 0; a<nAges; ++a){
-        ageIndex(y,a) = ageIndex(y,a) *areas.sum()/nInt;
-      }
-    }
-  }
-  //--------------------------------------
-
-  array<Type> logLengthIndex(nYears,numberOfLengthGroups);
-  array<Type> logLengthIndexStrata(nYears,numberOfLengthGroups,nStrata);
-  logLengthIndex= log(lengthIndex);
-  logLengthIndexStrata = log(lengthIndexStrata);
-
-  REPORT(lengthIndex);
-  REPORT(lengthIndexStrata);
-
-  if(dat.applyALK==0){//Do not adreport length if calculating index per length to reduce computation time.
-    ADREPORT(logLengthIndex);
-  }
-
-
-  array<Type> logAgeIndex(nYears,nAges);
-  if(dat.applyALK==1){
-    logAgeIndex = log(ageIndex);
-    ADREPORT(logAgeIndex);
-  }
-
-
-  //Report COG
-  if(dat.applyALK==1){
-    matrix<Type> COGAgeX(nYears,nAges);
-    matrix<Type> COGAgeY(nYears,nAges);
-    COGAgeX.setZero();
-    COGAgeY.setZero();
-
-    Type COGageTotal=0;
-
-    for(int a = 0; a<nAges; ++a){
-      for(int y = 0; y<nYears; ++y){
-        COGageTotal=0;
-        for(int i =0; i<nInt; ++i){
-          COGAgeX(y,a) += ageIndexDetailed(y,a,i)*dat.xInt(i);
-          COGAgeY(y,a) += ageIndexDetailed(y,a,i)*dat.yInt(i);
-          COGageTotal += ageIndexDetailed(y,a,i);
-        }
-        COGAgeX(y,a) = COGAgeX(y,a)/COGageTotal;
-        COGAgeY(y,a) = COGAgeY(y,a)/COGageTotal;
-      }
-    }
-
-    REPORT(ageIndexDetailed);//For plotting
-//    ADREPORT(COGAgeX);
-//    ADREPORT(COGAgeY);
-    REPORT(ALK_int);
-  }
-
-  //For plotting
-  REPORT(lengthIndexDetailed);
-
-
-  //Report covariates
-  vector<Type> fourierReportLow = X_sunAltReport*betaSunLow;
-//  vector<Type> fourierReportHigh = X_sunAltReport*betaSunHigh;
-  ADREPORT(fourierReportLow);
-//  ADREPORT(fourierReportHigh);
-
-  vector<Type> depthReport1 =X_depthReport*parDepth1;
-//  vector<Type> depthReport2 =X_depthReport*parDepth2;
-  ADREPORT(depthReport1);
-//  ADREPORT(depthReport2);
+  //Predict and report indices
+  indexPred(dat,par, this);
 
   return nll;
 }
