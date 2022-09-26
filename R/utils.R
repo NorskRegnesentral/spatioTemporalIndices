@@ -170,7 +170,7 @@ includeDummyAge = function(data){
   data$spdeMatricesST_alk = data$spdeMatricesS
   data$A_alk_list = data$A_list
   data$Apred_alk = data$ApredS
-  data$lengthGroups = c(1,2,3)
+ # data$lengthGroups = c(1,2,3)
   data$dL = c(1,2,3)
   data$rwBeta0_alk = 0
   data$maxAge = 99
@@ -178,6 +178,8 @@ includeDummyAge = function(data){
   data$pcPriorsALKRange = c(200,0.1)
   data$pcPriorsALKSD = c(1,0.1)
   data$usePCpriorsALK = 0
+  data$spatialALK = 0
+  data$spatioTemporalALK = 0
 
   return(data)
 }

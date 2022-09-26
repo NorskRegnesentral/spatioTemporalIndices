@@ -225,6 +225,7 @@ setMap <- function(par, conf){
     map$logKappa_alk = as.factor(rep(NA, length(par$logKappa_alk)))
     map$transRho_alk = as.factor(rep(NA, length(par$transRho_alk)))
     map$xST_alk = as.factor(rep(NA, length(par$xST_alk)))
+    map$xS_alk = as.factor(rep(NA, length(par$xS_alk)))
   }
 
   if(length(conf$skipYears)>0) {

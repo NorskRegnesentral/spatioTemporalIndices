@@ -106,6 +106,7 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(logSigma_alk);par.logSigma_alk = logSigma_alk;
   PARAMETER_VECTOR(logKappa_alk);par.logKappa_alk = logKappa_alk;
   PARAMETER_VECTOR(transRho_alk);par.transRho_alk = transRho_alk;
+  PARAMETER_ARRAY(xS_alk); par.xS_alk = xS_alk;// Ordering: xST.col(age).col(year).col(spatial)
   PARAMETER_ARRAY(xST_alk); par.xST_alk = xST_alk;// Ordering: xST.col(age).col(year).col(spatial)
   //----------------------------
 
@@ -121,6 +122,13 @@ Type objective_function<Type>::operator() ()
 
   //Predict and report indices
   indexPred(dat,par, this);
+
+  array<Type> ALK_hauls;
+  if(dat.applyALK==1){
+    ALK_hauls = ALKhauls(dat,par,A_ListST); //ALKs at for integration points
+    REPORT(ALK_hauls);
+  }
+
 
   return nll;
 }

@@ -53,6 +53,7 @@ includeDummyPar <- function(par){
   par$logSigma_alk = c(1,2,3)
   par$logKappa_alk = c(1,2,3)
   par$transRho_alk = c(1,2,3)
+  par$xS_alk = array(0.0, dim = c(2,2))
   par$xST_alk = array(0.0, dim = c(2,2))
 
   return(par)

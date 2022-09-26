@@ -86,15 +86,15 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
   if(conf_l$applyALK ==1){
     if(conf_l$rwBeta0==1){
       if(data$rwBeta0_alk==1){
-        obj <- MakeADFun(data, par, random=c("xST_alk","xS","xST","betaDepth", "nugget","beta0","beta0_alk"),profile = c("betaSun","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
-      }else{
-        obj <- MakeADFun(data, par, random=c("xST_alk","xS","xST","betaDepth", "nugget","beta0"),profile = c("betaSun","betaLength_alk","beta0_alk"), DLL="spatioTemporalIndices",map = map)
+        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget","beta0","beta0_alk"),profile = c("betaSun","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
+        }else{
+        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget","beta0"),profile = c("betaSun","betaLength_alk","beta0_alk"), DLL="spatioTemporalIndices",map = map)
       }
     }else{
       if(data$rwBeta0_alk==1){
-        obj <- MakeADFun(data, par, random=c("xST_alk","xS","xST","betaDepth", "nugget","beta0_alk"),profile = c("beta0","betaSun","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
+        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget","beta0_alk"),profile = c("beta0","betaSun","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
       }else{
-        obj <- MakeADFun(data, par, random=c("xST_alk","xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun","beta0_alk","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
+        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun","beta0_alk","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
       }
     }
   }else{
@@ -109,12 +109,10 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
     }
   }
 
-
   lower<-rep(-Inf,length(obj$par))
   upper<-rep(Inf,length(obj$par))
   for(nn in names(low)) lower[names(obj$par)==nn]=low[[nn]]
   for(nn in names(up)) upper[names(obj$par)==nn]=up[[nn]]
-
 
   opt <- nlminb(obj$par, obj$fn, obj$gr,
                 control = list(trace = 1,iter.max = 1000, eval.max = 1000),
@@ -125,10 +123,6 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
 
   rl = as.list(rep,"Est", report = TRUE)
   rlSd = as.list(rep,"Std", report = TRUE)
-
-
-
-
 
 
   toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,

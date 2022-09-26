@@ -79,6 +79,9 @@ struct dataSet{
   int applyALK;
   vector<int> idxStrata;
   vector<Type> areas;
+  int spatioTemporalALK;
+  int spatialALK;
+
 
   int rwBeta0_alk;
 
@@ -94,6 +97,7 @@ struct paraSet{
   vector<Type> logKappa_alk;
   vector<Type> transRho_alk;
   array<Type> xST_alk;
+  array<Type> xS_alk;
 
   matrix<Type> beta0;
   vector<Type> log_sigma_beta0;
