@@ -265,7 +265,7 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
                       lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
                       resolution = 3)
     bf = fortify.bathy(b)
-
+    
     loc = data.frame(bf$x,bf$y)
     names(loc) = c("X","Y")
     attr(loc, "projection") = "LL"
