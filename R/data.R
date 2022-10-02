@@ -15,11 +15,11 @@ setupData = function(dataLength,conf,confPred){
 
   #Remove too short lengths
   dataLength = subset(dataLength,lengthGroup>=conf$minLength)
-
+  
   #Include plus group
   dataLength = dataLength %>% mutate(lengthGroup=ifelse(lengthGroup>conf$maxLength,conf$maxLength,lengthGroup)) %>%
     group_by(across(-catch)) %>% dplyr::summarise(catch=sum(catch)) %>% ungroup()
-
+  
   #Convert to UTM coordinates
   loc = data.frame(dataLength$longitude,dataLength$latitude)
   names(loc) = c("X","Y")
@@ -27,15 +27,15 @@ setupData = function(dataLength,conf,confPred){
   attr(loc, "zone") = conf$zone
   ddpcr::quiet(locUTM <- PBSmapping::convUL(loc))
   colnames(locUTM) = c("UTMX", "UTMY")
-
+  
   dataLength$UTMX = locUTM$UTMX
   dataLength$UTMY = locUTM$UTMY
-
+  
   dataLength$year = as.integer(format(dataLength$startdatetime, format = "%Y"))
-
+  
   #Remove observations in years not used
   dataLength = dataLength[dataLength$year %in% conf$years, ]
-
+  
   #Set up structure used for the SPDE-procedure
   meshS=createMesh(conf)$mesh
   spdeS = inla.spde2.matern(meshS, alpha=2)
@@ -43,9 +43,9 @@ setupData = function(dataLength,conf,confPred){
   A_ListS=list(rep(1,length(conf$years)))
   plot(meshS)
   meshST=meshS; spdeST= spdeS; spdeMatricesST = spdeMatricesS;  A_ListST = A_ListS; #Apply same setup for spatial and spatio-temporal part
-
+  
   singleHauls = which(dataLength$lengthGroup==conf$maxLength)
-
+  
   dist = dataLength$distance[singleHauls]
   yearObs = dataLength$year[singleHauls]
   station = dataLength$station[singleHauls]
