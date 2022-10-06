@@ -14,12 +14,21 @@
 setupData = function(dataLength,conf,confPred){
 
   #Remove too short lengths
-  dataLength = subset(dataLength,lengthGroup>=conf$minLength)
-  
-  #Include plus group
-  dataLength = dataLength %>% mutate(lengthGroup=ifelse(lengthGroup>conf$maxLength,conf$maxLength,lengthGroup)) %>%
-    group_by(across(-catch)) %>% dplyr::summarise(catch=sum(catch)) %>% ungroup()
-  
+  #  dataLength = subset(dataLength,lengthGroup>=conf$minLength)
+  dataLength = dataLength[dataLength$lengthGroup>=conf$minLength,]
+
+  #Include plus group. Comment by Olav: By some reason this creates dublicates of rows with max length.
+  #  dataLength = dataLength %>% mutate(lengthGroup=ifelse(lengthGroup>conf$maxLength,conf$maxLength,lengthGroup)) %>%
+  #    group_by(across(-catch)) %>% dplyr::summarise(catch=sum(catch)) %>% ungroup()
+
+  for(id in unique(dataLength$station)){
+    index =which(dataLength$station==id & dataLength$lengthGroup>=conf$maxLength)
+    dataLength$catch[index[1]] = sum(dataLength$catch[index])
+  }
+  if(length(which(dataLength$lengthGroup> conf$maxLength)>0)){
+    dataLength = dataLength[-which(dataLength$lengthGroup> conf$maxLength),]
+  }
+
   #Convert to UTM coordinates
   loc = data.frame(dataLength$longitude,dataLength$latitude)
   names(loc) = c("X","Y")
@@ -27,15 +36,15 @@ setupData = function(dataLength,conf,confPred){
   attr(loc, "zone") = conf$zone
   ddpcr::quiet(locUTM <- PBSmapping::convUL(loc))
   colnames(locUTM) = c("UTMX", "UTMY")
-  
+
   dataLength$UTMX = locUTM$UTMX
   dataLength$UTMY = locUTM$UTMY
-  
+
   dataLength$year = as.integer(format(dataLength$startdatetime, format = "%Y"))
-  
+
   #Remove observations in years not used
   dataLength = dataLength[dataLength$year %in% conf$years, ]
-  
+
   #Set up structure used for the SPDE-procedure
   meshS=createMesh(conf)$mesh
   spdeS = inla.spde2.matern(meshS, alpha=2)
@@ -43,9 +52,9 @@ setupData = function(dataLength,conf,confPred){
   A_ListS=list(rep(1,length(conf$years)))
   plot(meshS)
   meshST=meshS; spdeST= spdeS; spdeMatricesST = spdeMatricesS;  A_ListST = A_ListS; #Apply same setup for spatial and spatio-temporal part
-  
+
   singleHauls = which(dataLength$lengthGroup==conf$maxLength)
-  
+
   dist = dataLength$distance[singleHauls]
   yearObs = dataLength$year[singleHauls]
   station = dataLength$station[singleHauls]
@@ -265,7 +274,7 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
                       lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
                       resolution = 3)
     bf = fortify.bathy(b)
-    
+
     loc = data.frame(bf$x,bf$y)
     names(loc) = c("X","Y")
     attr(loc, "projection") = "LL"
