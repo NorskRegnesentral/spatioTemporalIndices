@@ -20,6 +20,8 @@ template <class Type>
     vector<Type> sigma = exp(par.log_sigma);
     vector<Type> kappa = exp(par.log_kappa);
     Type size= exp(par.logSize);
+    Type scale; //If apply dgamma
+    Type shape; //If apply dgamma
 
     vector<Type> rho_t(1);
     rho_t(0)=Type(2)/(Type(1) + exp(-Type(2) * par.tan_rho_t(0))) - Type(1);
@@ -71,7 +73,7 @@ template <class Type>
 //          SEPARABLE(AR1(rho_l(1)),SEPARABLE(AR1(rho_t(0)),GMRF(Q_st))).simulate(par.xST);
 //        }
       }
-      Type scaleST = Type(1)/((4*3.14159265)*kappa[1]*kappa[1]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
+      Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
       par.xST = par.xST/sqrt(scaleST);
     }
 
@@ -177,17 +179,22 @@ template <class Type>
             if(dat.zeroInflated ==1){
               muZero = exp(par.delta_z(0) +
                 par.delta_z(1)* par.beta0.row(y)(l) +
-                par.delta_z(2)* (covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter)) +
-                par.delta_z(3)* deltaMatrixS.row(l)(s)*sigma(0)+
-                par.delta_z(4)* deltaMatrixST.row(l)(s)*sigma(1)+
-                par.delta_z(5)* (covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter))+
-                par.delta_z(7)* par.nugget.col(counter)(l)*sigma(2)+
-                par.delta_z(8)* log(dat.dist(counter)));
+                par.delta_z(1)* (covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter)) +
+                par.delta_z(1)* deltaMatrixS.row(l)(s)*sigma(0)+
+                par.delta_z(1)* deltaMatrixST.row(l)(s)*sigma(1)+
+                par.delta_z(1)* (covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter))+
+                par.nugget.col(counter)(l)*sigma(2)+
+                log(dat.dist(counter)));
               pZero = dpois(Type(0), muZero,true);
               if(dat.obsModel==1){
                 pPos = dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true)  + logspace_sub(Type(0),pZero);
               }else if (dat.obsModel==2){
                 pPos = dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true)  + logspace_sub(Type(0),pZero);
+              }else if (dat.obsModel==3){
+                //Gamma distributed response
+                scale = size;
+                shape = mu(counter,l)/scale;
+                pPos = dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true)  + logspace_sub(Type(0),pZero);
               }else{
                 //Not implemented
                 exit(0);
@@ -209,6 +216,11 @@ template <class Type>
  //               SIMULATE{
 //                  dat.fishObsMatrix(counter,l) = rpois(mu(counter,l));
 //                }
+              }else if (dat.obsModel==3){
+                //Gamma distributed response
+                scale = size;
+                shape = mu(counter,l)/scale;
+                nll -= keep(dat.idxStart(counter) +l)*dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true);
               }
             }
           }else{

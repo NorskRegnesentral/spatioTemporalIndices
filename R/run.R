@@ -75,9 +75,8 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
       par$logSigma_alk = pl$logSigma_alk
       par$logKappa_alk = pl$logKappa_alk
       par$transRho_alk = pl$transRho_alk
+      par$beta0_alk = pl$beta0_alk
     }
-
-    print("Use good inital values")
   }
 
   if(!is.null(parPrior)){par = parPrior}

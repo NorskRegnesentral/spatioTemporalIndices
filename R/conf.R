@@ -211,8 +211,6 @@ setMap <- function(par, conf){
 
   if(conf$zeroInflated==0){
     map$delta_z = as.factor(rep(NA,length(par$delta_z)))
-  }else{
-    warning("Map-functionality not yet implemented for selected zero-inflation procedure.")
   }
 
   map$tan_rho_l = as.factor(map$tan_rho_l)

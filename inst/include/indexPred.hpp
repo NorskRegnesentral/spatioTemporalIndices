@@ -15,8 +15,8 @@ template <class Type>
     vector<Type> sigma = exp(par.log_sigma);
     vector<Type> kappa = exp(par.log_kappa);
 
-    Type scaleS = Type(1)/((4*3.14159265)*kappa[0]*kappa[0]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
-    Type scaleST = Type(1)/((4*3.14159265)*kappa[1]*kappa[1]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
+    Type scaleS = Type(1)/((4*3.14159265)*kappa(0)*kappa(0)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
+    Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
 
     array<Type>  lengthIndex(nYears,numberOfLengthGroups);
     array<Type>  lengthIndexDetailed(nYears,numberOfLengthGroups, nInt);
@@ -67,6 +67,22 @@ template <class Type>
         }
       }
     }
+
+    Type  muZero;
+    Type  pZero;
+    if(dat.zeroInflated ==1){
+      for(int y=0; y<nYears; ++y){
+        for(int l =0; l<numberOfLengthGroups; ++l){
+          for(int i =0; i<nInt; ++i){
+            muZero = exp(par.delta_z(0) +
+              par.delta_z(1)*log(lengthIndexDetailed(y,l,i)));
+            pZero = dpois(Type(0), muZero);
+            lengthIndexDetailed(y,l,i) = lengthIndexDetailed(y,l,i)*(1-pZero);
+          }
+        }
+      }
+    }
+
 
     int nAges = 2;//Dummy-number
     if(dat.applyALK==1){

@@ -27,7 +27,7 @@ setPar <- function(data,conf){
                      logSize =0.2,
                      tan_rho_t =0,
                      tan_rho_l =rep(0,3),
-                     delta_z = rep(0,9),
+                     delta_z = c(-3,0),
                      xS = xS,
                      xST  = xST,
                      nugget = nugget,
