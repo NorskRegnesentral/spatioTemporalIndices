@@ -21,7 +21,9 @@ conf_l = defConf(years = 1994:2020, # years to use, use all years with data by d
 
 #Define configurations age part
 conf_alk = defConf_alk(maxAge = 10,
-                       spatioTemporal = 0,
+                       minAge = 3,
+                       readability = 1,
+                       spatioTemporal = 2,
                        rwBeta0 = 1)
 
 
@@ -33,7 +35,6 @@ run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty =
 end_time <- Sys.time()
 timeUsed = end_time - start_time
 timeUsed
-
 
 
 #Plot covariate effects
@@ -78,7 +79,7 @@ for(i in 1:length(conf_l$years)){
   covYears[[i]] = cov[id,id]
   covYears[[i]] = covYears[[i]][minAge:conf_alk$maxAge,minAge:conf_alk$maxAge]
 }
-save(covYears,file = "covYears.Rda") #Can be directly utilized by SAM
+#save(covYears,file = "covYears.Rda") #Can be directly utilized by SAM
 
 #Illustrate yearly correlation
 library(ellipse)
@@ -287,6 +288,8 @@ for(age in 3:10){
     mapTmp[which(is.na(newmap$x)),] = NA
     polygon(mapTmp,col = 'lightgrey')
     points(attributes(run$data)$locObs[which(attributes(run$data)$year == (year +1993)),], cex = 0.1)
+
+    points(1000,8600, cex = rlSd$logAgeIndex[year,age]^2 *5, col = "blue")
 
     if(year==nYears){
       plot(1,1,axes=F,ylim = c(-99,-98))
