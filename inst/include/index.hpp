@@ -183,8 +183,8 @@ template <class Type>
                 par.delta_z(1)* deltaMatrixS.row(l)(s)*sigma(0)+
                 par.delta_z(1)* deltaMatrixST.row(l)(s)*sigma(1)+
                 par.delta_z(1)* (covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter))+
-                par.nugget.col(counter)(l)*sigma(2)+
-                log(dat.dist(counter)));
+                par.delta_z(1)* par.nugget.col(counter)(l)*sigma(2)+
+                par.delta_z(1)* log(dat.dist(counter)));
               pZero = dpois(Type(0), muZero,true);
               if(dat.obsModel==1){
                 pPos = dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true)  + logspace_sub(Type(0),pZero);
