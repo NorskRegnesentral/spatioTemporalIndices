@@ -23,11 +23,11 @@ setPar <- function(data,conf){
                      betaDepth = rep(0,data$Sdim*2),
                      log_lambda =c(2,2),
                      log_sigma =c(2,1,1),
-                     log_kappa =c(-5,-5),
+                     log_kappa =c(-6,-6),
                      logSize =0.2,
                      tan_rho_t =0,
                      tan_rho_l =rep(0,3),
-                     delta_z = c(-3,0),
+                     delta_z = c(-3,0,0),
                      xS = xS,
                      xST  = xST,
                      nugget = nugget,
@@ -36,6 +36,17 @@ setPar <- function(data,conf){
   if(conf$applyALK==0){
     parameters = includeDummyPar(parameters)
   }
+
+  if(conf$obsModel==3){
+    if(conf$zeroInflated==1){
+      parameters$tweedieP = numeric(0)
+    }else{
+      parameters$tweedieP = 0
+    }
+  }else{
+    parameters$tweedieP = numeric(0)
+  }
+
 
   return(parameters)
 }

@@ -54,10 +54,6 @@ partable<-function(run, ...){
   pl = as.list(run$rep,"Est")
   plsd = as.list(run$rep,"Std. Error")
 
-  betaSun=pl$betaSun[1:2]
-  betaSun_L=betaSun - 1.96*plsd$betaSun[1:2]
-  betaSun_U=betaSun + 1.96*plsd$betaSun[1:2]
-
   rho_l =  2/(1 + exp(-2 * pl$tan_rho_l)) - 1
   rho_l_U =  2/(1 + exp(-2 * (pl$tan_rho_l + 1.96*plsd$tan_rho_l))) - 1
   rho_l_L =  2/(1 + exp(-2 * (pl$tan_rho_l - 1.96*plsd$tan_rho_l))) - 1
@@ -69,30 +65,59 @@ partable<-function(run, ...){
   rho_l_U[1:2] = rho_l_U[1:2]^(1/run$conf_l$reduceLength)
   rho_l_L[1:2] = rho_l_L[1:2]^(1/run$conf_l$reduceLength)
 
-  sigma = exp(pl$log_sigma)
-  sigmaU = exp(pl$log_sigma + 1.96*plsd$log_sigma)
-  sigmaL = exp(pl$log_sigma - 1.96*plsd$log_sigma)
+  rho_l = round(rho_l,2)
+  rho_l_U = round(rho_l_U,2)
+  rho_l_L = round(rho_l_L,2)
+  rho_t = round(rho_t,2)
+  rho_t_U = round(rho_t_U,2)
+  rho_t_L = round(rho_t_L,2)
 
-  kappa = exp(pl$log_kappa)
-  kappaU = exp(pl$log_kappa +  1.96*plsd$log_kappa)
-  kappaL = exp(pl$log_kappa -  1.96*plsd$log_kappa)
 
-  nu = exp(pl$logSize)
-  nuU = exp(pl$logSize+  1.96*plsd$logSize)
-  nuL = exp(pl$logSize -  1.96*plsd$logSize)
+  sigma = round(exp(pl$log_sigma),2)
+  sigmaU = round(exp(pl$log_sigma + 1.96*plsd$log_sigma),2)
+  sigmaL = round(exp(pl$log_sigma - 1.96*plsd$log_sigma),2)
 
-  lambda = 1/exp(pl$log_lambda)[1]
-  lambdaU = 1/exp(pl$log_lambda +  1.96*plsd$log_lambda)[1]
-  lambdaL = 1/exp(pl$log_lambda -  1.96*plsd$log_lambda)[1]
+  kappa = round(exp(pl$log_kappa),4)
+  kappaU = round(exp(pl$log_kappa +  1.96*plsd$log_kappa),4)
+  kappaL = round(exp(pl$log_kappa -  1.96*plsd$log_kappa),4)
 
   sigmaRW = c(exp(pl$log_sigma_beta0), exp(pl$log_sigma_beta0 + 1.96*plsd$log_sigma_beta0*c(-1,1)))
-
   sigmaRW_alk = c(exp(pl$log_sigma_beta0_alk), exp(pl$log_sigma_beta0_alk + 1.96*plsd$log_sigma_beta0_alk*c(-1,1)))
-  sigma_alk = c(exp(pl$logSigma_alk), exp(pl$logSigma_alk + 1.96*plsd$logSigma_alk*c(-1,1)))
-  kappa_alk = c(exp(pl$logKappa_alk), exp(pl$logKappa_alk + 1.96*plsd$logKappa_alk*c(-1,1)))
+
+  sigma_alkS = c(exp(pl$logSigma_alk)[1],exp(pl$logSigma_alk[1] + 1.96*plsd$logSigma_alk[1]*c(-1,1)))
+  sigma_alkST = c(exp(pl$logSigma_alk)[2],exp(pl$logSigma_alk[2] + 1.96*plsd$logSigma_alk[2]*c(-1,1)))
+
+  kappa_alkS = c(exp(pl$logKappa_alk)[1],exp(pl$logKappa_alk[1] + 1.96*plsd$logKappa_alk[1]*c(-1,1)))
+  kappa_alkST = c(exp(pl$logKappa_alk)[2],exp(pl$logKappa_alk[2] + 1.96*plsd$logKappa_alk[2]*c(-1,1)))
 
 
-  par = matrix(0,16,3)
+  sigmaRW = round(sigmaRW,2);
+  sigmaRW_alk = round(sigmaRW_alk,2);
+  sigma_alkS = round(sigma_alkS,2);
+  sigma_alkST = round(sigma_alkST,2);
+  kappa_alkS = round(kappa_alkS,4);
+  kappa_alkST = round(kappa_alkST,4);
+
+
+  if(run$conf_l$spatial==0){
+    sigma[1] = "-";sigmaL[1] = "-";sigmaU[1] = "-"
+    kappa[1] = "-";kappaL[1] = "-";kappaU[1] = "-"
+  }
+  if(run$conf_l$spatioTemporal==0){
+    sigma[2] = "-";sigmaL[2] = "-";sigmaU[2] = "-"
+    kappa[2] = "-";kappaL[2] = "-";kappaU[2] = "-"
+  }
+  if(run$conf_alk$spatial==0){
+    sigma_alkS = rep("-",3);
+    kappa_alkS = rep("-",3);
+  }
+  if(run$conf_alk$spatioTemporal==0){
+    sigma_alkST = rep("-",3);
+    kappa_alkST = rep("-",3);
+  }
+
+
+  par = matrix(0,15,3)
   par[1,1] = rho_l[1]; par[1,2:3] = c(rho_l_L[1],rho_l_U[1])
   par[2,1] = rho_l[2]; par[2,2:3] = c(rho_l_L[2],rho_l_U[2])
   par[3,1] = rho_l[3]; par[3,2:3] = c(rho_l_L[3],rho_l_U[3])
@@ -101,21 +126,18 @@ partable<-function(run, ...){
   par[5,1] = sigma[1]; par[5,2:3] = c(sigmaL[1],sigmaU[1])
   par[6,1] = sigma[2]; par[6,2:3] = c(sigmaL[2],sigmaU[2])
   par[7,1] = sigma[3]; par[7,2:3] = c(sigmaL[3],sigmaU[3])
-
   par[8,1] = kappa[1]; par[8,2:3] = c(kappaL[1],kappaU[1])
   par[9,1] = kappa[2]; par[9,2:3] = c(kappaL[2],kappaU[2])
-  par[10,1] = lambda; par[10,2:3] = c(lambdaL,lambdaU)
 
-  par[11,1] = betaSun[1]; par[11,2:3] = c(betaSun_L[1],betaSun_U[1])
-  par[12,1] = betaSun[2]; par[12,2:3] = c(betaSun_L[2],betaSun_U[2])
+  par[10,] = sigmaRW
+  par[11,] = sigmaRW_alk
+  par[12,] = sigma_alkS
+  par[13,] = sigma_alkST
+  par[14,] = kappa_alkS
+  par[15,] = kappa_alkST
 
-  par[13,] = sigmaRW;
-  par[14,] = sigmaRW_alk;
-  par[15,] = sigma_alk;
-  par[16,] = kappa_alk;
-
-  rownames(par) = c("rho_l_S","rho_l_ST","rho_l_nugg","rho_t","sigmaS", "sigmaST","sigmaNugget", "kappaS", "kappaST","lambda", "betaSun1", "betaSun2", "sigma_beta0_RW",
-                    "sigmaRW_alk","sigmaST_alk", "kappaST_alk")
+  rownames(par) = c("rho_l_S","rho_l_ST","rho_l_nugg","rho_t","sigmaS", "sigmaST","sigmaNugget", "kappaS", "kappaST", "sigma_beta0_RW",
+                    "sigmaRW_alk","sigmaS_alk","sigmaST_alk", "kappaS_alk", "kappaST_alk")
   colnames(par) = c("MLE", "0.025Percentile", "0.975Percentile")
 
   return(par)

@@ -12,7 +12,8 @@ fitModel(
   conf_alk = NULL,
   parPrior = NULL,
   low = list(),
-  up = list()
+  up = list(),
+  ...
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ fitModel(
 \item{low}{Lower bounds in the optimization, typically not used.}
 
 \item{up}{Upper bounds in the optimization, typically not used.}
+
+\item{...}{Parameters sendt to sdreport.}
 
 \item{conf}{Configurations for length part of model}
 }

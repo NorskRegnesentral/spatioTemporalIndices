@@ -25,7 +25,6 @@ defConf(
   obsModel = 2,
   rwBeta0 = 1,
   applyALK = 0,
-  doDetailtedADREPORT = 0,
   mapRhoL = c(0, 1, 2),
   simulateProcedure = 1,
   stratasystem = list(),

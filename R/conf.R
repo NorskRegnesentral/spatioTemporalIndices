@@ -132,7 +132,6 @@ setMap <- function(par, conf){
   if(conf$nugget[1] ==0){
     map$log_sigma = as.factor(c(0,1,NA))
     map$nugget = as.factor(rep(NA,length(par$nugget)))
-    map$nuggetIndex = as.factor(rep(NA,length(par$nuggetIndex)))
     map$tan_rho_l[3] = NA
   }else{
     map$log_sigma = as.factor(c(0,1,2))
@@ -211,6 +210,12 @@ setMap <- function(par, conf){
 
   if(conf$zeroInflated==0){
     map$delta_z = as.factor(rep(NA,length(par$delta_z)))
+  }else if(conf$zeroInflated==1){
+    map$delta_z = as.factor(c(0,1,NA))
+  }else if(conf$zeroInflated==2){
+    map$delta_z = as.factor(c(0,NA,NA))
+  }else{
+    stop("No such zero inflation included")
   }
 
   map$tan_rho_l = as.factor(map$tan_rho_l)
