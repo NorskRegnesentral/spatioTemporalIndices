@@ -98,6 +98,7 @@ Type objective_function<Type>::operator() ()
   PARAMETER_ARRAY(xST); par.xST = xST;
   PARAMETER_ARRAY(nugget); par.nugget = nugget;
   PARAMETER_VECTOR(log_sigma_beta0); par.log_sigma_beta0 = log_sigma_beta0;
+  PARAMETER_VECTOR(tweedieP); par.tweedieP = tweedieP;
 
   //ALK stuff-------------------
   PARAMETER_MATRIX(beta0_alk); par.beta0_alk = beta0_alk;//Intercepts

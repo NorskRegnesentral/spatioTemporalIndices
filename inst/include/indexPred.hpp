@@ -70,7 +70,7 @@ template <class Type>
 
     Type  muZero;
     Type  pZero;
-    if(dat.zeroInflated ==1){
+    if(dat.zeroInflated !=0){
       for(int y=0; y<nYears; ++y){
         for(int l =0; l<numberOfLengthGroups; ++l){
           for(int i =0; i<nInt; ++i){

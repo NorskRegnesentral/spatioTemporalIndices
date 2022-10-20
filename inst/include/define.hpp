@@ -96,6 +96,7 @@ struct paraSet{
   vector<Type> logSigma_alk;
   vector<Type> logKappa_alk;
   vector<Type> transRho_alk;
+  vector<Type> tweedieP;
   array<Type> xST_alk;
   array<Type> xS_alk;
 

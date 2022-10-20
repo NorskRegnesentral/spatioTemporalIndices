@@ -22,6 +22,7 @@ template <class Type>
     Type size= exp(par.logSize);
     Type scale; //If apply dgamma
     Type shape; //If apply dgamma
+    Type pTweedie;
 
     vector<Type> rho_t(1);
     rho_t(0)=Type(2)/(Type(1) + exp(-Type(2) * par.tan_rho_t(0))) - Type(1);
@@ -176,7 +177,7 @@ template <class Type>
             par.nugget.col(counter)(l)*sigma(2));
           log_var_minus_mu=log(mu(counter,l)*mu(counter,l)*size);
           if(dat.predMatrix(counter,l)==0){
-            if(dat.zeroInflated ==1){
+            if(dat.zeroInflated !=0){
               muZero = exp(par.delta_z(0) +
                 par.delta_z(1)* par.beta0.row(y)(l) +
                 par.delta_z(1)* (covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter)) +
@@ -184,7 +185,7 @@ template <class Type>
                 par.delta_z(1)* deltaMatrixST.row(l)(s)*sigma(1)+
                 par.delta_z(1)* (covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter))+
                 par.delta_z(1)* par.nugget.col(counter)(l)*sigma(2)+
-                par.delta_z(1)* log(dat.dist(counter)));
+                par.delta_z(2)* log(dat.dist(counter)));
               pZero = dpois(Type(0), muZero,true);
               if(dat.obsModel==1){
                 pPos = dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true)  + logspace_sub(Type(0),pZero);
@@ -192,16 +193,25 @@ template <class Type>
                 pPos = dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true)  + logspace_sub(Type(0),pZero);
               }else if (dat.obsModel==3){
                 //Gamma distributed response
-                scale = size;
-                shape = mu(counter,l)/scale;
-                pPos = dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true)  + logspace_sub(Type(0),pZero);
+
+                if(dat.obsVector(dat.idxStart(counter) +l) >0){
+                  scale = size;
+                  shape = mu(counter,l)/scale;
+                  pPos = dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true)  + logspace_sub(Type(0),pZero);
+                }else{
+                  //Not needed, gamma cant be exactly zero
+                }
               }else{
                 //Not implemented
                 exit(0);
               }
 
               if(dat.fishObsMatrix(counter,l)==0){
-                nll -=keep(dat.idxStart(counter) +l)*logspace_add(pZero,pPos);
+                if(dat.obsModel==3){
+                  nll -=keep(dat.idxStart(counter) +l)*pZero;
+                }else{
+                  nll -=keep(dat.idxStart(counter) +l)*logspace_add(pZero,pPos);
+                  }
               }else{
                 nll -=keep(dat.idxStart(counter) +l)*pPos;
               }
@@ -220,7 +230,10 @@ template <class Type>
                 //Gamma distributed response
                 scale = size;
                 shape = mu(counter,l)/scale;
-                nll -= keep(dat.idxStart(counter) +l)*dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true);
+                pTweedie =  Type(1)/(Type(1) + exp(-Type(2) * par.tweedieP(0))) + Type(1);
+
+ //               nll -= keep(dat.idxStart(counter) +l)*dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true); //Need zero-probability
+                nll -= keep(dat.idxStart(counter) +l)*dtweedie(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),size,pTweedie,true);
               }
             }
           }else{
