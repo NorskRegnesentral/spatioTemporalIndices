@@ -87,6 +87,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
     }
   }
 
+
   lower<-rep(-Inf,length(obj$par))
   upper<-rep(Inf,length(obj$par))
   for(nn in names(low)) lower[names(obj$par)==nn]=low[[nn]]
@@ -102,6 +103,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
   rl = as.list(rep,"Est", report = TRUE)
   rlSd = as.list(rep,"Std", report = TRUE)
 
+  FreeADFun(obj)#Free memory from C-side
 
   toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,
                   pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
