@@ -10,7 +10,17 @@ logLik.stim<-function(object, ...){
   if(object$conf_l$sunAlt[2]==0)sunCov = object$conf_l$sunAlt[1]*2
   if(object$conf_l$sunAlt[2]==1)sunCov = object$conf_l$sunAlt[1]*4
 
-  attr(ret,"df")<-length(object$opt$par) + length(object$conf_l$lengthGroups)*length(object$conf_l$years) + sunCov #NB, beta_0 included in the inner optimization in TMB
+  beta0 = 0
+  if(object$conf_l$rwBeta0==0){
+    beta0 = beta0+ length(object$conf_l$lengthGroups)*length(object$conf_l$years)
+  }
+
+  if(object$conf_l$applyALK!=0){
+    if(object$conf_alk$rwBeta0==0){
+      beta0 = beta0+ length(object$conf_alk$minAge:object$conf_alk$maxAge )*length(object$conf_l$years)
+    }
+  }
+  attr(ret,"df")<-length(object$opt$par) + beta0 + sunCov #NB, beta_0 included in the inner optimization in TMB
   class(ret)<-"logLik"
   ret
 }
