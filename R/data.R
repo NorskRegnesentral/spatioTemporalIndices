@@ -268,36 +268,77 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
   data$yInt = points$locUTM[,2]
 
   #Find depth covariate
-  # with depth data from NOAA database
-  if(confPred$Depth == "NOAA") {
-    b = getNOAA.bathy(lon1 = floor(min(attributes(data)$locObsLatLon[,1])), lon2 = ceiling(max(attributes(data)$locObsLatLon[,1])),
-                      lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
-                      resolution = 3)
-    bf = fortify.bathy(b)
-
-    loc = data.frame(bf$x,bf$y)
-    names(loc) = c("X","Y")
-    attr(loc, "projection") = "LL"
-    attr(loc, "zone") = conf$zone
-    ddpcr::quiet(locUTM <- PBSmapping::convUL(loc))
-    colnames(locUTM) = c("UTMX", "UTMY")
-
-    obs = SpatialPoints(locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-
-    intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-
-    dist = gDistance(obs,intPoints, byid=T)
-    minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[2])
-
-    depthNOAA = -bf$z
-
-    depthNOAA[depthNOAA<conf$minDepth]=conf$minDepth
-    depthNOAA[depthNOAA>conf$maxDepth]=conf$maxDepth
-
-    X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
-
-    data$X_depth_int = X_depth
-  } else {
+  if(!is.null(confPred$Depth)) {
+    if(grepl(".nc",confPred$Depth)) {
+      tryCatch({
+        b <- marmap::readGEBCO.bathy(confPred$Depth,res=25)
+        bf <- marmap::fortify.bathy(bathy) 
+        bf$z <- -1*bf$z
+        bf <- subset(bf,z < conf$maxDepth & z > conf$minDepth) 
+        
+        loc = data.frame(bf$x,bf$y)
+        names(loc) = c("X","Y")
+        attr(loc, "projection") = "LL"
+        attr(loc, "zone") = conf$zone
+        ddpcr::quiet(locUTM <- PBSmapping::convUL(loc))
+        colnames(locUTM) = c("UTMX", "UTMY")
+        
+        obs = SpatialPoints(locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
+        
+        intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
+        
+        dist = gDistance(obs,intPoints, byid=T)
+        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[2])
+        
+        depthGEBCO = -bf$z
+        
+        depthGEBCO[depthGEBCO<conf$minDepth]=conf$minDepth
+        depthGEBCO[depthGEBCO>conf$maxDepth]=conf$maxDepth
+        
+        X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
+        data$X_depth_int = X_depth },
+      error = function(e) {
+        confPred$Depth=NULL  
+        print("No depth data loaded, using depth information from survey stations.") })
+    }
+    # with depth data from NOAA database
+    else if(confPred$Depth == "NOAA") {
+      tryCatch({
+        b = getNOAA.bathy(lon1 = floor(min(attributes(data)$locObsLatLon[,1])), lon2 = ceiling(max(attributes(data)$locObsLatLon[,1])),
+                          lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
+                          resolution = 3)
+        bf = fortify.bathy(b)
+        
+        loc = data.frame(bf$x,bf$y)
+        names(loc) = c("X","Y")
+        attr(loc, "projection") = "LL"
+        attr(loc, "zone") = conf$zone
+        ddpcr::quiet(locUTM <- PBSmapping::convUL(loc))
+        colnames(locUTM) = c("UTMX", "UTMY")
+    
+        obs = SpatialPoints(locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
+    
+        intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
+    
+        dist = gDistance(obs,intPoints, byid=T)
+        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[2])
+    
+        depthNOAA = -bf$z
+    
+        depthNOAA[depthNOAA<conf$minDepth]=conf$minDepth
+        depthNOAA[depthNOAA>conf$maxDepth]=conf$maxDepth
+    
+        X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
+    
+        data$X_depth_int = X_depth },
+        error = function(e) {
+          confPred$Depth=NULL  
+          print("Not able to access NOAA database, using depth information from survey stations.") })
+    } else {
+      confPred$Depth=NULL
+    }
+  }
+  if(is.null(confPred$Depth)) {
     obs = SpatialPoints(attributes(data)$locObs,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
     intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
     dist = gDistance(obs,intPoints, byid=T)
