@@ -23,11 +23,11 @@ conf_l = defConf(years = 1994:2020, # years to use, use all years with data by d
 conf_alk = defConf_alk(maxAge = 10,
                        minAge = 3,
                        readability = 1,
-                       spatioTemporal = 2,
+                       spatioTemporal = 0,
                        rwBeta0 = 1)
 
 
-confPred = defConfPred(conf=conf_l,Depth="Data",nInt=2000)
+confPred = defConfPred(conf=conf_l,Depth="Data",nInt=3000)
 
 # run model
 start_time <- Sys.time()
@@ -39,7 +39,10 @@ timeUsed
 
 #Plot covariate effects
 plotResults(what = "sunAlt",run = run)
-plotResults(run,what = "depth")
+plotResults(what = "depth",run = run)
+
+#Save indices allong with variance and covariance structures
+saveIndex(run, file = "index.txt", folder = "")
 
 #Print parameters
 spatioTemporalIndices::partable(run)
@@ -59,28 +62,17 @@ rlSd = as.list(run$rep, "Std", report = TRUE)
 #Extract indices
 minAge = 3
 nYears = length(conf_l$years)
-ageLogIndex = rl$logAgeIndex[,minAge:conf_alk$maxAge]
-ageLogIndexSd = rlSd$logAgeIndex[,minAge:conf_alk$maxAge]
+ageLogIndex = rl$logAgeIndex[,-1]
+ageLogIndexSd = rlSd$logAgeIndex[,-1]
 
 ageIndexUse = round(as.data.frame(cbind(rep(1,dim(exp(ageLogIndex))[1]),exp(ageLogIndex))),3)
 ageLogIndexSdUse = round(as.data.frame(ageLogIndexSd),3)
-write.table(ageIndexUse, file = "index.txt", row.names = FALSE)
-write.table(ageLogIndexSdUse, file = "indexSd.txt", row.names = FALSE)
 
 
 #Extract yearly covariance matrices
 minAge = 3
-id = which(names(run$rep$value)=="logAgeIndex")
-cov = run$rep$cov[id,id]
 
-covYears = list()
-for(i in 1:length(conf_l$years)){
-  id = i + (0:(conf_alk$maxAge-1))*length(conf_l$years)
-  covYears[[i]] = cov[id,id]
-  covYears[[i]] = covYears[[i]][minAge:conf_alk$maxAge,minAge:conf_alk$maxAge]
-}
-#save(covYears,file = "covYears.Rda") #Can be directly utilized by SAM
-
+load("cov_index.Rda")
 #Illustrate yearly correlation
 library(ellipse)
 ccolors <- c("#A50F15","#DE2D26","#FB6A4A","#FCAE91","#FEE5D9","white",
@@ -168,7 +160,7 @@ mtext(paste0("Predicted log CPUE of length ", length, " cm "  ), outer=TRUE,  ce
 alk = run$obj$report()$ALK_int
 length = 45
 l = which(conf_l$lengthGroups== length)
-age = 4
+age = 5
 
 zlim = c(0,1)
 mfrow = c(6,5)
@@ -190,8 +182,8 @@ for(year in 1:nYears){
     yC = 1
     for(yy in y){
       if(length(which(run$data$xInt ==xx & run$data$yInt ==yy))>0){
-        #       z[xC,yC] = sum(alk[l,1:age,which(run$data$xInt ==xx & run$data$yInt ==yy),year])
-        z[xC,yC] = alk[l,age,which(run$data$xInt ==xx & run$data$yInt ==yy),year]
+        #       z[xC,yC] = sum(alk[l,1:(age-1),which(run$data$xInt ==xx & run$data$yInt ==yy),year])
+        z[xC,yC] = alk[l,age-1,which(run$data$xInt ==xx & run$data$yInt ==yy),year]
       }
       yC = yC+1
     }
@@ -264,7 +256,7 @@ for(age in 3:10){
       yC = 1
       for(yy in y){
         if(length(which(run$data$xInt ==xx & run$data$yInt ==yy))>0){
-          z[xC,yC] = log(aa[year,age,which(run$data$xInt ==xx & run$data$yInt ==yy)])
+          z[xC,yC] = log(aa[year,age-1,which(run$data$xInt ==xx & run$data$yInt ==yy)])
         }
         yC = yC+1
       }
@@ -289,7 +281,7 @@ for(age in 3:10){
     polygon(mapTmp,col = 'lightgrey')
     points(attributes(run$data)$locObs[which(attributes(run$data)$year == (year +1993)),], cex = 0.1)
 
-    points(1000,8600, cex = rlSd$logAgeIndex[year,age]^2 *5, col = "blue")
+    points(1000,8600, cex = rlSd$logAgeIndex[year,age-1]^2 *5, col = "blue")
 
     if(year==nYears){
       plot(1,1,axes=F,ylim = c(-99,-98))
@@ -308,36 +300,4 @@ for(age in 3:10){
   mtext(text="Northern direction (km)",cex=2,side=2,line=2.4,outer=TRUE)
   mtext(paste0("Predicted log CPUE of age ", age  ), outer=TRUE,  cex=2, line=0.5)
 }
-
-
-
-
-
-reduce = 1.5
-#Cohort plot
-plot(rep(1, dim(ageLogIndex)[2]),minAge:run$data$ageRange[2],cex = (ageLogIndex[1,]-reduce*min(ageLogIndex, na.rm = TRUE))/reduce, xlim =c(1,dim(ageLogIndex)[1]))
-for(i in 2:nYears){
-  points(rep(i, dim(ageLogIndex)[2]),minAge:run$data$ageRange[2],cex = (ageLogIndex[i,]-reduce*min(ageLogIndex, na.rm = TRUE))/reduce)
-}
-
-#Cohort plot
-x11()
-par(mfrow = c(3,3))
-for(a in 1:(conf_alk$maxAge- minAge)){
-  aa = a + minAge-1
-  xlim = c(min(ageLogIndex[,a:(a+1)], na.rm = TRUE),max(ageLogIndex[,a:(a+1)], na.rm = TRUE))
-  plot(ageLogIndex[1,a], ageLogIndex[2,a+1], ylim =xlim, xlim = xlim,
-       xlab = paste0("Age ", aa, " year y"),
-       ylab = paste0("Age ", aa+1, " year y+1"))
-  for(i in 2:(dim(ageLogIndex)[1]-1)){
-    points(ageLogIndex[i,a], ageLogIndex[i+1,a+1])
-  }
-  ll = lm(y~1 + x, data = data.frame(x = ageLogIndex[1:(nYears-1),a], y =ageLogIndex[2:(nYears),a+1] ))
-  abline(a = ll$coefficients[1],b = ll$coefficients[2])
-  abline(0,1, col = 'green')
-}
-
-
-
-
 

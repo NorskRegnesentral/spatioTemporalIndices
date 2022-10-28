@@ -112,10 +112,13 @@ partable<-function(run, ...){
   if(run$conf_l$spatial==0){
     sigma[1] = "-";sigmaL[1] = "-";sigmaU[1] = "-"
     kappa[1] = "-";kappaL[1] = "-";kappaU[1] = "-"
+    rho_l[1] = "-";rho_l_L[1] = "-";rho_l_U[1] = "-"
   }
   if(run$conf_l$spatioTemporal==0){
     sigma[2] = "-";sigmaL[2] = "-";sigmaU[2] = "-"
     kappa[2] = "-";kappaL[2] = "-";kappaU[2] = "-"
+    rho_l[2] = "-";rho_l_L[2] = "-";rho_l_U[2] = "-"
+    rho_t = "-";rho_t_L = "-";rho_t_U = "-"
   }
   if(run$conf_alk$spatial==0){
     sigma_alkS = rep("-",3);
