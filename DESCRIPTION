@@ -9,8 +9,8 @@ Description: Predict indices with a standard spatio-temporal Gaussian model. Ind
 License: What license is it under?
 Encoding: UTF-8
 LazyData: TRUE
-Depends: sp, TMB, INLA, mgcv, fields, dplyr, tidyr, rgeos, rgdal, marmap
+Depends: sp, TMB, INLA, mgcv, fields, rgeos, rgdal, marmap
 LinkingTo: TMB, RcppEigen
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Suggests: 
     testthat
