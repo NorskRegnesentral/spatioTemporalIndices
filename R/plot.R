@@ -265,7 +265,7 @@ plotSunAlt<-function(run){
   lines(sunAltEffectLowerL,main="Lower",col="red",lty = 2)
   lines(sunAltEffectLowerU,main="Lower",col="red",lty = 2)
 
-  if(run$conf_l$sunAlt[2] !=0){
+  if(run$conf_l$sunAlt[2] ==2){
     lines(sunAltEffectUpper,col="blue")
     lines(sunAltEffectUpperL,main="Lower",col="blue",lty = 2)
     lines(sunAltEffectUpperU,main="Lower",col="blue",lty = 2)
@@ -276,7 +276,7 @@ plotSunAlt<-function(run){
   x = c(1,tmp/4,tmp/2,tmp*3/4,tmp)
   text = c("Lowest (morning)", "", "Heighest", "", "Lowest (evening)")
   axis(1, at=x,labels=text)
-  if(run$conf_l$sunAlt[2] !=0){
+  if(run$conf_l$sunAlt[2] ==2){
     legend(legend=c("20 cm","100 cm"),col=c("red","blue"),"topright",lty=1,cex =1.5)
   }
 

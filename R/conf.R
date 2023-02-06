@@ -9,8 +9,8 @@
 ##' @param spatial If 0-no spatial effect, 1-Include spatial effect
 ##' @param spatioTemporal If 0-no spatial-temporal effect, 1-Include spatial-temporal effect, 2-Include spatial-temporal effect with independence between years
 ##' @param nugget If 0-no nugget effect, 1-Include nugget effect
-##' @param splineDepth Vector with depth configurations, first element is the k-variable in spline (6 means 6 basis function). Second element: 0- no depth effect, 1-depth effectk, 2-length dependent depth effect.
-##' @param sunAlt Vector with sun altitude configurations, first element is the numberof basis functions. Second element: 0-sun effect, 1-length dependent sun effect.
+##' @param splineDepth Vector with depth configurations, first element is the k-variable in spline (6 means 6 basis function). Second element: 0: no depth effect, 1: depth effect(length independent), 2:length dependent depth effect.
+##' @param sunAlt Vector with sun altitude configurations, first element is the numberof basis functions. Second element: 0: No sun effect, 1:sun effect (length independent), 2: length dependent sun effect.
 ##' @param maxLength Maximum length, used when defining the pluss group
 ##' @param minLength Minimum length, used when defining the minus group (probably never used)
 ##' @param reduceLength The resolution in length dimension used in latent effect
@@ -27,7 +27,7 @@
 ##' @param plusGroup Include plus goup? 1:yes, 0: No
 ##' @details
 ##' @export
-defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,1),sunAlt=c(1,0),
+defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,1),sunAlt=c(1,1),
                     maxLength = NULL,dLength = 1, minLength = NULL,reduceLength = 3,
                     cutoff = 100, cbound = 200,
                     pcPriorRange = c(100,0.1),pcPriorsd = c(1,0.1), usePcPriors = 0, zeroInflated = 0,
@@ -138,9 +138,9 @@ setMap <- function(par, conf){
   }
 
 
-  if(conf$sunAlt[1]==0){
+  if(conf$sunAlt[2]==0){
     map$betaSun = as.factor(rep(NA,length(par$betaSun))) #Not use time in day
-  }else if(conf$sunAlt[2]==0){
+  }else if(conf$sunAlt[2]==1){
     tmp = 0:(conf$sunAlt[1]*2-1)
     map$betaSun = as.factor(c(tmp,tmp)) #Not use length dependent time in day
   }

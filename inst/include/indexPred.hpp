@@ -191,13 +191,18 @@ template <class Type>
 
     //Report covariates
     vector<Type> fourierReportLow = dat.X_sunAltReport*betaSunLow;
-    //  vector<Type> fourierReportHigh = dat.X_sunAltReport*betaSunHigh;
     ADREPORT_F(fourierReportLow, of);
-    //  ADREPORT_F(fourierReportHigh, of);
+
+    if(dat.sunEffect==2){
+      vector<Type> fourierReportHigh = dat.X_sunAltReport*betaSunHigh;
+      ADREPORT_F(fourierReportHigh, of);
+    }
 
     vector<Type> depthReport1 =dat.X_depthReport*parDepth1;
-    //  vector<Type> depthReport2 =dat.X_depthReport*parDepth2;
     ADREPORT_F(depthReport1, of);
-    //  ADREPORT_F(depthReport2, of);
+    if(dat.splineDepth ==2){ //Two length dependent splines
+      vector<Type> depthReport2 =dat.X_depthReport*parDepth2;
+      ADREPORT_F(depthReport2, of);
+    }
 
   }

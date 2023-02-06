@@ -54,6 +54,7 @@ struct dataSet{
   vector<Type> weigthLength;
   int zeroInflated;
   int nBasisSunAlt;
+  int sunEffect;
   int obsModel;
   vector<Type> obsVector;
   vector<int> idxStart;

@@ -58,6 +58,7 @@ Type objective_function<Type>::operator() ()
   DATA_INTEGER(rwBeta0); dat.rwBeta0 = rwBeta0;
   DATA_IVECTOR(idxStrata); dat.idxStrata = idxStrata;
   DATA_VECTOR(areas); dat.areas = areas;
+  DATA_INTEGER(sunEffect); dat.sunEffect = sunEffect;
 
 
   //ALK stuff----------------
