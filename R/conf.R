@@ -25,6 +25,7 @@
 ##' @param maxDepth Maximum depth considered
 ##' @param trawlWidth Swept width of trawl
 ##' @param plusGroup Include plus goup? 1:yes, 0: No
+##' @param strataReport ADREPORT index in each strata? 1:yes, 0: No. NB!: Currenlty not working in combination with ALK
 ##' @details
 ##' @export
 defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,1),sunAlt=c(1,1),
@@ -35,7 +36,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
                     mapRhoL = c(0,1,2), simulateProcedure = 1,
                     stratasystem = list(),
                     minDepth=50,maxDepth=600,trawlWidth=1,
-                    plusGroup = 1){
+                    plusGroup = 1, strataReport = 0){
   conf= list()
   conf$years = years
   conf$skipYears = skipYears
@@ -91,7 +92,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$trawlWidth = trawlWidth
 
   conf$plusGroup =plusGroup
-  conf$smartStart = NULL #TODO
+  conf$strataReport = strataReport
   return(conf)
 }
 
@@ -158,7 +159,7 @@ setMap <- function(par, conf){
     tmp = 0:(length(par$betaDepth)/2-1)
     map$log_lambda=as.factor(c(0,0))
     map$betaDepth = as.factor(c(tmp,tmp)) #Not use length dependent depth effect
-  }else if(conf$splineDepth[2]==1){
+  }else if(conf$splineDepth[2]==2){
     map$log_lambda=as.factor(c(0,0))#Use same lambda in both depth splines
   }
 

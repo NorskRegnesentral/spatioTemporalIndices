@@ -77,7 +77,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
     }
   }else{
     if(conf_l$rwBeta0==1){
-      if(conf_l$sunAlt[1]==1){
+      if(conf_l$sunAlt[2]>0){
         obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget","beta0"),profile = c("betaSun"), DLL="spatioTemporalIndices",map = map)
       }else{#Profile needs not to be mapped to only constants, TODO: make this part neater
         obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget","beta0"), DLL="spatioTemporalIndices",map = map)

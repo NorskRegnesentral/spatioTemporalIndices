@@ -225,8 +225,8 @@ setupData = function(dataLength,conf,confPred){
   data$pcPriorsSD = conf$pcPriorsd
   data$usePCpriors = conf$usePcPriors
   data$zeroInflated = conf$zeroInflated
-
   data$sunEffect = conf$sunAlt[2]
+  data$strataReport = conf$strataReport
 
   attributes(data)$year = yearObs
   attributes(data)$meshS = meshS

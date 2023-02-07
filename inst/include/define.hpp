@@ -82,6 +82,7 @@ struct dataSet{
   vector<Type> areas;
   int spatioTemporalALK;
   int spatialALK;
+  int strataReport;
 
 
   int rwBeta0_alk;

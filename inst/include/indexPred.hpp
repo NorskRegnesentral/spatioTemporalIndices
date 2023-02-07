@@ -147,6 +147,10 @@ template <class Type>
     REPORT_F(lengthIndex, of);
     REPORT_F(lengthIndexStrata, of);
 
+    if(dat.strataReport==1){
+      ADREPORT_F(logLengthIndexStrata, of);
+    }
+
     if(dat.applyALK==0){//Do not adreport length if calculating index per length to reduce computation time.
       ADREPORT_F(logLengthIndex, of);
     }
