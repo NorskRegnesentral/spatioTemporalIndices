@@ -144,8 +144,8 @@ template <class Type>
     logLengthIndex= log(lengthIndex);
     logLengthIndexStrata = log(lengthIndexStrata);
 
-    REPORT_F(lengthIndex, of);
-    REPORT_F(lengthIndexStrata, of);
+    REPORT_F(logLengthIndex, of);
+    REPORT_F(logLengthIndexStrata, of);
 
     if(dat.strataReport==1){
       ADREPORT_F(logLengthIndexStrata, of);
