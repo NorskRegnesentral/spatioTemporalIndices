@@ -285,7 +285,7 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
         intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
 
         dist = gDistance(obs,intPoints, byid=T)
-        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[2])
+        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[1])
 
         depthGEBCO = -bf$z
 
@@ -318,7 +318,7 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
         intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
 
         dist = gDistance(obs,intPoints, byid=T)
-        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[2])
+        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[1])
 
         depthNOAA = -bf$z
 
@@ -339,9 +339,9 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
     obs = SpatialPoints(attributes(data)$locObs,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
     intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
     dist = gDistance(obs,intPoints, byid=T)
-    minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[2])
+    minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[1])
 
-    xDepth = matrix(0,dim(points$locUTM)[1],dim(data$X_depth)[2])
+    xDepth = matrix(0,dim(points$locUTM)[1],dim(data$X_depth)[1])
     xDepth = data$X_depth[minDist,]
     data$X_depth_int = xDepth
     print("No depth information for prediction provided, using depth from observations.")
