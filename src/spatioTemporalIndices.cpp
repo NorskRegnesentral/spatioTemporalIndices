@@ -116,11 +116,11 @@ Type objective_function<Type>::operator() ()
 
   Type nll = 0.0;
   //Likelihood contribution from length part
-  nll += nllIndex(dat,par,spdeMatricesS,spdeMatricesST,A_ListS,A_ListST, keep);
+  nll += nllIndex(dat,par,spdeMatricesS,spdeMatricesST,A_ListS,A_ListST, keep, this);
 
   //Likelihood contribution from ALK part
   if(dat.applyALK==1){
-    nll += nllALK(dat,par,spdeMatricesST_alk,A_alk_list);
+    nll += nllALK(dat,par,spdeMatricesST_alk,A_alk_list, this);
   }
 
   //Predict and report indices

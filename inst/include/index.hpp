@@ -4,7 +4,7 @@ using namespace Eigen; //Utilize sparse structures
 
 template <class Type>
   Type nllIndex(dataSet<Type> dat, paraSet<Type> par, spde_t<Type> spdeMatricesS, spde_t<Type> spdeMatricesST ,
-                LOSM_t<Type> A_ListS, LOSM_t<Type> A_ListST, data_indicator<vector<Type>,Type> keep){
+                LOSM_t<Type> A_ListS, LOSM_t<Type> A_ListST, data_indicator<vector<Type>,Type> keep, objective_function<Type> *of){
 
     Type nll = 0;
 
@@ -13,6 +13,12 @@ template <class Type>
       for(int y=1;y<dat.nStationsEachYear.size();y++){
         for(int l=0; l<dat.numberOfLengthGroups; ++l){
           nll -= dnorm(par.beta0(y,l),par.beta0(y-1,l),sigma_beta0,true);
+
+          if(dat.simulateProcedure==1){
+            SIMULATE_F(of){
+              par.beta0(y,l) = rnorm(par.beta0(y-1,l),sigma_beta0);
+            }
+          }
         }
       }
     }
@@ -55,9 +61,9 @@ template <class Type>
       }
       nll += SEPARABLE(AR1(rho_l(0)),GMRF(Q_s))(par.xS);
       if(dat.simulateProcedure==1){
-//        SIMULATE{
-//          SEPARABLE(AR1(rho_l(0)),GMRF(Q_s)).simulate(par.xS);
-//        }
+        SIMULATE_F(of){
+          SEPARABLE(AR1(rho_l(0)),GMRF(Q_s)).simulate(par.xS);
+        }
       }
 
       Type scaleS = Type(1)/((4*3.14159265)*kappa[0]*kappa[0]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
@@ -70,9 +76,9 @@ template <class Type>
       }
       nll += SEPARABLE(AR1(rho_l(1)),SEPARABLE(AR1(rho_t(0)),GMRF(Q_st)))(par.xST);
       if(dat.simulateProcedure==1){
-//        SIMULATE{
-//          SEPARABLE(AR1(rho_l(1)),SEPARABLE(AR1(rho_t(0)),GMRF(Q_st))).simulate(par.xST);
-//        }
+        SIMULATE_F(of){
+            SEPARABLE(AR1(rho_l(1)),SEPARABLE(AR1(rho_t(0)),GMRF(Q_st))).simulate(par.xST);
+        }
       }
       Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
       par.xST = par.xST/sqrt(scaleST);
@@ -88,9 +94,9 @@ template <class Type>
 
       nll += SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2)))(par.nugget);
       if(dat.simulateProcedure==1){
-//        SIMULATE{
-//          SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2))).simulate(par.nugget);
-//        }
+        SIMULATE_F(of){
+            SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2))).simulate(par.nugget);
+        }
       }
       SparseMatrix<Type> Q_nuggetIIDI(dat.xInt.size(),dat.xInt.size());
       for(int i = 0; i< dat.xInt.size(); ++i){
@@ -218,14 +224,14 @@ template <class Type>
             }else{
               if(dat.obsModel==1){
                 nll -= keep(dat.idxStart(counter) +l)*dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true);
-//                SIMULATE{
-//                  dat.fishObsMatrix(counter,l) = rnbinom2(mu(counter,l),mu(counter,l) + mu(counter,l)*mu(counter,l)/size);
+//                SIMULATE_F(of){
+//                  dat.obsVector(dat.idxStart(counter) +l) = rnbinom_robust(log(mu(counter,l)),log_var_minus_mu);
 //                }
               }else if(dat.obsModel==2){
                 nll -= keep(dat.idxStart(counter) +l)*dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true);
- //               SIMULATE{
-//                  dat.fishObsMatrix(counter,l) = rpois(mu(counter,l));
-//                }
+                SIMULATE_F(of){
+                    dat.obsVector(dat.idxStart(counter) +l) = rpois(mu(counter,l));
+                }
               }else if (dat.obsModel==3){
                 //Gamma distributed response
                 scale = size;
@@ -245,7 +251,19 @@ template <class Type>
     }
     //---------------------------------------------
 
+    SIMULATE_F(of){
+      vector<Type> obsVector=dat.obsVector;
+      REPORT_F(obsVector,of);
+      vector<Type> nugget=par.nugget;
+      REPORT_F(nugget,of);
+      array<Type> xS=par.xS;
+      array<Type> xST=par.xST;
+      REPORT_F(xS,of);
+      REPORT_F(xST,of);
+      matrix<Type> beta0 = par.beta0;
+      REPORT_F(beta0,of);
 
+    }
 
 
     return(nll);

@@ -3,7 +3,8 @@ using namespace density; //use GMRF
 using namespace Eigen; //Utilize sparse structures
 
 template <class Type>
-  Type nllALK(dataSet<Type> dat, paraSet<Type> par, spde_t<Type> spdeMatricesST_alk, LOSM_t<Type> A_alk_list){
+  Type nllALK(dataSet<Type> dat, paraSet<Type> par, spde_t<Type> spdeMatricesST_alk,
+              LOSM_t<Type> A_alk_list,objective_function<Type> *of){
 
     Type nll = 0;
 
@@ -17,6 +18,11 @@ template <class Type>
       for(int y=1;y<dat.idx1.size();y++){
         for(int a=1; a<(nAges-1); ++a){
           nll -= dnorm(par.beta0_alk(y,a),par.beta0_alk(y-1,a-1),sigma_beta0_alk,true);
+          if(dat.simulateProcedure==1){
+            SIMULATE_F(of){
+              par.beta0_alk(y,a) = rnorm(par.beta0_alk(y-1,a-1),sigma_beta0_alk);
+            }
+          }
         }
       }
     }
@@ -34,9 +40,20 @@ template <class Type>
 
     if(dat.spatialALK!=0){
       nll += SEPARABLE(GMRF(Q_age),GMRF(QS))(par.xS_alk); //Opposite order than on R side
+      if(dat.simulateProcedure==1){
+        SIMULATE_F(of){
+          SEPARABLE(GMRF(Q_age),GMRF(QS)).simulate(par.xS_alk);
+        }
+      }
+
     }
     if(dat.spatioTemporalALK !=0){
       nll += SEPARABLE(GMRF(Q_age),SEPARABLE(AR1(rho),GMRF(QST)))(par.xST_alk); //Opposite order than on R side
+      if(dat.simulateProcedure==1){
+        SIMULATE_F(of){
+          SEPARABLE(GMRF(Q_age),SEPARABLE(AR1(rho),GMRF(QST))).simulate(par.xST_alk);
+        }
+      }
     }
 
     Type d = 2; //Part of spatial pc-prior
@@ -112,7 +129,34 @@ template <class Type>
         }
         break;
       }
+
+      SIMULATE_F(of){
+
+        vector<Type> probAge = ALK.row(s);
+        Type uu = runif( (Type) 0, (Type) 1);
+        Type sum = 0;
+//        matrix<Type> sampledAge = rmultinom(1, 1, probAge);
+        for(int aa =0; aa < probAge.size(); ++aa){
+          sum += probAge(aa);
+          if(sum>uu){
+            dat.age(s) = aa + minAge;
+            sum = -999;
+          }
+        }
+      }
     }
+
+    SIMULATE_F(of){
+      array<Type> xS_alk=par.xS_alk;
+      array<Type> xST_alk=par.xST_alk;
+      REPORT_F(xS_alk,of);
+      REPORT_F(xST_alk,of);
+      vector<int> ageVector=dat.age;
+      REPORT_F(ageVector,of);
+      matrix<Type> beta0_alk = par.beta0_alk;
+      REPORT_F(beta0_alk,of);
+    }
+
 
     return(nll);
   }
