@@ -28,7 +28,9 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
       lines(depth, depthSpline2 - 1.96*sdDepthSpline2, lty=2,col="blue")
       lines(depth, depthSpline2 + 1.96*sdDepthSpline2, lty=2,col="blue")
 
-      legend(legend=c("20 cm","100 cm"),col=c("red","blue"),"topright",lty=1,cex =1.5)
+      minLength = min(run$conf_l$lengthGroups)
+      maxLength = max(run$conf_l$lengthGroups)
+      legend(legend=c(paste0(minLength, " cm"), paste0(maxLength, " cm")),col=c("red","blue"),"topright",lty=1,cex =1.5)
     }
 
     abline(h = 0)
@@ -276,8 +278,10 @@ plotSunAlt<-function(run){
   x = c(1,tmp/4,tmp/2,tmp*3/4,tmp)
   text = c("Lowest (morning)", "", "Heighest", "", "Lowest (evening)")
   axis(1, at=x,labels=text)
+  minLength = min(run$conf_l$lengthGroups)
+  maxLength = max(run$conf_l$lengthGroups)
   if(run$conf_l$sunAlt[2] ==2){
-    legend(legend=c("20 cm","100 cm"),col=c("red","blue"),"topright",lty=1,cex =1.5)
+    legend(legend=c(paste0(minLength, " cm"), paste0(maxLength, " cm")),col=c("red","blue"),"topright",lty=1,cex =1.5)
   }
 
   abline(v=1,lty=3)
