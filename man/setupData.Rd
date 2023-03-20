@@ -13,9 +13,6 @@ setupData(dataLength, conf, confPred)
 
 \item{data}{A list of the data object returned by getBaseline, where each element of the list is a year}
 }
-\value{
-
-}
 \description{
 setupData
 }

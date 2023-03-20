@@ -15,9 +15,6 @@ jit(run, njit, ncores = 1, sd = 0.2)
 
 \item{sd}{Standard deviation of noise to start values}
 }
-\value{
-
-}
 \description{
 jit
 }

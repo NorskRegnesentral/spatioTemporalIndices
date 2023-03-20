@@ -6,11 +6,6 @@
 \usage{
 constructIntPoints(conf, confPred)
 }
-\value{
-
-
-
-}
 \description{
 constructIntPoints
 }

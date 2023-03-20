@@ -11,7 +11,7 @@ defConfPred(conf, nIntPoints = 4000, Depth = "Data")
 
 \item{nIntPoints}{provide number of integration points}
 
-\item{Depth}{if "NOAA": use NOAA data base for estimating depth in integration points}
+\item{Depth}{if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration}
 }
 \description{
 Configurations used for prediction.

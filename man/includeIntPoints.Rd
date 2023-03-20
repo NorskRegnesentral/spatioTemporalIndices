@@ -6,11 +6,6 @@
 \usage{
 includeIntPoints(data, conf, confPred, gamSetup_depth)
 }
-\value{
-
-
-
-}
 \description{
 includeIntPoints
 }

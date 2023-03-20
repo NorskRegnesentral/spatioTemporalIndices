@@ -6,11 +6,6 @@
 \usage{
 combineLengthALK(dat_l, par_l, map_l, dat_a, par_a, map_a, conf, confpred)
 }
-\value{
-
-
-
-}
 \description{
 combineLengthALK
 }

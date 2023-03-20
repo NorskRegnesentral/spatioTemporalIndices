@@ -28,7 +28,7 @@
 ##' @param strataReport ADREPORT index in each strata? 1:yes, 0: No. NB!: Currenlty not working in combination with ALK
 ##' @details
 ##' @export
-defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,1),sunAlt=c(1,1),
+defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,0),sunAlt=c(1,0),
                     maxLength = NULL,dLength = 1, minLength = NULL,reduceLength = 3,
                     cutoff = 100, cbound = 200,
                     pcPriorRange = c(100,0.1),pcPriorsd = c(1,0.1), usePcPriors = 0, zeroInflated = 0,
