@@ -1,0 +1,462 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+title: Configurations in the spatio-temporal index model
+---
+
+
+```{r echo=FALSE, eval=TRUE, results='hide',include=FALSE}
+library(spatioTemporalALK)
+library(spatioTemporalIndices)
+```
+
+In this document we first provide a basic cookbook recipe for running the spatio-termporal index model. Then we introduce all configurations available. 
+
+### Installation
+<details>  
+  <summary> `Install index model at length`  </summary>
+```{r  , eval=FALSE}
+devtools::install_github("NorskRegnesentral/spatioTemporalALK")
+```
+</details>
+<details>  
+  <summary> `Install model for converting length to age`  </summary>
+```{r  , eval=FALSE}
+devtools::install_github("NorskRegnesentral/spatioTemporalIndices")
+```
+</details>
+
+
+
+
+### Standard run
+
+
+
+We will now go trough each line for running the model in detail:
+
+<details>  
+  <summary> `Make the models availble in your R session`  </summary>
+```{r }
+library(spatioTemporalIndices)
+library(spatioTemporalALK)
+```
+</details>
+
+<details>  
+  <summary> `Read data on length`  </summary>
+```{r }
+  dat_l = readRDS("catch_at_length.rds")
+  head(dat_l,3)
+```
+</details>
+
+<details>  
+  <summary> `Read age data`  </summary>
+```{r }
+  dat_a = readRDS("catch_at_age.rds")
+  head(dat_a,3)
+```
+</details>
+
+<details>  
+  <summary> `Define configurations for catch at length model`  </summary>
+```{r , eval=FALSE}
+conf_l = defConf(years = 1994:2020, 
+                 maxLength = 75,
+                 minLength = 20,
+                 dLength = 5,
+                 stratasystem = list(dsn="winterSurvey", layer = "Vintertoktet_nye_strata"),
+                 applyALK = 1)
+```
+</details>
+
+<details>  
+  <summary> `Define configurations for ALK model`  </summary>
+```{r , eval=FALSE}
+conf_alk = defConf_alk(maxAge = 10,
+                       minAge = 3)
+```
+</details>
+
+
+<details>  
+  <summary> `Define configurations for prediciton`  </summary>
+```{r , eval=FALSE}
+confPred = defConfPred(conf=conf_l,Depth="NOAA",nInt = 5000)
+```
+</details>
+
+
+<details>  
+  <summary> `Fit the model`  </summary>
+```{r , eval=FALSE}
+run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+```
+</details>
+
+<details>  
+  <summary> `Save indices and assosiated uncertainty and correlation`  </summary>
+```{r , eval=FALSE}
+saveIndex(run,file = "indexSimple.txt")
+```
+
+
+We have now saved the index estimates and assosiated uncertainty estimates. Below follow how to extract these estimates.
+
+  <details>  
+    <summary> `Look at index`  </summary>
+  ```{r }
+  index= as.matrix(read.table("indexSimple.txt", sep = " ") )[,-1]
+  index
+  ```
+  </details>
+    
+  
+  
+  <details>  
+    <summary> `Look at standard devitation of index`  </summary>
+  ```{r }
+  sdIdex=  as.matrix(read.table("sdindexSimple.txt", sep = " ",header = T))[,-1]
+  sdIdex
+  ```
+  </details>
+  
+  
+  <details>  
+    <summary> `Look at covariance`  </summary>
+  ```{r }
+  load("cov_indexSimple.Rda")
+  covYears[[1]]
+  ```
+  </details>
+
+
+</details>
+
+
+\
+
+Here is a full code example for running the model and saving indices with assosiated uncertainty and correlation structure:
+<details>  
+  <summary> `Full R-code for a standard run`  </summary>
+```{r , eval=FALSE}
+library(spatioTemporalIndices)
+library(spatioTemporalALK)
+rm(list=ls())
+
+#Read data
+dat_l = readRDS("catch_at_length.rds")
+dat_alk = readRDS("catch_at_age.rds")
+
+#Configurations length part
+conf_l = defConf(years = 1994:2020,
+                 maxLength = 75,
+                 minLength = 20,
+                 dLength = 5,
+                 stratasystem = list(dsn="winterSurvey", layer = "Vintertoktet_nye_strata"),
+                 applyALK = 1)
+
+
+#Define configurations age part
+conf_alk = defConf_alk(maxAge = 10,
+                       minAge = 3)
+
+confPred = defConfPred(conf=conf_l,Depth="DATA",nInt=5000)
+
+
+# run model
+start_time <- Sys.time()
+run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+end_time <- Sys.time()
+timeUsed = end_time - start_time
+timeUsed
+
+#Save indices with covariance structures to be used by SAM
+saveIndex(run,file = "index.txt")
+index= as.matrix(read.table("index.txt", sep = " ") )[,-1]
+sdIdex=  as.matrix(read.table("sdindex.txt", sep = " ",header = T))[,-1]
+load("cov_index.Rda")
+covYears[[1]]
+
+#Look at the indices with uncertainty without saving it
+rl = as.list(run$rep, what = "Est", report = TRUE)
+rlsd = as.list(run$rep, what = "Std", report = TRUE)
+rl$logAgeIndex
+rlsd$logAgeIndex
+
+```
+</details>
+
+
+
+
+## Configurations
+
+We will now go trough each configuration in detail
+
+#### Configurations for catch at lenght model
+
+<details>  
+  <summary> `maxLength` (Maximum length) </summary>
+Maximum length used in the length-based model. Depending on the configuration  `plusGroup`,  all longer age groups are included in a plus group with length `maxLength`. 
+
+   **Example**:
+   
+```{r , eval=FALSE}
+conf$maxLength = 75
+```
+
+Longest lenght group included in the model is 75 cm.
+
+</details>
+
+
+<details>  
+  <summary> `minLength` (Minimum length) </summary>
+Minimum length used in the length-based model. All shorter catch observations are removed from the length-part of the model`. 
+
+   **Example**:
+   
+```{r , eval=FALSE}
+conf$minLength = 20
+```
+
+All fish of length shorter than 20 cm are neglected.
+
+</details>
+
+
+<details>  
+  <summary> `plusGroup` (Plus length group) </summary>
+Include `maxLength` as a plus group? 
+
+ * 0: No 
+ * 1: yes
+ 
+</details>
+
+
+
+
+
+<details>  
+  <summary> `years` (Years of data used) </summary>
+   Years of data used in the model. 
+   
+   **Example**:
+   
+```{r , eval=FALSE}
+conf$years = 1994:2020
+```
+
+Data from years 1994 to 2020 is used to fit the model.  Individual years within the period can be left out with `skipYears`.
+
+</details>
+
+<details>  
+  <summary> `skipYears` (Years left out) </summary>
+   Years within `years` not used in the inference 
+
+**Example**:
+   
+```{r , eval=FALSE}
+conf$skipYears = 2016
+```
+
+Data from year 2016 is neglected.
+
+</details>
+
+
+<details>  
+  <summary> `spatial` (Spatial effect) </summary>
+   The configuration `spatial` defines if a spatial component is inclued for catch at length.
+
+**Example**:
+   
+```{r , eval=FALSE}
+conf$spatial = 1
+```
+
+A spatial component is included.
+
+**Definition**:
+
+The spatial effect is define with Matern covariance structure and with autoregressivie structure in length. Denote $\alpha$ as the spatial effect. $\alpha$ is defined as a mean zero Gaussian random effect with the covariance structure in length and space given by:
+
+$$\text{Cov}(\alpha(\mathbf{s}_1,l_1),\alpha(\mathbf{s}_2,l_2)) = \rho_{\alpha,l}^{|l_1-l_2|} \frac{\sigma^2_{\alpha}}{2^{\nu-1}\Gamma(\nu)}(\kappa_{\alpha}||\mathbf{s}_1 -\mathbf{s}_2||)^{\nu}K_{\nu}(\kappa_{\alpha}||\mathbf{s}_1-\mathbf{s}_2||)  $$
+
+**Code**:
+
+Example of internal usage of the configuration: 
+
+```c
+if(dat.spatial==1){
+  nll += SEPARABLE(AR1(rho_l(0)),GMRF(Q_s))(par.xS);
+}
+```
+
+
+</details>
+
+
+
+<details>  
+  <summary> `spatioTemporal` (Spatio-temporal effect) </summary>
+   The configuration `spatioTemporal` defines if and how a spatio-temporal component is included for catch at length.
+
+
+**Description**:
+
+ * 0: No spatio-temproal effect
+ * 1: Spatio-temporal effect with correlation structure in time-space and length
+ * 2: Spatio-temporal effect with indenpendent correlation structure in time.
+
+
+**Example**:
+   
+```{r , eval=FALSE}
+conf$spatioTemporal = 1
+```
+
+In this example a spatio-temporal component is included with correlation correlaiton structure in time, space and length.
+
+**Definition**:
+
+The spatial effect is define with Matern covariance structure in space and separate AR1 in length and time.  Denote $\gamma$ as the spatio-temporal effect. $\gamma$ is defined as a mean zero Gaussian random effect with the covariance structure in time, length and space given by:
+
+$$ \text{Cov}(\gamma(y_1,\mathbf{s}_1,l_1),\gamma(y_2,\mathbf{s}_2,l_2)) = \rho_{\gamma,y}^{|y_1-y_2|} \rho_{\gamma,l}^{|l_1-l_2|} \frac{\sigma^2_{\gamma}}{2^{\nu-1}\Gamma(\nu)}(\kappa_{\gamma}||\mathbf{s}_1 -\mathbf{s}_2||)^{\nu}K_{\nu}(\kappa_{\gamma}||\mathbf{s}_1-\mathbf{s}_2||) $$
+
+
+If `spatioTemporal` is set to 2, then the parameter $\rho_{\gamma,y}$ is fixed to 0, (and defining  $0^0 = 1$) meaning that there is no correlation between years in the spatio-temporal effect. This will drastically reduce the computation time, but we may lose spatio-temporal information that can be utilized to predict into areas with poor coverage.
+
+**Code**:
+
+Example of internal usage of the configuration: 
+
+```c
+if(dat.spatioTemporal==1){
+      nll += SEPARABLE(AR1(rho_l(1)),SEPARABLE(AR1(rho_t(0)),GMRF(Q_st)))(par.xST);
+}
+```
+
+
+</details>
+
+
+
+
+<details>  
+  <summary> `nugget` (nugget effect) </summary>
+   The configuration `nugget` defines if a nugget effect is included for catch at length. We typically include a nugget effect.
+
+**Example**:
+   
+```{r , eval=FALSE}
+conf$nugget = 1
+```
+
+A nugget effect is included with correlaiton structres across length within hauls.
+
+**Definition**:
+
+The nugget effect is defined with AR1 correlation structure across length in each haul:
+
+$$\text{Cov}(\psi(y_1,\mathbf{s}_1,l_1),\psi(y_2,\mathbf{s}_2,l_2))= \begin{cases}
+  \sigma^2_{\psi} \rho_{\psi}^{|l_1-l_2|} ,& \text{ if } \mathbf{s}_1 = \mathbf{s}_2 \text{ and }  y_1 = y_2, \\
+ 0 ,& \text{else}.
+  \end{cases}$$
+
+**Code**:
+
+Example of internal usage of the configuration: 
+
+```c
+if(dat.useNugget==1){
+  int nHaul = dat.nStationsEachYear.sum();
+
+  SparseMatrix<Type> Q_nuggetIID(nHaul,nHaul);
+  for(int i = 0; i< nHaul; ++i){
+    Q_nuggetIID.coeffRef(i,i)=1;
+  }
+
+  nll += SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2)))(par.nugget);
+}
+```
+
+
+</details>
+
+
+
+
+<details>  
+  <summary> `dLength` (Length resolution) </summary>
+Resolution in length dimension. This has to match your data on catch at length. 
+
+   **Example**:
+   
+```{r , eval=FALSE}
+conf$dLength = 5
+```
+
+Catch at length observations are given per 5 cm groups.
+
+</details>
+
+
+<details>  
+  <summary> `reduceLength` (reduce dimension of laten effect) </summary>
+   The configuration `reduceLength` defines how we reduce the dimension of the latent spatial and spatio-temporal effect. This can be done for reducing computation time. Note that the resolution off intercept parameters and nugget effect are not modified. 
+
+**Example**:
+   
+```{r , eval=FALSE}
+conf$reduceLength = 3
+```
+
+
+We include every third length group in the latent spatial and spatio-temporal effect. 
+
+Assume we have the length groups $L_1, ... , L_N$. In this example we deine the latent effect on length groups $L_1,L_4,L_7,...,L_N*$. Heres $N*$ is the smallest integer in the sequence such that $L_N \leq L_N*$.
+
+
+Let $L'$ be a length group between $L_i$ and $L_{i+1}$. We define $\alpha(s,L') = (1-\pi)\alpha(s,L_i) + \pi \alpha(s,L_{i+1})$ where $\pi  = \frac{L' - L_i}{L_{i+1} - L_i}$
+
+</details>
+
+
+#### Configurations for age at length model
+
+<details>  
+  <summary> `maxAge` (Maximum age) </summary>
+
+ ...
+
+</details>
+
+
+
+#### Configurations for prediction
+
+<details>  
+  <summary> `Depth` (how to extrapolate depth) </summary>
+
+ ...
+
+</details>
+
+
+
+***
+
+
+
+
+## References
+
+
+
+
