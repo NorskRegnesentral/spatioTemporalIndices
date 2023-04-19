@@ -123,7 +123,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
 #' @return
 #' @export
 #'
-jit<-function(run,njit,ncores = 1,sd = 0.2){
+jit<-function(run,njit,ncores = 1,sd = 0.1){
 
   #Construct jitter
   data_l = setupData(run$dat_l,run$conf_l,run$confPred)
@@ -155,7 +155,13 @@ jit<-function(run,njit,ncores = 1,sd = 0.2){
   })
 
   if(run$conf_l$applyALK==1){
-    warning("Jitter somethimes fails because of betaLength_alk")
+    for(i in 1:njit){
+      tmp = sum(exp(par[[i]]$betaLength_alk[-1]))
+      for(a in 2:length(parOriginal$betaLength_alk)){
+        #Very often run into  convergence issues when these are not decreasing. Reasonable they are decreasing because fish grows with age.
+        par[[i]]$betaLength_alk[a] = par[[i]]$betaLength_alk[a-1] - exp(par[[i]]$betaLength_alk[a])/tmp
+      }
+    }
   }
 
   if(ncores ==1){
@@ -174,14 +180,26 @@ jit<-function(run,njit,ncores = 1,sd = 0.2){
   p <- lapply(runs, function(f){
     unlist(as.list(f$rep,"Est"))
   })
+  plList <- lapply(runs, function(f){
+    as.list(f$rep,"Est")
+  })
 
   #Max diff of indices and log-likelihood
   rl = as.list(run$rep, "Est", report = TRUE)
 
-  maxDiffIndices = lapply(runs,function(f){
-    rlJ = as.list(f$rep, "Est", report = TRUE)
-    max(abs(rlJ$logLengthIndex- rl$logLengthIndex))
-  })
+  if(run$conf_l$applyALK==1){
+    maxDiffIndices = lapply(runs,function(f){
+      rlJ = as.list(f$rep, "Est", report = TRUE)
+      max(abs(rlJ$logAgeIndex- rl$logAgeIndex))
+    })
+  }else{
+    maxDiffIndices = lapply(runs,function(f){
+      rlJ = as.list(f$rep, "Est", report = TRUE)
+      max(abs(rlJ$logLengthIndex- rl$logLengthIndex))
+    })
+  }
+
+
 
   maxDiffLogLik = lapply(runs,function(f){
     max(abs(f$opt$objective- run$opt$objective))
@@ -197,17 +215,28 @@ jit<-function(run,njit,ncores = 1,sd = 0.2){
     max(abs(rlJ$depthReport1- rl$depthReport1))
   })
 
+
   pl = as.list(run$rep,"Est")
-  pl$xS = pl$xS* exp(pl$log_sigma[1])
-  pl$xST = pl$xST* exp(pl$log_sigma[2])
+  scaleS = 1/((4*3.14159265)*exp(pl$logKappa)*exp(pl$logKappa))
+  pl$xS = pl$xS/scaleS[1]* exp(pl$log_sigma[1])
+  pl$xST = pl$xST/scaleS[2]* exp(pl$log_sigma[2])
   pl$nugget = pl$nugget* exp(pl$log_sigma[3])
 
+  scaleS_alk = 1/((4*3.14159265)*exp(pl$logKappa_alk)*exp(pl$logKappa_alk))
+  pl$xS_alk = pl$xS_alk/scaleS_alk[1]* exp(pl$logSigma_alk[1])
+  pl$xST_alk = pl$xS_alk/scaleS_alk[2]* exp(pl$logSigma_alk[2])
 
   diffPar = lapply(runs, function(f) {
     plJit = as.list(f$rep, "Est")
-    plJit$xS = plJit$xS* exp(plJit$log_sigma[1])
-    plJit$xST = plJit$xST* exp(plJit$log_sigma[2])
+    scaleS = 1/((4*3.14159265)*exp(plJit$logKappa)*exp(plJit$logKappa))
+    plJit$xS = plJit$xS/scaleS[1]* exp(plJit$log_sigma[1])
+    plJit$xST = plJit$xST/scaleS[2]* exp(plJit$log_sigma[2])
     plJit$nugget = plJit$nugget* exp(plJit$log_sigma[3])
+
+    scaleS_alk = 1/((4*3.14159265)*exp(plJit$logKappa_alk)*exp(plJit$logKappa_alk))
+    plJit$xS_alk = plJit$xS_alk/scaleS_alk[1]* exp(plJit$logSigma_alk[1])
+    plJit$xST_alk = plJit$xS_alk/scaleS_alk[2]* exp(plJit$logSigma_alk[2])
+
     mpd = mapply(function(g,h){
       max(abs(g-h))
     } , plJit, pl)
@@ -221,7 +250,7 @@ jit<-function(run,njit,ncores = 1,sd = 0.2){
                     max(unlist(maxDiffSun)),
                     max(unlist(maxDiffDepth)))
   names(maxVecAll) = c(names(pl), "Index", "logLik", "Sun","Depth")
-
+  colnames(maxMat) = names(pl)
 
   return(list(runs = runs, maxVecAll = maxVecAll,maxMat = maxMat))
 }
