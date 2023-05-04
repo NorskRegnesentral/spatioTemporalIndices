@@ -12,7 +12,14 @@ simStudy = function(run,nsim = 5){
   }
 
   for(i in 1:nsim){
-    simRuns[[i]] = fitModelSim(run,simData[[i]])
+    simRuns[[i]] = tryCatch(
+      {
+        fitModelSim(run,simData[[i]])
+      },
+      error = function(e){
+        NA
+      }
+    )
   }
 
   class(simRuns)  = "stimSim"
