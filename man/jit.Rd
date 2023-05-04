@@ -4,7 +4,7 @@
 \alias{jit}
 \title{jit}
 \usage{
-jit(run, njit, ncores = 1, sd = 0.2)
+jit(run, njit, ncores = 1, sd = 0.1)
 }
 \arguments{
 \item{run}{The result of running fitModel}

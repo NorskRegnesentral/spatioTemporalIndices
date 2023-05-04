@@ -10,7 +10,7 @@ defConf(
   spatial = 1,
   spatioTemporal = 0,
   nugget = 1,
-  splineDepth = c(6, 1),
+  splineDepth = c(6, 0),
   sunAlt = c(1, 0),
   maxLength = NULL,
   dLength = 1,
@@ -31,7 +31,8 @@ defConf(
   minDepth = 50,
   maxDepth = 600,
   trawlWidth = 1,
-  plusGroup = 1
+  plusGroup = 1,
+  strataReport = 0
 )
 }
 \arguments{
@@ -45,9 +46,9 @@ defConf(
 
 \item{nugget}{If 0-no nugget effect, 1-Include nugget effect}
 
-\item{splineDepth}{Vector with depth configurations, first element is the k-variable in spline (6 means 6 basis function). Second element: 0- no depth effect, 1-depth effectk, 2-length dependent depth effect.}
+\item{splineDepth}{Vector with depth configurations, first element is the k-variable in spline (6 means 6 basis function). Second element: 0: no depth effect, 1: depth effect(length independent), 2:length dependent depth effect.}
 
-\item{sunAlt}{Vector with sun altitude configurations, first element is the numberof basis functions. Second element: 0-sun effect, 1-length dependent sun effect.}
+\item{sunAlt}{Vector with sun altitude configurations, first element is the numberof basis functions. Second element: 0: No sun effect, 1:sun effect (length independent), 2: length dependent sun effect.}
 
 \item{maxLength}{Maximum length, used when defining the pluss group}
 
@@ -76,6 +77,8 @@ defConf(
 \item{trawlWidth}{Swept width of trawl}
 
 \item{plusGroup}{Include plus goup? 1:yes, 0: No}
+
+\item{strataReport}{ADREPORT index in each strata? 1:yes, 0: No. NB!: Currenlty not working in combination with ALK}
 }
 \description{
 Configurations used. The object returned is

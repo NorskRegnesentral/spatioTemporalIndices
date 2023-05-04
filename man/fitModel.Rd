@@ -11,8 +11,6 @@ fitModel(
   dat_alk = NULL,
   conf_alk = NULL,
   parPrior = NULL,
-  low = list(),
-  up = list(),
   ...
 )
 }
@@ -23,11 +21,7 @@ fitModel(
 
 \item{dat_alk}{Data frame with age data}
 
-\item{conf_alk}{Configurations for ALK model}
-
-\item{low}{Lower bounds in the optimization, typically not used.}
-
-\item{up}{Upper bounds in the optimization, typically not used.}
+\item{conf_alk}{Configurations for ALK model.}
 
 \item{...}{Parameters sendt to sdreport.}
 

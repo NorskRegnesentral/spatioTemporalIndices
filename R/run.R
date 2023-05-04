@@ -5,15 +5,13 @@
 #' @param conf Configurations for length part of model
 #' @param confPred Configurations for predictions
 #' @param dat_alk Data frame with age data
-#' @param conf_alk Configurations for ALK model
-#' @param low Lower bounds in the optimization, typically not used.
-#' @param up Upper bounds in the optimization, typically not used.
+#' @param conf_alk Configurations for ALK model.
 #' @param ... Parameters sendt to sdreport.
 #' @useDynLib spatioTemporalIndices
 #' @return A fitted stim object
 #' @details
 #' @export
-fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrior = NULL,  low = list(),up = list(),...){
+fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrior = NULL,...){
 
   tryCatch(
     {
@@ -88,14 +86,9 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
   }
 
 
-  lower<-rep(-Inf,length(obj$par))
-  upper<-rep(Inf,length(obj$par))
-  for(nn in names(low)) lower[names(obj$par)==nn]=low[[nn]]
-  for(nn in names(up)) upper[names(obj$par)==nn]=up[[nn]]
 
   opt <- nlminb(obj$par, obj$fn, obj$gr,
-                control = list(trace = 1,iter.max = 1000, eval.max = 1000),
-                lower = lower, upper = upper)
+                control = list(trace = 1,iter.max = 1000, eval.max = 1000))
   rep <- sdreport(obj,...)
   pl = as.list(rep,"Est")
   plSd = as.list(rep,"Std")
@@ -111,6 +104,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
 
   return(toReturn)
 }
+
 
 
 

@@ -38,7 +38,7 @@ template <class Type>
       Q_age.coeffRef(a,a)=1;
     }
 
-    if(dat.spatialALK!=0){
+    if(dat.spatialALK !=0){
       nll += SEPARABLE(GMRF(Q_age),GMRF(QS))(par.xS_alk); //Opposite order than on R side
       if(dat.simulateProcedure==1){
         SIMULATE_F(of){
@@ -136,6 +136,7 @@ template <class Type>
         Type uu = runif( (Type) 0, (Type) 1);
         Type sum = 0;
 //        matrix<Type> sampledAge = rmultinom(1, 1, probAge);
+
         for(int aa =0; aa < probAge.size(); ++aa){
           sum += probAge(aa);
           if(sum>uu){
@@ -151,8 +152,8 @@ template <class Type>
       array<Type> xST_alk=par.xST_alk;
       REPORT_F(xS_alk,of);
       REPORT_F(xST_alk,of);
-      vector<int> ageVector=dat.age;
-      REPORT_F(ageVector,of);
+      vector<int> age=dat.age;
+      REPORT_F(age,of);
       matrix<Type> beta0_alk = par.beta0_alk;
       REPORT_F(beta0_alk,of);
     }
