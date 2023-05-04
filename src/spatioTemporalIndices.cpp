@@ -82,7 +82,8 @@ Type objective_function<Type>::operator() ()
   DATA_VECTOR(pcPriorsALKRange); dat.pcPriorsALKRange = pcPriorsALKRange;
   DATA_VECTOR(pcPriorsALKSD); dat.pcPriorsALKSD = pcPriorsALKSD;
   DATA_INTEGER(usePCpriorsALK); dat.usePCpriorsALK = usePCpriorsALK;
-
+  DATA_INTEGER(spatialALK);  dat.spatialALK = spatialALK;//Configuration spatial, include if 1
+  DATA_INTEGER(spatioTemporalALK);  dat.spatioTemporalALK = spatioTemporalALK;//Configuration spatio-temporal, include if 1
   //-----------------------------
 
   paraSet<Type> par;
