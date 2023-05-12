@@ -93,11 +93,11 @@ template <class Type>
       }
 
       nll += SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2)))(par.nugget);
-      if(dat.simulateProcedure==1){
-        SIMULATE_F(of){
-            SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2))).simulate(par.nugget);
-        }
+
+      SIMULATE_F(of){
+          SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2))).simulate(par.nugget);
       }
+
       SparseMatrix<Type> Q_nuggetIIDI(dat.xInt.size(),dat.xInt.size());
       for(int i = 0; i< dat.xInt.size(); ++i){
         Q_nuggetIIDI.coeffRef(i,i)=1;
