@@ -160,7 +160,7 @@ setMap <- function(par, conf){
     map$log_lambda=as.factor(c(0,0))
     map$betaDepth = as.factor(c(tmp,tmp)) #Not use length dependent depth effect
   }else if(conf$splineDepth[2]==2){
-    map$log_lambda=as.factor(c(0,0))#Use same lambda in both depth splines
+    #map$log_lambda=as.factor(c(0,0))#Use same lambda in both depth splines
   }
 
 
