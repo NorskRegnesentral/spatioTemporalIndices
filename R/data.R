@@ -151,8 +151,8 @@ setupData = function(dataLength,conf,confPred){
   Sdim=nrow(S_depth)
 
   gamSetup_sunAltReport = gam(sunAltFormulaIntRep,
-                              data=data.frame(sunAlt=seq(0,1,by = 0.05),sin=sin(seq(0,1,by = 0.05) *2*pi),
-                                              cos = cos(seq(0,1,by = 0.05)*2*pi)),fit=FALSE)
+                              data=data.frame(sunAlt=seq(0,1,by = 0.025),sin=sin(seq(0,1,by = 0.025) *2*pi),
+                                              cos = cos(seq(0,1,by = 0.025)*2*pi)),fit=FALSE)
   X_sunAltReport = gamSetup_sunAltReport$X[,-1]
 
   #Maximum sun height is used in index calculation
@@ -235,6 +235,7 @@ setupData = function(dataLength,conf,confPred){
   attributes(data)$locObsLatLon = locObsLatLon
   attributes(data)$depth = depth #Used when constructing integration points
   attributes(data)$X_sunAltIntegrate = X_sunAltIntegrate #Used when constructing integration points
+  attributes(data)$sunAltTrans = sunAltTrans
 
   #Include integration points
   data = includeIntPoints(data,conf,confPred, gamSetup_depth)

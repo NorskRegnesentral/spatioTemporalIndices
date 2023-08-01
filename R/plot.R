@@ -15,7 +15,7 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
     sdDepthSpline<-run$rep$sd[names(run$rep$value)=="depthReport1"]
     depth=seq(from=min(attributes(run$data)$depth),to=max(attributes(run$data)$depth),length.out = length(depthSpline))
 
-    plot(depth, depthSpline, lty=1,type = 'l',ylim = c(min(depthSpline - 1.96*sdDepthSpline)-0.2,max(depthSpline + 1.96*sdDepthSpline)+0.2),
+    plot(depth, depthSpline, lty=1,type = 'l',ylim = c(min(depthSpline - 1.96*sdDepthSpline),max(depthSpline + 1.96*sdDepthSpline)),
          ylab = "Effect in linear predictor",main = "Depth effect",col="red",xlab = "Depth (m)",
          cex.main = 1.7,cex.lab = 1.5, cex = 1.5)
     lines(depth, depthSpline - 1.96*sdDepthSpline, lty=2,col="red")
@@ -33,11 +33,14 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
       legend(legend=c(paste0(minLength, " cm"), paste0(maxLength, " cm")),col=c("red","blue"),"topright",lty=1,cex =1.5)
     }
 
+    nn = length(attributes(run$data)$depth)
+    ww = 0.05
+    points(attributes(run$data)$depth ,rep(0,nn)+ ww/2 -runif(nn)*ww, cex = 0.2)
+
     abline(h = 0)
-    abline(v=100,lty=3)
-    abline(v=200,lty=3)
-    abline(v=300,lty=3)
-    abline(v=400,lty=3)
+    for(i in 1:20){
+      abline(v=i*50,lty=3)
+    }
   }else if(what[1] == "S"){
     mesh = attributes(run$data)$meshS
     randomEffects=run$rep$par.random[names(run$rep$par.random)=="xS"]
@@ -66,7 +69,6 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
 
     image(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
                xlab = '', ylab = "",
-#               zlim = c(range[1],range[2]),
                main = paste0("Spatial effect for length group: ", what[3]),
                cex.lab = 1.1,cex.axis = 1.1, cex.main=1, cex.sub= 1.1,xaxt='n',yaxt='n')
 
@@ -122,14 +124,10 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
 
     image(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),
           col =  colorRampPalette(c("white","yellow", "red"))(12),
-#          xlab = '', ylab = "",
-        #  zlim = c(range[1],range[2]),
           main = "",
           xlim = c(floor(min(proj$x)),ceiling(max(proj$x))),
           ylim = c(floor(min(proj$y)),ceiling(max(proj$y))), # offset removed
           cex.lab = 1.1,cex.axis = 1.1, cex.main=1, cex.sub= 1.1,xaxt = 'n',yaxt = 'n' )
-#    if(addX)axis(1, at=seq(0,10000,by = 300), labels=seq(0,10000,by = 300), col.axis="black", las=2)
-#    if(addY)axis(2, at=seq(0,10000,by = 300), labels=seq(0,10000,by = 300), col.axis="black", las=2)
     contour(proj$x, proj$y,inla.mesh.project(proj, latentFieldMAP) ,add = T,labcex  = 1,cex = 1)
     cex = rowMeans(run$data$fishObsMatrix[which(attributes(run$data)$year == year), (lD-1):(lD+1)])
     points(attributes(run$data)$locObs[attributes(run$data)$year == year,],cex = log(cex+2),col = 'blue')
@@ -151,16 +149,13 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
     title(main=what[2],line = -1,cex.main=1.2,outer=FALSE)
 
     if(legend == TRUE){
-
       image.plot(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
             xlab = '', ylab = "",
-        #    zlim = c(range[1],range[2]),
             main = "",
             xlim = c(floor(min(proj$x)),ceiling(max(proj$x))),
             ylim = c(floor(min(proj$y)),ceiling(max(proj$y))), # offset removed
             cex.lab = 1.1,cex.axis = 1.1, cex.main=1, cex.sub= 1.1,xaxt = 'n',yaxt = 'n',
             smallplot = c(0.1, 0.15, .1, .9), axes=F)
-
     }
 
     title(main=paste0("Spatial effect for length group: ", what[3]),line = 0,cex.main=1.5,outer=TRUE)
@@ -176,7 +171,6 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
       indexStart2=length(run$conf_l$years)*mesh$n *(l)+(yearPosition-1)*mesh$n+1
       indexEnd2=indexStart2+mesh$n-1
 
-
       kappa = exp(run$pl$log_kappa)[2]
       scalingConstant = exp(run$rep$par.fixed[which(names(run$rep$par.fixed)=="log_sigma")])[2]
       scalingConstant2 = sqrt(1/((4*3.14159265)*kappa*kappa))
@@ -184,7 +178,6 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
 
       lD = which(run$conf_l$lengthGroups == as.numeric(what[3]))
       ST = (run$data$weigthLength[lD]*randomEffects[indexStart:indexEnd] + (1-run$data$weigthLength[lD])*randomEffects[indexStart2:indexEnd2] )*scale
-
 
       meshS = attributes(run$data)$meshS
       randomEffectsS=run$rep$par.random[names(run$rep$par.random)=="xS"]
@@ -198,7 +191,6 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
       scalingConstant2 = sqrt(1/((4*3.14159265)*kappa*kappa))
       scale = scalingConstant/scalingConstant2
 
-
       S = (run$data$weigthLength[lD]*randomEffects[indexStartS:indexEndS] + (1-run$data$weigthLength[lD])*randomEffectsS[indexStartS2:indexEndS2] )*scale
 
       beta0 = pl$beta0
@@ -208,7 +200,6 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
       latentFieldMAP =beta0This + S +  ST
       image(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
             xlab = '', ylab = "",
-   #         zlim = c(range[1],range[2]),
             main = paste0("Year ", what[2]),
             cex.lab = 1.1,cex.axis = 1.1, cex.main=1, cex.sub= 1.1,xaxt='n',yaxt='n')
 
@@ -259,23 +250,23 @@ plotSunAlt<-function(run){
   sunAltEffectUpperL=  sunAltEffectUpper - 1.96*run$rep$sd[which(names(run$rep$value)=="fourierReportHigh")]
   sunAltEffectUpperU=  sunAltEffectUpper + 1.96*run$rep$sd[which(names(run$rep$value)=="fourierReportHigh")]
 
-  plot(sunAltEffectLower,
+  pi = 3.1415
+  tmp = seq(0,2*pi, length.out = length(sunAltEffectLower))
+  plot(tmp,sunAltEffectLower,
        ylim=c(min(sunAltEffectLowerL,sunAltEffectUpperL),max(sunAltEffectLowerU,sunAltEffectUpperU)),
        main="Sun altitude effect",type="l",col="red",xaxt="n",xlab = "Sun altitude", ylab  = "Effect in linear predictor",
        cex.main = 1.7,cex.lab = 1.5, cex = 1.5)
   abline(a=0,b=0)
-  lines(sunAltEffectLowerL,main="Lower",col="red",lty = 2)
-  lines(sunAltEffectLowerU,main="Lower",col="red",lty = 2)
+  lines(tmp,sunAltEffectLowerL,main="Lower",col="red",lty = 2)
+  lines(tmp,sunAltEffectLowerU,main="Lower",col="red",lty = 2)
 
   if(run$conf_l$sunAlt[2] ==2){
-    lines(sunAltEffectUpper,col="blue")
-    lines(sunAltEffectUpperL,main="Lower",col="blue",lty = 2)
-    lines(sunAltEffectUpperU,main="Lower",col="blue",lty = 2)
+    lines(tmp,sunAltEffectUpper,col="blue")
+    lines(tmp,sunAltEffectUpperL,main="Lower",col="blue",lty = 2)
+    lines(tmp,sunAltEffectUpperU,main="Lower",col="blue",lty = 2)
   }
 
-
-  tmp = length(sunAltEffectLower)
-  x = c(1,tmp/4,tmp/2,tmp*3/4,tmp)
+  x = c(0,0.5*pi,pi,pi*3/2,2*pi)
   text = c("Lowest (morning)", "", "Heighest", "", "Lowest (evening)")
   axis(1, at=x,labels=text)
   minLength = min(run$conf_l$lengthGroups)
@@ -284,10 +275,13 @@ plotSunAlt<-function(run){
     legend(legend=c(paste0(minLength, " cm"), paste0(maxLength, " cm")),col=c("red","blue"),"topright",lty=1,cex =1.5)
   }
 
-  abline(v=1,lty=3)
-  abline(v=tmp/4,lty=3)
-  abline(v=tmp/2,lty=3)
-  abline(v=tmp*3/4,lty=3)
-  abline(v=tmp,lty=3)
+  nn = length(attributes(run$data)$sunAltTrans)
+  ww = 0.05
+  points( (attributes(run$data)$sunAltTrans)*(2*pi) ,rep(0,nn)+ ww/2 -runif(nn)*ww, cex = 0.2)
 
+  abline(v=0,lty=3)
+  abline(v=pi/2,lty=3)
+  abline(v=pi,lty=3)
+  abline(v=pi*3/2,lty=3)
+  abline(v=2*pi,lty=3)
 }
