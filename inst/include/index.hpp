@@ -15,9 +15,9 @@ template <class Type>
           nll -= dnorm(par.beta0(y,l),par.beta0(y-1,l),sigma_beta0,true);
 
           if(dat.simulateProcedure==1){
-            SIMULATE_F(of){
-              par.beta0(y,l) = rnorm(par.beta0(y-1,l),sigma_beta0);
-            }
+//            SIMULATE_F(of){
+//              par.beta0(y,l) = rnorm(par.beta0(y-1,l),sigma_beta0);
+//            }
           }
         }
       }
@@ -50,6 +50,8 @@ template <class Type>
 
 
     //Latent effects
+    Type scaleS = Type(1)/((4*3.14159265)*kappa[0]*kappa[0]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
+    Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
     Type d = 2; //Part of spatial pc-prior
     Type rhoP;
     Type R = -log(dat.pcPriorsRange(1))*pow(dat.pcPriorsRange(0),d/2);
@@ -65,9 +67,6 @@ template <class Type>
           SEPARABLE(AR1(rho_l(0)),GMRF(Q_s)).simulate(par.xS);
         }
       }
-
-      Type scaleS = Type(1)/((4*3.14159265)*kappa[0]*kappa[0]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
-      par.xS = par.xS/sqrt(scaleS);
     }
     if(dat.spatioTemporal != 0){
       if(dat.usePCpriors==1){
@@ -80,8 +79,6 @@ template <class Type>
             SEPARABLE(AR1(rho_l(1)),SEPARABLE(AR1(rho_t(0)),GMRF(Q_st))).simulate(par.xST);
         }
       }
-      Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
-      par.xST = par.xST/sqrt(scaleST);
     }
 
     if(dat.useNugget==1){
@@ -171,8 +168,8 @@ template <class Type>
           covariatesConvexW = (dat.numberOfLengthGroups-l-1)/(dat.numberOfLengthGroups-1);
           mu(counter,l)= exp( par.beta0.row(y)(l)+
             covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter) +
-            deltaMatrixS.row(l)(s)*sigma(0)+
-            deltaMatrixST.row(l)(s)*sigma(1)+
+            deltaMatrixS.row(l)(s)*sigma(0)/sqrt(scaleS)+
+            deltaMatrixST.row(l)(s)*sigma(1)/sqrt(scaleST)+
             log(dat.dist(counter))+
             covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter)+
             par.nugget.col(counter)(l)*sigma(2));
@@ -182,8 +179,8 @@ template <class Type>
               muZero = exp(par.delta_z(0) +
                 par.delta_z(1)* par.beta0.row(y)(l) +
                 par.delta_z(1)* (covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter)) +
-                par.delta_z(1)* deltaMatrixS.row(l)(s)*sigma(0)+
-                par.delta_z(1)* deltaMatrixST.row(l)(s)*sigma(1)+
+                par.delta_z(1)* deltaMatrixS.row(l)(s)*sigma(0)/sqrt(scaleS)+
+                par.delta_z(1)* deltaMatrixST.row(l)(s)*sigma(1)/sqrt(scaleST)+
                 par.delta_z(1)* (covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter))+
                 par.delta_z(1)* par.nugget.col(counter)(l)*sigma(2)+
                 par.delta_z(2)* log(dat.dist(counter)));
@@ -255,8 +252,8 @@ template <class Type>
       array<Type> xST=par.xST;
       REPORT_F(xS,of);
       REPORT_F(xST,of);
-      matrix<Type> beta0 = par.beta0;
-      REPORT_F(beta0,of);
+ //     matrix<Type> beta0 = par.beta0;
+//      REPORT_F(beta0,of);
 
     }
 
