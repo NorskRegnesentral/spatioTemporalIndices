@@ -40,7 +40,7 @@ fitModelSim<-function(run,simData){
 
   data$obsVector = simData$obsVector
   data$age =simData$age
-  data$readability = rep(1,length(data$readability)) #NB
+  data$readability = rep(1,length(data$readability)) #NB!!! Do not simulate readability
   par = run$par
   if(conf_l$applyALK ==1){
     if(conf_l$rwBeta0==1){
@@ -53,7 +53,11 @@ fitModelSim<-function(run,simData){
       if(data$rwBeta0_alk==1){
         obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget","beta0_alk"),profile = c("beta0","betaSun","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
       }else{
-        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun","beta0_alk","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
+        if(conf_l$nugget==1){
+          obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun","beta0_alk","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
+        }else{#Need a parameter that is not profiled to estimate
+          obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun","beta0_alk"), DLL="spatioTemporalIndices",map = map)
+        }
       }
     }
   }else{
@@ -64,7 +68,11 @@ fitModelSim<-function(run,simData){
         obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget","beta0"), DLL="spatioTemporalIndices",map = map)
       }
     }else{
-      obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun"), DLL="spatioTemporalIndices",map = map)
+      if(conf_l$nugget==1){
+        obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun"), DLL="spatioTemporalIndices",map = map)
+      }else{#Need a parameter that is not profiled to estimate
+        obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget"),profile = c("betaSun"), DLL="spatioTemporalIndices",map = map)
+      }
     }
   }
 
