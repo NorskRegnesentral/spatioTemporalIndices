@@ -149,10 +149,16 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
   par <- lapply(1:njit, function(i)relist(pOriginal+rnorm(length(pOriginal),sd=sd), run$par))
 
   #Set to spatio-temporal parameters to arrays as needed in the current implementation
+
+
   for(i in 1:length(par)){
-    par[[i]]$xS = array(par[[i]]$xS, dim = dim(parOriginal$xS))
-    par[[i]]$xST = array(par[[i]]$xST, dim = dim(parOriginal$xST))
-    par[[i]]$xST_alk = array(par[[i]]$xST_alk, dim = dim(parOriginal$xST_alk))
+    scaleS = 1/((4*3.14159265)*exp(par[[i]]$logKappa)*exp(par[[i]]$logKappa))
+    scaleS_alk = 1/((4*3.14159265)*exp(par[[i]]$logKappa_alk)*exp(par[[i]]$logKappa_alk))
+
+    par[[i]]$xS = array(par[[i]]$xS, dim = dim(parOriginal$xS))* sqrt(scaleS[1])
+    par[[i]]$xST = array(par[[i]]$xST, dim = dim(parOriginal$xST))* sqrt(scaleS[2])
+    par[[i]]$xST_alk = array(par[[i]]$xST_alk, dim = dim(parOriginal$xST_alk))* sqrt(scaleS_alk[1])
+    par[[i]]$xS_alk = array(par[[i]]$xS_alk, dim = dim(parOriginal$xS_alk))* sqrt(scaleS_alk[2])
   }
 
   #Set those who are mapped as NA to its initial value
@@ -234,7 +240,7 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
 
   scaleS_alk = 1/((4*3.14159265)*exp(pl$logKappa_alk)*exp(pl$logKappa_alk))
   pl$xS_alk = pl$xS_alk/scaleS_alk[1]* exp(pl$logSigma_alk[1])
-  pl$xST_alk = pl$xS_alk/scaleS_alk[2]* exp(pl$logSigma_alk[2])
+  pl$xST_alk = pl$xST_alk/scaleS_alk[2]* exp(pl$logSigma_alk[2])
 
   diffPar = lapply(runs, function(f) {
     plJit = as.list(f$rep, "Est")
@@ -245,7 +251,7 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
 
     scaleS_alk = 1/((4*3.14159265)*exp(plJit$logKappa_alk)*exp(plJit$logKappa_alk))
     plJit$xS_alk = plJit$xS_alk/scaleS_alk[1]* exp(plJit$logSigma_alk[1])
-    plJit$xST_alk = plJit$xS_alk/scaleS_alk[2]* exp(plJit$logSigma_alk[2])
+    plJit$xST_alk = plJit$xST_alk/scaleS_alk[2]* exp(plJit$logSigma_alk[2])
 
     mpd = mapply(function(g,h){
       max(abs(g-h))
