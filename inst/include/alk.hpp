@@ -19,9 +19,9 @@ template <class Type>
         for(int a=1; a<(nAges-1); ++a){
           nll -= dnorm(par.beta0_alk(y,a),par.beta0_alk(y-1,a-1),sigma_beta0_alk,true);
           if(dat.simulateProcedure==1){
-            SIMULATE_F(of){
-              par.beta0_alk(y,a) = rnorm(par.beta0_alk(y-1,a-1),sigma_beta0_alk);
-            }
+//            SIMULATE_F(of){
+ //             par.beta0_alk(y,a) = rnorm(par.beta0_alk(y-1,a-1),sigma_beta0_alk);
+//            }
           }
         }
       }
@@ -154,8 +154,8 @@ template <class Type>
       REPORT_F(xST_alk,of);
       vector<int> age=dat.age;
       REPORT_F(age,of);
-      matrix<Type> beta0_alk = par.beta0_alk;
-      REPORT_F(beta0_alk,of);
+//      matrix<Type> beta0_alk = par.beta0_alk;
+//      REPORT_F(beta0_alk,of);
     }
 
 

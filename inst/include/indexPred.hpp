@@ -160,6 +160,7 @@ template <class Type>
     if(dat.applyALK==1){
       logAgeIndex = log(ageIndex);
       ADREPORT_F(logAgeIndex, of);
+      REPORT_F(logAgeIndex, of);
     }
 
 
