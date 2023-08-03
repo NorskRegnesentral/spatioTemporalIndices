@@ -382,6 +382,7 @@ combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf,confpred){
   attributes(dat_joint)$locObsLatLon = attributes(dat_l)$locObsLatLon
   attributes(dat_joint)$depth = attributes(dat_l)$depth #Used when constructing integration points
   attributes(dat_joint)$X_sunAltIntegrate = attributes(dat_l)$X_sunAltIntegrate #Used when constructing integration points
+  attributes(dat_joint)$sunAltTrans = attributes(dat_l)$sunAltTrans
 
   return(list(dat_joint = dat_joint, par_joint = par_joint,map_joint = map_joint))
 }
