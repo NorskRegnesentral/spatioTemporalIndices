@@ -365,7 +365,7 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
 #' @export
 #' @examples
 #' @return
-combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf,confpred){
+combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf,confPred){
 
   dat_joint = c(dat_l,dat_a)
   par_joint = c(par_l,par_a)
