@@ -1,5 +1,6 @@
-library(spatioTemporalIndices)
-library(spatioTemporalALK)
+suppressMessages(library(spatioTemporalIndices))
+suppressMessages(library(spatioTemporalALK))
+
 
 dat_l = readRDS("haddock2018-2020_length_ex_rus.rds")
 dat_alk = readRDS("haddock2018-2020_age_ex_rus.rds")
@@ -38,7 +39,9 @@ timeUsed
 
 
 cat(run$opt$objective,"\n", file="res.out")
-apply(run$rl$logAgeIndex,1, function(f)cat(f,"\n", file="res.out", append = TRUE))
+#cat(run$opt$objective,"\n", file="res.EXP")
+apply(round(run$rl$logAgeIndex,3),1, function(f)cat(f,"\n", file="res.out", append = TRUE))
+#apply(round(run$rl$logAgeIndex,3),1, function(f)cat(f,"\n", file="res.EXP", append = TRUE))
 
 
 
