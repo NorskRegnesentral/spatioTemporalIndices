@@ -272,3 +272,82 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
 }
 
 
+
+
+#' retroSTIM
+#' @param run The result of running fitModel
+#' @param nyears The number of years to remove sequentially
+#' @param years Default NULL, will overwrite nyears and select which years to remove sequentially
+#' @param ncores Number of cores to use.
+#' @details
+#' @return
+#' @export
+#'
+retroSTIM = function(run,nyears,years = NULL,ncores = 1){
+  if(is.null(years)){
+    if(ncores>1){
+      cl <- makeCluster(ncores) #set up nodes
+      on.exit(stopCluster(cl)) #shut it down
+      clusterExport(cl, varlist=c("run","confPred"), envir=environment()) #TODO: by some reason confPred is needed here. Look more into that.
+      lib.ver <- dirname(path.package("spatioTemporalIndices"))
+      clusterExport(cl, varlist="lib.ver", envir=environment())
+      clusterEvalQ(cl, {library(spatioTemporalIndices ,lib.loc=lib.ver)
+        library(spatioTemporalALK ,lib.loc=lib.ver)})
+      ret = parLapply(cl,1:nyears, function(y,dat_l = run$dat_l,dat_alk = run$dat_alk,
+                                            conf_l = run$conf_l,conf_alk = run$conf_alk,confPred= run$confPred){
+        maxYear = max(conf_l$years)
+        yy_l = as.numeric(format(dat_l$startdatetime,"%Y"))
+        yy_alk = as.numeric(format(dat_alk$startdatetime,"%Y"))
+        dat_l = dat_l[which(yy_l<= (maxYear-y)),]
+        dat_alk = dat_alk[which(yy_alk<= (maxYear-y)),]
+        conf_l$years = conf_l$years[conf_l$years <= ((maxYear-y))]
+        runTmp = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+        runTmp})
+    }else{
+      ret = lapply(1:nyears, function(y,dat_l = run$dat_l,dat_alk = run$dat_alk,
+                                      conf_l = run$conf_l,conf_alk = run$conf_alk,confPred= run$confPred){
+        maxYear = max(conf_l$years)
+        yy_l = as.numeric(format(dat_l$startdatetime,"%Y"))
+        yy_alk = as.numeric(format(dat_alk$startdatetime,"%Y"))
+        dat_l = dat_l[which(yy_l<= (maxYear-y)),]
+        dat_alk = dat_alk[which(yy_alk<= (maxYear-y)),]
+        conf_l$years = conf_l$years[conf_l$years <= ((maxYear-y))]
+        runTmp = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+        runTmp})
+    }
+  }else{
+    if(ncores >1){
+      cl <- makeCluster(ncores) #set up nodes
+      on.exit(stopCluster(cl)) #shut it down
+      clusterExport(cl, varlist=c("run","confPred"), envir=environment())
+      lib.ver <- dirname(path.package("spatioTemporalIndices"))
+      clusterExport(cl, varlist="lib.ver", envir=environment())
+      clusterEvalQ(cl, {library(spatioTemporalIndices ,lib.loc=lib.ver)
+        library(spatioTemporalALK ,lib.loc=lib.ver)})
+      ret = parLapply(cl, years, function(year,dat_l = run$dat_l,dat_alk = run$dat_alk,
+                                          conf_l = run$conf_l,conf_alk = run$conf_alk,confPred= run$confPred){
+        yy_l = as.numeric(format(dat_l$startdatetime,"%Y"))
+        yy_alk = as.numeric(format(dat_alk$startdatetime,"%Y"))
+        dat_l = dat_l[which(yy_l< year),]
+        dat_alk = dat_alk[which(yy_alk< year),]
+        conf_l$years = conf_l$years[conf_l$years <year]
+        runTmp = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+        runTmp})
+    }else{
+      ret = lapply(years, function(year,dat_l = run$dat_l,dat_alk = run$dat_alk,
+                                   conf_l = run$conf_l,conf_alk = run$conf_alk,confPred= run$confPred){
+        yy_l = as.numeric(format(dat_l$startdatetime,"%Y"))
+        yy_alk = as.numeric(format(dat_alk$startdatetime,"%Y"))
+        dat_l = dat_l[which(yy_l)< year,]
+        dat_alk = dat_alk[which(yy_alk)< year,]
+        conf_l$years = conf_l$years[conf_l$years <year]
+        runTmp = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+        runTmp})
+    }
+  }
+  attributes(ret)$run = run
+  class(ret) = "stimRetro"
+  ret
+}
+
+
