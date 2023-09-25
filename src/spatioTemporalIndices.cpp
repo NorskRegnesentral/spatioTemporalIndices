@@ -20,7 +20,7 @@ Type objective_function<Type>::operator() ()
   dataSet<Type> dat;
   DATA_MATRIX(fishObsMatrix); dat.fishObsMatrix = fishObsMatrix; //Observations in a matrix
   DATA_VECTOR(dist); dat.dist = dist; // Distance of each haul
-  DATA_STRUCT(A_ListS, LOSM_t); //TODO
+  DATA_STRUCT(A_ListS, LOSM_t);
   DATA_STRUCT(A_ListST, LOSM_t);
   DATA_STRUCT(spdeMatricesS,spde_t); //Three matrices needed for representing the GMRF, see p. 8 in Lindgren et al. (2011)
   DATA_STRUCT(spdeMatricesST,spde_t); //Three matrices needed for representing the GMRF, see p. 8 in Lindgren et al. (2011)

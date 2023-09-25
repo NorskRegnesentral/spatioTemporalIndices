@@ -18,11 +18,6 @@ template <class Type>
       for(int y=1;y<dat.idx1.size();y++){
         for(int a=1; a<(nAges-1); ++a){
           nll -= dnorm(par.beta0_alk(y,a),par.beta0_alk(y-1,a-1),sigma_beta0_alk,true);
-          if(dat.simulateProcedure==1){
-//            SIMULATE_F(of){
- //             par.beta0_alk(y,a) = rnorm(par.beta0_alk(y-1,a-1),sigma_beta0_alk);
-//            }
-          }
         }
       }
     }
@@ -135,8 +130,6 @@ template <class Type>
         vector<Type> probAge = ALK.row(s);
         Type uu = runif( (Type) 0, (Type) 1);
         Type sum = 0;
-//        matrix<Type> sampledAge = rmultinom(1, 1, probAge);
-
         for(int aa =0; aa < probAge.size(); ++aa){
           sum += probAge(aa);
           if(sum>uu){
@@ -154,10 +147,7 @@ template <class Type>
       REPORT_F(xST_alk,of);
       vector<int> age=dat.age;
       REPORT_F(age,of);
-//      matrix<Type> beta0_alk = par.beta0_alk;
-//      REPORT_F(beta0_alk,of);
     }
-
 
     return(nll);
   }
@@ -188,7 +178,6 @@ template <class Type>
         }
       }
     }
-
 
     array<Type> ALK_int(dat.numberOfLengthGroups,nAges, nInt,nYears);
     ALK_int.setZero();
@@ -251,7 +240,6 @@ array<Type> ALKhauls(dataSet<Type> dat, paraSet<Type> par, LOSM_t<Type> A_ListST
     }
   }
 
-
   Type tmp2;
   Type probLess2;
   for(int y=0; y<nYears; ++y){
@@ -273,7 +261,6 @@ array<Type> ALKhauls(dataSet<Type> dat, paraSet<Type> par, LOSM_t<Type> A_ListST
       }
     }
   }
-
   return(ALK_obs);
 }
 

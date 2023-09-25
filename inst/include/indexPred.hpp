@@ -155,14 +155,12 @@ template <class Type>
       ADREPORT_F(logLengthIndex, of);
     }
 
-
     array<Type> logAgeIndex(nYears,nAges);
     if(dat.applyALK==1){
       logAgeIndex = log(ageIndex);
       ADREPORT_F(logAgeIndex, of);
       REPORT_F(logAgeIndex, of);
     }
-
 
     //Report COG
     if(dat.applyALK==1){

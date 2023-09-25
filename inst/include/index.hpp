@@ -13,12 +13,6 @@ template <class Type>
       for(int y=1;y<dat.nStationsEachYear.size();y++){
         for(int l=0; l<dat.numberOfLengthGroups; ++l){
           nll -= dnorm(par.beta0(y,l),par.beta0(y-1,l),sigma_beta0,true);
-
-          if(dat.simulateProcedure==1){
-//            SIMULATE_F(of){
-//              par.beta0(y,l) = rnorm(par.beta0(y-1,l),sigma_beta0);
-//            }
-          }
         }
       }
     }
@@ -130,8 +124,6 @@ template <class Type>
     vector<Type> depthEffect1 = dat.X_depth*parDepth1;
     vector<Type> depthEffect2 = dat.X_depth*parDepth2;
 
-//    vector<Type> validation(dat.numberOfLengthGroups);
-//    validation.setZero();
     int counter=0;
     for(int y=0;y<dat.nStationsEachYear.size();y++){
       SparseMatrix<Type> As = A_ListS(y);
@@ -191,7 +183,6 @@ template <class Type>
                 pPos = dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true)  + logspace_sub(Type(0),pZero);
               }else if (dat.obsModel==3){
                 //Gamma distributed response
-
                 if(dat.obsVector(dat.idxStart(counter) +l) >0){
                   scale = size;
                   shape = mu(counter,l)/scale;
@@ -216,26 +207,21 @@ template <class Type>
             }else{
               if(dat.obsModel==1){
                 nll -= keep(dat.idxStart(counter) +l)*dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true);
-//                SIMULATE_F(of){
-//                  dat.obsVector(dat.idxStart(counter) +l) = rnbinom_robust(log(mu(counter,l)),log_var_minus_mu);
-//                }
+                //TODO simulation
               }else if(dat.obsModel==2){
                 nll -= keep(dat.idxStart(counter) +l)*dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true);
                 SIMULATE_F(of){
                     dat.obsVector(dat.idxStart(counter) +l) = rpois(mu(counter,l));
                 }
               }else if (dat.obsModel==3){
-                //Gamma distributed response
+                //Tweedie distributed response
                 scale = size;
                 shape = mu(counter,l)/scale;
                 pTweedie =  Type(1)/(Type(1) + exp(-Type(2) * par.tweedieP(0))) + Type(1);
-
- //               nll -= keep(dat.idxStart(counter) +l)*dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true); //Need zero-probability
+                //TODO simulation
                 nll -= keep(dat.idxStart(counter) +l)*dtweedie(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),size,pTweedie,true);
               }
             }
-          }else{
-//            validation(l) = validation(l) + mu(counter,l);
           }
         }
         counter++;
@@ -252,11 +238,7 @@ template <class Type>
       array<Type> xST=par.xST;
       REPORT_F(xS,of);
       REPORT_F(xST,of);
- //     matrix<Type> beta0 = par.beta0;
-//      REPORT_F(beta0,of);
-
     }
-
 
     return(nll);
   }
