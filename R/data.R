@@ -16,9 +16,12 @@ setupData = function(dataLength,conf,confPred){
   #Remove too short lengths
   dataLength = dataLength[dataLength$lengthGroup>=conf$minLength,]
 
+  #Remove too long lengths
   for(id in unique(dataLength$station)){
     index =which(dataLength$station==id & dataLength$lengthGroup>=conf$maxLength)
-    dataLength$catch[index[1]] = sum(dataLength$catch[index])
+    if(conf$plusGroup==1){
+      dataLength$catch[index[1]] = sum(dataLength$catch[index])
+    }
   }
   if(length(which(dataLength$lengthGroup> conf$maxLength)>0)){
     dataLength = dataLength[-which(dataLength$lengthGroup> conf$maxLength),]
