@@ -11,16 +11,13 @@
 #' @return A fitted stim object
 #' @details
 #' @export
-fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrior = NULL,runModel = TRUE, mapSet = NULL,...){
+fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,runModel = TRUE, mapSet = NULL,...){
 
-  tryCatch(
-    {
-      #Will fail if not using MKL (efficient linear algebra library)
+  tryCatch({
       setMKLthreads(1) #not profiting much by using more cores
     },
     error=function(cond) {
       message("MKL library not used, couputation time may be reduced by using MLK library")
-      return(NA)
     }
   )
 
@@ -56,46 +53,37 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
   print("Start inference")
 
 
-  if(!is.null(parPrior)){par = parPrior}
+  if(!is.null(parSet)){par = parSet}
+  if(!is.null(mapSet)){map = mapSet}
 
-  if(!is.null(mapSet)){
-    map = mapSet
+  random = c("xS","xST", "nugget","betaDepth")
+  profile = NULL
+  if(conf_l$sunAlt[2]!=0){
+    profile = c("betaSun")
   }
-
+  if(conf_l$rwBeta0==1){
+    random=c(random,"beta0")
+  }else{
+    profile = c(profile,"beta0")
+  }
   if(conf_l$applyALK ==1){
-    if(conf_l$rwBeta0==1){
-      if(data$rwBeta0_alk==1){
-        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget","beta0","beta0_alk"),profile = c("betaSun","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
-        }else{
-        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget","beta0"),profile = c("betaSun","betaLength_alk","beta0_alk"), DLL="spatioTemporalIndices",map = map)
-      }
+    random = c(random, "xS_alk","xST_alk")
+    profile = c(profile,"betaLength_alk")
+    if(data$rwBeta0_alk==1){
+      random=c(random,"beta0_alk")
     }else{
-      if(data$rwBeta0_alk==1){
-        obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget","beta0_alk"),profile = c("beta0","betaSun","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
-      }else{
-        if(conf_l$nugget==1){
-          obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun","beta0_alk","betaLength_alk"), DLL="spatioTemporalIndices",map = map)
-        }else{#Need a parameter that is not profiled to estimate
-          obj <- MakeADFun(data, par, random=c("xS_alk","xST_alk","xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun","beta0_alk"), DLL="spatioTemporalIndices",map = map)
-        }
-      }
+      profile = c(profile,"beta0_alk")
+    }
+    if(conf_l$rwBeta0==0& data$rwBeta0_alk==0 &conf_l$nugget==0 & conf_l$spatial==0 & conf_l$spatioTemporal==0 & conf_l$splineDepth[2]==0 & conf_l$sunAlt[2]==0){
+      profile = NULL#Need one parameter that is not profiled
     }
   }else{
-    if(conf_l$rwBeta0==1){
-      if(conf_l$sunAlt[2]>0){
-        obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget","beta0"),profile = c("betaSun"), DLL="spatioTemporalIndices",map = map)
-      }else{#Profile needs not to be mapped to only constants, TODO: make this part neater
-        obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget","beta0"), DLL="spatioTemporalIndices",map = map)
-      }
-    }else{
-      if(conf_l$nugget==1){
-        obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget"),profile = c("beta0","betaSun"), DLL="spatioTemporalIndices",map = map)
-      }else{#Need a parameter that is not profiled to estimate
-        obj <- MakeADFun(data, par, random=c("xS","xST","betaDepth", "nugget"),profile = c("betaSun"), DLL="spatioTemporalIndices",map = map)
-      }
+    if(conf_l$rwBeta0==0 &conf_l$nugget==0 & conf_l$spatial==0 & conf_l$spatioTemporal==0 & conf_l$splineDepth[2]==0 & conf_l$sunAlt[2]==0){
+      profile = NULL#Need one parameter that is not profiled
     }
   }
 
+  obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map)
 
   if(runModel){
     opt <- nlminb(obj$par, obj$fn, obj$gr,
@@ -114,10 +102,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parPrio
     toReturn = list(obj = obj,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk)
   }
 
-
-
   class(toReturn) = "stim"
-
   return(toReturn)
 }
 

@@ -31,22 +31,16 @@ setPar <- function(data,conf){
                      xS = xS,
                      xST  = xST,
                      nugget = nugget,
-                     log_sigma_beta0 = 0)
+                     log_sigma_beta0 = 0,
+                     tweedieP = numeric(0))
 
   if(conf$applyALK==0){
     parameters = includeDummyPar(parameters)
   }
 
-  if(conf$obsModel==3){
-    if(conf$zeroInflated==1){
-      parameters$tweedieP = numeric(0)
-    }else{
-      parameters$tweedieP = 0
-    }
-  }else{
-    parameters$tweedieP = numeric(0)
+  if(conf$obsModel==3 & conf$zeroInflated==0){
+    parameters$tweedieP = 0
   }
-
 
   return(parameters)
 }
