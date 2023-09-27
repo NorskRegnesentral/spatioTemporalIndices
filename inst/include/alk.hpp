@@ -20,6 +20,8 @@ template <class Type>
           nll -= dnorm(par.beta0_alk(y,a),par.beta0_alk(y-1,a-1),sigma_beta0_alk,true);
         }
       }
+      nll -= dnorm(par.beta0_alk(0,(nAges-2)),par.beta0_alk(1,(nAges-2)),sigma_beta0_alk,true); //random walk for oldest age in first year
+      nll -= dnorm(par.beta0_alk(dat.idx1.size()-1,0),par.beta0_alk(dat.idx1.size()-2,0),sigma_beta0_alk,true); //random walk for youngest age in last year
     }
 
     vector<Type> sigma =exp(par.logSigma_alk);
