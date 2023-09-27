@@ -4,7 +4,7 @@
 \alias{combineLengthALK}
 \title{combineLengthALK}
 \usage{
-combineLengthALK(dat_l, par_l, map_l, dat_a, par_a, map_a, conf, confpred)
+combineLengthALK(dat_l, par_l, map_l, dat_a, par_a, map_a, conf, confPred)
 }
 \description{
 combineLengthALK

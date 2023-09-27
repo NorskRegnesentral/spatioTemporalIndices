@@ -10,7 +10,9 @@ fitModel(
   confPred,
   dat_alk = NULL,
   conf_alk = NULL,
-  parPrior = NULL,
+  parSet = NULL,
+  runModel = TRUE,
+  mapSet = NULL,
   ...
 )
 }
