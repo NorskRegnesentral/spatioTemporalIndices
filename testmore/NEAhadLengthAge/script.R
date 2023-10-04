@@ -15,7 +15,7 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
                  splineDepth = c(6,2),
                  dLength = 5,
                  reduceLength = 3,
-                 stratasystem = list(dsn="Vintertokt_strata_system", layer = "Vintertoktet_nye_strata"),
+                 stratasystem = list(dsn="strata", layer = "Vintertoktet_nye_strata"),
                  minDepth=150,maxDepth=400,
                  applyALK = 1,
                  cutoff =120, cbound = 130)
