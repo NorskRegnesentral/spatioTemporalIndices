@@ -166,13 +166,13 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
   }
 
   if(ncores ==1){
-    runs=lapply(par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parPrior = f))
+    runs=lapply(par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f))
   }else{
     stop("not working with several cores, TODO")
     cl <-makeCluster(min(njit,ncores),outfile = "")
     clusterExport(cl,varlist=c("run","par"),envir=environment())
     clusterEvalQ(cl, library("spatioTemporalIndices"))
-    runs=parLapply(cl,par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parPrior = f))
+    runs=parLapply(cl,par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f))
     stopCluster(cl)
   }
 
