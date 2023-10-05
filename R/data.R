@@ -150,7 +150,7 @@ setupData = function(dataLength,conf,confPred){
 
   X_sunAlt = gamSetup_sunAlt$X[,-1]
   X_depth = gamSetup_depth$X[,-1]
-  S_depth=as(gamSetup_depth$smooth[[1]]$S[[1]], "dgTMatrix")
+  S_depth=as(gamSetup_depth$smooth[[1]]$S[[1]], "TsparseMatrix")
   Sdim=nrow(S_depth)
 
   gamSetup_sunAltReport = gam(sunAltFormulaIntRep,
