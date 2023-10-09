@@ -91,8 +91,8 @@ partable<-function(run, ...){
   sigmaL = round(exp(pl$log_sigma - 1.96*plsd$log_sigma),2)
 
   kappa = round(exp(pl$log_kappa),4)
-  kappaU = round(exp(pl$log_kappa +  1.96*plsd$log_kappa),4)
-  kappaL = round(exp(pl$log_kappa -  1.96*plsd$log_kappa),4)
+  kappaU = round(exp(pl$log_kappa +  1.96*plsd$log_kappa),5)
+  kappaL = round(exp(pl$log_kappa -  1.96*plsd$log_kappa),5)
 
   sigmaRW = c(exp(pl$log_sigma_beta0), exp(pl$log_sigma_beta0 + 1.96*plsd$log_sigma_beta0*c(-1,1)))
   sigmaRW_alk = c(exp(pl$log_sigma_beta0_alk), exp(pl$log_sigma_beta0_alk + 1.96*plsd$log_sigma_beta0_alk*c(-1,1)))
@@ -108,8 +108,8 @@ partable<-function(run, ...){
   sigmaRW_alk = round(sigmaRW_alk,2);
   sigma_alkS = round(sigma_alkS,2);
   sigma_alkST = round(sigma_alkST,2);
-  kappa_alkS = round(kappa_alkS,4);
-  kappa_alkST = round(kappa_alkST,4);
+  kappa_alkS = round(kappa_alkS,5);
+  kappa_alkST = round(kappa_alkST,5);
 
 
   if(run$conf_l$spatial==0){
@@ -218,6 +218,7 @@ includeDummyAge = function(data){
   data$usePCpriorsALK = 0
   data$spatialALK = 0
   data$spatioTemporalALK = 0
+  data$betaLength = 1
 
   return(data)
 }

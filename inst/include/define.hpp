@@ -87,7 +87,7 @@ struct dataSet{
   int spatioTemporalALK;
   int spatialALK;
   int strataReport;
-
+  int betaLength;
 
   int rwBeta0_alk;
 
@@ -97,7 +97,7 @@ struct dataSet{
 template <class Type>
 struct paraSet{
   matrix<Type> beta0_alk;
-  vector<Type> log_sigma_beta0_alk;
+  vector<Type> log_sigma_beta_alk;
   vector<Type> betaLength_alk;
   vector<Type> logSigma_alk;
   vector<Type> logKappa_alk;

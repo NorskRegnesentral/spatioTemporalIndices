@@ -84,6 +84,7 @@ Type objective_function<Type>::operator() ()
   DATA_INTEGER(usePCpriorsALK); dat.usePCpriorsALK = usePCpriorsALK;
   DATA_INTEGER(spatialALK);  dat.spatialALK = spatialALK;//Configuration spatial, include if 1
   DATA_INTEGER(spatioTemporalALK);  dat.spatioTemporalALK = spatioTemporalALK;//Configuration spatio-temporal, include if 1
+  DATA_INTEGER(betaLength); dat.betaLength = betaLength; //Time varying regression coefficients for length (1=no, 2=yes)
   //-----------------------------
 
   paraSet<Type> par;
@@ -105,7 +106,7 @@ Type objective_function<Type>::operator() ()
 
   //ALK stuff-------------------
   PARAMETER_MATRIX(beta0_alk); par.beta0_alk = beta0_alk;//Intercepts
-  PARAMETER_VECTOR(log_sigma_beta0_alk);par.log_sigma_beta0_alk = log_sigma_beta0_alk;
+  PARAMETER_VECTOR(log_sigma_beta_alk);par.log_sigma_beta_alk = log_sigma_beta_alk;
   PARAMETER_VECTOR(betaLength_alk); par.betaLength_alk = betaLength_alk;//Regression parameters
   PARAMETER_VECTOR(logSigma_alk);par.logSigma_alk = logSigma_alk;
   PARAMETER_VECTOR(logKappa_alk);par.logKappa_alk = logKappa_alk;
