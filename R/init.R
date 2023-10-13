@@ -53,7 +53,7 @@ setPar <- function(data,conf){
 includeDummyPar <- function(par){
 
   par$beta0_alk = matrix(rep(0,4),nrow = 2)
-  par$log_sigma_beta0_alk = 0
+  par$log_sigma_beta_alk = c(0,0)
   par$betaLength_alk = c(1,2,3)
   par$logSigma_alk = c(1,2,3)
   par$logKappa_alk = c(1,2,3)
