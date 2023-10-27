@@ -33,18 +33,18 @@ template <class Type>
         nll -= dnorm(par.betaLength_alk((dat.idx1.size()-1)*(nAges-1) + 0),par.betaLength_alk((dat.idx1.size()-2)*(nAges-1) + 0),sigma_beta_alk(1),true); //random walk for youngest age in last year
       }
     }else{
-      for(int y=0;y<dat.idx1.size();y++){
-        for(int a=0; a<(nAges-1); ++a){
-          nll -= dnorm(par.beta0_alk(y,a),Type(0),Type(50),true); //Penalization, often needed for convergence
-        }
-      }
-      if(dat.betaLength==2){
-        for(int y=0;y<dat.idx1.size();y++){
-          for(int a=0; a<(nAges-1); ++a){
-            nll -= dnorm(par.betaLength_alk(y*(nAges-1) + a),Type(0),Type(50),true);//Penalization, often needed for convergence
-          }
-        }
-      }
+//      for(int y=0;y<dat.idx1.size();y++){
+//        for(int a=0; a<(nAges-1); ++a){
+//          nll -= dnorm(par.beta0_alk(y,a),Type(0),Type(50),true); //Penalization, often needed for convergence
+//        }
+//      }
+//      if(dat.betaLength==2){
+//        for(int y=0;y<dat.idx1.size();y++){
+//          for(int a=0; a<(nAges-1); ++a){
+//            nll -= dnorm(par.betaLength_alk(y*(nAges-1) + a),Type(0),Type(50),true);//Penalization, often needed for convergence
+//          }
+//        }
+//      }
     }
 
     vector<Type> sigma =exp(par.logSigma_alk);
@@ -90,8 +90,8 @@ template <class Type>
       }
     }
 
-    Type scaleS = Type(1)/((4*3.14159265)*kappa(0)*kappa(0)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
-    Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
+    Type scaleS = Type(1)/((4*M_PI)*kappa(0)*kappa(0)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
+    Type scaleST = Type(1)/((4*M_PI)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
 
     matrix<Type> linPredMatrix(nObs, nAges-1);
     linPredMatrix.setZero();
@@ -156,7 +156,6 @@ template <class Type>
       }
 
       SIMULATE_F(of){
-
         vector<Type> probAge = ALK.row(s);
         Type uu = runif( (Type) 0, (Type) 1);
         Type sum = 0;
@@ -188,8 +187,8 @@ template <class Type>
 
     vector<Type> sigma =exp(par.logSigma_alk);
     vector<Type> kappa =exp(par.logKappa_alk);
-    Type scaleS = Type(1)/((4*3.14159265)*kappa(0)*kappa(0));
-    Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1));
+    Type scaleS = Type(1)/((4*M_PI)*kappa(0)*kappa(0));
+    Type scaleST = Type(1)/((4*M_PI)*kappa(1)*kappa(1));
 
     int nAges = dat.ageRange(1) - dat.ageRange(0) + 1;
     int nYears = dat.nStationsEachYear.size();
@@ -220,22 +219,22 @@ template <class Type>
     array<Type> ALK_int(dat.numberOfLengthGroups,nAges, nInt,nYears);
     ALK_int.setZero();
 
-    Type tmp2;
-    Type probLess2;
+    Type tmp;
+    Type probLess;
     for(int y=0; y<nYears; ++y){
       for(int i=0; i<nInt; ++i){
         for(int a = 0; a<nAges; ++a){
           for(int l = 0; l<dat.numberOfLengthGroups; ++l){
-            probLess2 = 0;
+            probLess = 0;
             for(int b = 0; b <a; ++b ){
-              tmp2 = ALK_int(l,b,i,y);
-              probLess2 = probLess2 + tmp2;
+              tmp = ALK_int(l,b,i,y);
+              probLess = probLess + tmp;
             }
             if(a <(nAges-1)){
-              tmp2 = linPredArray_alk_int(i,y,l,a);
-              ALK_int(l,a,i,y) = invlogit(tmp2)*(1-probLess2);
+              tmp = linPredArray_alk_int(i,y,l,a);
+              ALK_int(l,a,i,y) = invlogit(tmp)*(1-probLess);
             }else{
-              ALK_int(l,nAges-1,i,y)= (1-probLess2);
+              ALK_int(l,nAges-1,i,y)= (1-probLess);
             }
           }
         }
@@ -259,8 +258,8 @@ array<Type> ALKhauls(dataSet<Type> dat, paraSet<Type> par, LOSM_t<Type> A_ListST
 
   vector<Type> sigma =exp(par.logSigma_alk);
   vector<Type> kappa =exp(par.logKappa_alk);
-  Type scaleS = Type(1)/((4*3.14159265)*kappa(0)*kappa(0));
-  Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1));
+  Type scaleS = Type(1)/((4*M_PI)*kappa(0)*kappa(0));
+  Type scaleST = Type(1)/((4*M_PI)*kappa(1)*kappa(1));
 
   array<Type> linPredArray_alk_haul(nObs,nYears,dat.numberOfLengthGroups,nAges-1);
   linPredArray_alk_haul.setZero();
@@ -285,22 +284,22 @@ array<Type> ALKhauls(dataSet<Type> dat, paraSet<Type> par, LOSM_t<Type> A_ListST
     }
   }
 
-  Type tmp2;
-  Type probLess2;
+  Type tmp;
+  Type probLess;
   for(int y=0; y<nYears; ++y){
     for(int i=0; i<dat.nStationsEachYear(y); ++i){
       for(int a = 0; a<nAges; ++a){
         for(int l = 0; l<dat.numberOfLengthGroups; ++l){
-          probLess2 = 0;
+          probLess = 0;
           for(int b = 0; b <a; ++b ){
-            tmp2 = ALK_obs(l,b,i,y);
-            probLess2 = probLess2 + tmp2;
+            tmp = ALK_obs(l,b,i,y);
+            probLess = probLess + tmp;
           }
           if(a <(nAges-1)){
-            tmp2 = linPredArray_alk_haul(i,y,l,a);
-            ALK_obs(l,a,i,y) = invlogit(tmp2)*(1-probLess2);
+            tmp = linPredArray_alk_haul(i,y,l,a);
+            ALK_obs(l,a,i,y) = invlogit(tmp)*(1-probLess);
           }else{
-            ALK_obs(l,nAges-1,i,y)= (1-probLess2);
+            ALK_obs(l,nAges-1,i,y)= (1-probLess);
           }
         }
       }

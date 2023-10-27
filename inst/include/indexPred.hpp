@@ -15,8 +15,8 @@ template <class Type>
     vector<Type> sigma = exp(par.log_sigma);
     vector<Type> kappa = exp(par.log_kappa);
 
-    Type scaleS = Type(1)/((4*3.14159265)*kappa(0)*kappa(0)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
-    Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
+    Type scaleS = Type(1)/((4*M_PI)*kappa(0)*kappa(0)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
+    Type scaleST = Type(1)/((4*M_PI)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
 
     array<Type>  lengthIndex(nYears,numberOfLengthGroups);
     array<Type>  lengthIndexDetailed(nYears,numberOfLengthGroups, nInt);
@@ -107,7 +107,6 @@ template <class Type>
     for(int i=0; i<nInt; ++i){
       nIntStrata(dat.idxStrata(i)-1) = nIntStrata(dat.idxStrata(i)-1) +1;
     }
-
 
     for(int y=0; y<nYears; ++y){
       for(int l = 0; l<numberOfLengthGroups; ++l){

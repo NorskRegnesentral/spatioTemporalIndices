@@ -15,6 +15,12 @@ template <class Type>
           nll -= dnorm(par.beta0(y,l),par.beta0(y-1,l),sigma_beta0,true);
         }
       }
+    }else{
+//     for(int y=0;y<dat.nStationsEachYear.size();y++){
+//        for(int l=0; l<dat.numberOfLengthGroups; ++l){
+//          nll -= dnorm(par.beta0(y,l),Type(0),Type(100),true); //The regression parameters are free
+//        }
+//      }
     }
     //Transform parameters
     vector<Type> sigma = exp(par.log_sigma);
@@ -24,28 +30,21 @@ template <class Type>
     Type shape; //If apply dgamma
     Type pTweedie;
 
-    vector<Type> rho_t(1);
+    vector<Type> rho_t(1);//Time correlation parameter
     rho_t(0)=Type(2)/(Type(1) + exp(-Type(2) * par.tan_rho_t(0))) - Type(1);
 
-    vector<Type> rho_l(3);
+    vector<Type> rho_l(3);//Length correlation parameter
     rho_l(0) = Type(2)/(Type(1) + exp(-Type(2) * par.tan_rho_l(0))) - Type(1);
     rho_l(1) = Type(2)/(Type(1) + exp(-Type(2) * par.tan_rho_l(1))) - Type(1);
     rho_l(2) = Type(2)/(Type(1) + exp(-Type(2) * par.tan_rho_l(2))) - Type(1);
-
-    vector<Type> lambda = exp(par.log_lambda);
-
-    for(int i =1; i<par.delta_z.size(); ++i){
-      par.delta_z(i) = exp(par.delta_z(i));
-    }
 
     //Construct Q in spatial dimension
     SparseMatrix<Type> Q_s = Q_spde(spdeMatricesS,kappa(0));
     SparseMatrix<Type> Q_st = Q_spde(spdeMatricesST,kappa(1));
 
-
-    //Latent effects
-    Type scaleS = Type(1)/((4*3.14159265)*kappa[0]*kappa[0]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
-    Type scaleST = Type(1)/((4*3.14159265)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
+    //Latent spatio-terporal effects
+    Type scaleS = Type(1)/((4*M_PI)*kappa[0]*kappa[0]); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance. See section 2.1 in Lindgren (2011)
+    Type scaleST = Type(1)/((4*M_PI)*kappa(1)*kappa(1)); //No effect on results, but needed for interpreting the sigma^2 parameter as marginal variance
     Type d = 2; //Part of spatial pc-prior
     Type rhoP;
     Type R = -log(dat.pcPriorsRange(1))*pow(dat.pcPriorsRange(0),d/2);
@@ -77,20 +76,18 @@ template <class Type>
 
     if(dat.useNugget==1){
       int nHaul = dat.nStationsEachYear.sum();
-
       SparseMatrix<Type> Q_nuggetIID(nHaul,nHaul);
       for(int i = 0; i< nHaul; ++i){
         Q_nuggetIID.coeffRef(i,i)=1;
       }
-
       nll += SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2)))(par.nugget);
-
       SIMULATE_F(of){
           SEPARABLE(GMRF(Q_nuggetIID),AR1(rho_l(2))).simulate(par.nugget);
       }
     }
 
     //p-spline
+    vector<Type> lambda = exp(par.log_lambda);
     int nSplineDepth = par.betaDepth.size()/2;
     vector<Type> parDepth1(nSplineDepth);
     vector<Type> parDepth2(nSplineDepth);
@@ -135,7 +132,6 @@ template <class Type>
           deltaS2 = As * par.xS.col(dat.lengthGroupsReduced(l)+1).matrix();
           deltaST = Ast * par.xST.col(dat.lengthGroupsReduced(l)).col(y).matrix();
           deltaST2 = Ast * par.xST.col(dat.lengthGroupsReduced(l)+1).col(y).matrix();
-
           for(int s=0; s<dat.nStationsEachYear(y);++s){
             deltaMatrixS(l,s) = dat.weigthLength(l)*deltaS(s) + (1-dat.weigthLength(l))*deltaS2(s);
             deltaMatrixST(l,s) = dat.weigthLength(l)*deltaST(s) + (1-dat.weigthLength(l))*deltaST2(s);
@@ -152,9 +148,9 @@ template <class Type>
         }
       }
 
-      Type muZero;
-      Type pZero;
-      Type pPos;
+      Type muZero;//Used if applying zero inflation
+      Type pZero;//Used if applying zero inflation
+      Type pPos;//Used if applying zero inflation
       for(int s=0; s<dat.nStationsEachYear(y);++s){
         for(int l=0; l <dat.numberOfLengthGroups;++l){
           covariatesConvexW = (dat.numberOfLengthGroups-l-1)/(dat.numberOfLengthGroups-1);
@@ -167,7 +163,7 @@ template <class Type>
             par.nugget.col(counter)(l)*sigma(2));
           log_var_minus_mu=log(mu(counter,l)*mu(counter,l)*size);
           if(dat.predMatrix(counter,l)==0){
-            if(dat.zeroInflated !=0){
+            if(dat.zeroInflated !=0){//Include additional zero-probability //Under development
               muZero = exp(par.delta_z(0) +
                 par.delta_z(1)* par.beta0.row(y)(l) +
                 par.delta_z(1)* (covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter)) +

@@ -53,7 +53,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$lengthGroups = seq(conf$minLength,conf$maxLength,by = conf$dLength)
 
   if(length(stratasystem)>0) {
-    strata = readOGR(dsn = stratasystem[[1]], layer = stratasystem[[2]]) # dsn path must be adjusted to folder location
+    strata = readOGR(dsn = stratasystem[[1]], layer = stratasystem[[2]],verbose = FALSE) # dsn path must be adjusted to folder location
     conf$strata = spTransform(strata,CRS("+proj=longlat"))
     conf$zone = floor((mean(bbox(conf$strata)[1,]) + 180) / 6) + 1
     conf$stratasystem = stratasystem
@@ -223,7 +223,7 @@ setMap <- function(par, conf){
 
   if(conf$applyALK==0){
     map$beta0_alk = as.factor(rep(NA, length(par$beta0_alk)))
-    map$log_sigma_beta0_alk = as.factor(NA)
+    map$log_sigma_beta_alk = as.factor(rep(NA, length(par$log_sigma_beta_alk)))
     map$betaLength_alk = as.factor(rep(NA, length(par$betaLength_alk)))
     map$logSigma_alk = as.factor(rep(NA, length(par$logSigma_alk)))
     map$logKappa_alk = as.factor(rep(NA, length(par$logKappa_alk)))
