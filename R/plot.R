@@ -33,10 +33,6 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
       legend(legend=c(paste0(minLength, " cm"), paste0(maxLength, " cm")),col=c("red","blue"),"topright",lty=1,cex =1.5)
     }
 
-    nn = length(attributes(run$data)$depth)
-    ww = 0.05
-    points(attributes(run$data)$depth ,rep(0,nn)+ ww/2 -runif(nn)*ww, cex = 0.2)
-
     abline(h = 0)
     for(i in 1:20){
       abline(v=i*50,lty=3)
@@ -274,10 +270,6 @@ plotSunAlt<-function(run){
   if(run$conf_l$sunAlt[2] ==2){
     legend(legend=c(paste0(minLength, " cm"), paste0(maxLength, " cm")),col=c("red","blue"),"topright",lty=1,cex =1.5)
   }
-
-  nn = length(attributes(run$data)$sunAltTrans)
-  ww = 0.05
-  points( (attributes(run$data)$sunAltTrans)*(2*pi) ,rep(0,nn)+ ww/2 -runif(nn)*ww, cex = 0.2)
 
   abline(v=0,lty=3)
   abline(v=pi/2,lty=3)
