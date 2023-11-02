@@ -20,8 +20,10 @@ template <class Type>
 
     array<Type>  lengthIndex(nYears,numberOfLengthGroups);
     array<Type>  lengthIndexDetailed(nYears,numberOfLengthGroups, nInt);
+    vector<Type>  lengthIndexTotal(nYears);
     lengthIndex.setZero();
     lengthIndexDetailed.setZero();
+    lengthIndexTotal.setZero();
 
     vector<Type> deltaPredST;
     vector<Type> deltaPredS;
@@ -64,6 +66,7 @@ template <class Type>
             covariatesConvexW*depthEffectInt1(i) + (1-covariatesConvexW)*depthEffectInt2(i)+
             deltaPredS(i)/sqrt(scaleS)*sigma(0)+
             deltaPredST(i)/sqrt(scaleST)*sigma(1));
+          lengthIndexDetailed(y,l,i) = lengthIndexDetailed(y,l,i)*dat.trawlWidth;
         }
       }
     }
@@ -88,10 +91,12 @@ template <class Type>
     if(dat.applyALK==1){
       nAges = dat.ageRange(1) - dat.ageRange(0) + 1;
     }
-    array<Type> ageIndexDetailed(nYears,nAges, nInt);
     array<Type> ageIndex(nYears,nAges);
-    ageIndexDetailed.setZero();
+    array<Type> ageIndexDetailed(nYears,nAges, nInt);
+    vector<Type>  ageIndexTotal(nYears);
     ageIndex.setZero();
+    ageIndexDetailed.setZero();
+    ageIndexTotal.setZero();
 
     int nStrata = 0;
     for(int i=0; i<dat.idxStrata.size(); ++i){
@@ -129,10 +134,12 @@ template <class Type>
           lengthIndexStrata(y,l,s) = lengthIndexStrata(y,l,s)*dat.areas(s)/nIntStrata(s);
         }
         lengthIndex(y,l) = lengthIndex(y,l) *dat.areas.sum()/nInt;
+        lengthIndexTotal(y) = lengthIndexTotal(y) + lengthIndex(y,l);
       }
       if(dat.applyALK==1){
         for(int a = 0; a<nAges; ++a){
           ageIndex(y,a) = ageIndex(y,a) *dat.areas.sum()/nInt;
+          ageIndexTotal(y) = ageIndexTotal(y) + ageIndex(y,a);
         }
       }
     }
@@ -140,11 +147,15 @@ template <class Type>
 
     array<Type> logLengthIndex(nYears,numberOfLengthGroups);
     array<Type> logLengthIndexStrata(nYears,numberOfLengthGroups,nStrata);
+    vector<Type>  logLengthIndexTotal(nYears);
     logLengthIndex= log(lengthIndex);
     logLengthIndexStrata = log(lengthIndexStrata);
+    logLengthIndexTotal = log(lengthIndexTotal);
 
     REPORT_F(logLengthIndex, of);
     REPORT_F(logLengthIndexStrata, of);
+    REPORT_F(logLengthIndexTotal, of);
+    REPORT_F(lengthIndexDetailed, of);//For plotting
 
     if(dat.strataReport==1){
       ADREPORT_F(logLengthIndexStrata, of);
@@ -152,13 +163,18 @@ template <class Type>
 
     if(dat.applyALK==0){//Do not adreport length if calculating index per length to reduce computation time.
       ADREPORT_F(logLengthIndex, of);
+      ADREPORT_F(logLengthIndexTotal, of);
     }
 
     array<Type> logAgeIndex(nYears,nAges);
+    vector<Type>  logAgeIndexTotal(nYears);
     if(dat.applyALK==1){
       logAgeIndex = log(ageIndex);
+      logAgeIndexTotal = log(ageIndexTotal);
       ADREPORT_F(logAgeIndex, of);
-      REPORT_F(logAgeIndex, of);
+      ADREPORT_F(logAgeIndexTotal, of);
+      REPORT_F(ageIndexDetailed, of);//For plotting
+      REPORT_F(ALK_int, of);
     }
 
     //Report COG
@@ -167,9 +183,7 @@ template <class Type>
       matrix<Type> COGAgeY(nYears,nAges);
       COGAgeX.setZero();
       COGAgeY.setZero();
-
       Type COGageTotal=0;
-
       for(int a = 0; a<nAges; ++a){
         for(int y = 0; y<nYears; ++y){
           COGageTotal=0;
@@ -182,14 +196,10 @@ template <class Type>
           COGAgeY(y,a) = COGAgeY(y,a)/COGageTotal;
         }
       }
-
-      REPORT_F(ageIndexDetailed, of);//For plotting
       //ADREPORT_F(COGAgeX, of);
       //ADREPORT_F(COGAgeY, of);
-      REPORT_F(ALK_int, of);
     }
-    //For plotting
-    REPORT_F(lengthIndexDetailed, of);
+
 
     //Report covariates
     vector<Type> fourierReportLow = dat.X_sunAltReport*betaSunLow;
@@ -206,5 +216,4 @@ template <class Type>
       vector<Type> depthReport2 =dat.X_depthReport*parDepth2;
       ADREPORT_F(depthReport2, of);
     }
-
   }

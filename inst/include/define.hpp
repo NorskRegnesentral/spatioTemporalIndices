@@ -88,7 +88,7 @@ struct dataSet{
   int spatialALK;
   int strataReport;
   int betaLength;
-
+  Type trawlWidth;
   int rwBeta0_alk;
 
 };
