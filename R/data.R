@@ -218,7 +218,8 @@ setupData = function(dataLength,conf,confPred){
                applyALK = conf$applyALK,
                lengthGroups = conf$lengthGroups,
                dL = conf$dLength,
-               trawlWidth = conf$trawlWidth)
+               trawlWidth = conf$trawlWidth,
+               lowMemory = conf$lowMemory)
 
   #Configurations used on C-side
   data$spatial=conf$spatial

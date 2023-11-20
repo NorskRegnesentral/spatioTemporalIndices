@@ -13,6 +13,7 @@ fitModel(
   parSet = NULL,
   runModel = TRUE,
   mapSet = NULL,
+  intern = FALSE,
   ...
 )
 }

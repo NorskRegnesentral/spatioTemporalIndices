@@ -32,7 +32,8 @@ defConf(
   maxDepth = 600,
   trawlWidth = 1,
   plusGroup = 1,
-  strataReport = 0
+  strataReport = 0,
+  lowMemory = 0
 )
 }
 \arguments{

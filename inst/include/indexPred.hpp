@@ -157,13 +157,17 @@ template <class Type>
     REPORT_F(logLengthIndexTotal, of);
     REPORT_F(lengthIndexDetailed, of);//For plotting
 
-    if(dat.strataReport==1){
+    if((dat.strataReport==1) & (dat.applyALK==0)){
       ADREPORT_F(logLengthIndexStrata, of);
     }
 
     if(dat.applyALK==0){//Do not adreport length if calculating index per length to reduce computation time.
       ADREPORT_F(logLengthIndex, of);
-      ADREPORT_F(logLengthIndexTotal, of);
+      if(dat.lowMemory==0){
+        ADREPORT_F(logLengthIndexTotal, of);
+      }else{
+        REPORT_F(logLengthIndexTotal, of);
+      }
     }
 
     array<Type> logAgeIndex(nYears,nAges);
@@ -172,48 +176,53 @@ template <class Type>
       logAgeIndex = log(ageIndex);
       logAgeIndexTotal = log(ageIndexTotal);
       ADREPORT_F(logAgeIndex, of);
-      ADREPORT_F(logAgeIndexTotal, of);
+      if(dat.lowMemory==0){
+        ADREPORT_F(logAgeIndexTotal, of);
+      }else{
+        REPORT_F(logAgeIndexTotal, of);
+      }
       REPORT_F(ageIndexDetailed, of);//For plotting
       REPORT_F(ALK_int, of);
     }
 
-    //Report COG
-    if(dat.applyALK==1){
-      matrix<Type> COGAgeX(nYears,nAges);
-      matrix<Type> COGAgeY(nYears,nAges);
-      COGAgeX.setZero();
-      COGAgeY.setZero();
-      Type COGageTotal=0;
-      for(int a = 0; a<nAges; ++a){
-        for(int y = 0; y<nYears; ++y){
-          COGageTotal=0;
-          for(int i =0; i<nInt; ++i){
-            COGAgeX(y,a) += ageIndexDetailed(y,a,i)*dat.xInt(i);
-            COGAgeY(y,a) += ageIndexDetailed(y,a,i)*dat.yInt(i);
-            COGageTotal += ageIndexDetailed(y,a,i);
+    if(dat.lowMemory==0){
+      //Report COG
+      if(dat.applyALK==1){
+        matrix<Type> COGAgeX(nYears,nAges);
+        matrix<Type> COGAgeY(nYears,nAges);
+        COGAgeX.setZero();
+        COGAgeY.setZero();
+        Type COGageTotal=0;
+        for(int a = 0; a<nAges; ++a){
+          for(int y = 0; y<nYears; ++y){
+            COGageTotal=0;
+            for(int i =0; i<nInt; ++i){
+              COGAgeX(y,a) += ageIndexDetailed(y,a,i)*dat.xInt(i);
+              COGAgeY(y,a) += ageIndexDetailed(y,a,i)*dat.yInt(i);
+              COGageTotal += ageIndexDetailed(y,a,i);
+            }
+            COGAgeX(y,a) = COGAgeX(y,a)/COGageTotal;
+            COGAgeY(y,a) = COGAgeY(y,a)/COGageTotal;
           }
-          COGAgeX(y,a) = COGAgeX(y,a)/COGageTotal;
-          COGAgeY(y,a) = COGAgeY(y,a)/COGageTotal;
         }
+        //ADREPORT_F(COGAgeX, of);
+        //ADREPORT_F(COGAgeY, of);
       }
-      //ADREPORT_F(COGAgeX, of);
-      //ADREPORT_F(COGAgeY, of);
-    }
-
 
     //Report covariates
-    vector<Type> fourierReportLow = dat.X_sunAltReport*betaSunLow;
-    ADREPORT_F(fourierReportLow, of);
+      vector<Type> fourierReportLow = dat.X_sunAltReport*betaSunLow;
+      ADREPORT_F(fourierReportLow, of);
 
-    if(dat.sunEffect==2){
-      vector<Type> fourierReportHigh = dat.X_sunAltReport*betaSunHigh;
-      ADREPORT_F(fourierReportHigh, of);
-    }
+      if(dat.sunEffect==2){
+        vector<Type> fourierReportHigh = dat.X_sunAltReport*betaSunHigh;
+        ADREPORT_F(fourierReportHigh, of);
+      }
 
-    vector<Type> depthReport1 =dat.X_depthReport*parDepth1;
-    ADREPORT_F(depthReport1, of);
-    if(dat.splineDepth ==2){ //Two length dependent splines
-      vector<Type> depthReport2 =dat.X_depthReport*parDepth2;
-      ADREPORT_F(depthReport2, of);
+      vector<Type> depthReport1 =dat.X_depthReport*parDepth1;
+      ADREPORT_F(depthReport1, of);
+      if(dat.splineDepth ==2){ //Two length dependent splines
+        vector<Type> depthReport2 =dat.X_depthReport*parDepth2;
+        ADREPORT_F(depthReport2, of);
+      }
     }
   }

@@ -61,6 +61,7 @@ Type objective_function<Type>::operator() ()
   DATA_INTEGER(sunEffect); dat.sunEffect = sunEffect;
   DATA_INTEGER(strataReport); dat.strataReport = strataReport;
   DATA_SCALAR(trawlWidth);dat.trawlWidth = trawlWidth;
+  DATA_INTEGER(lowMemory);dat.lowMemory = lowMemory;
 
 
   //ALK stuff----------------

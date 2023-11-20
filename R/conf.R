@@ -36,7 +36,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
                     mapRhoL = c(0,1,2), simulateProcedure = 1,
                     stratasystem = list(),
                     minDepth=50,maxDepth=600,trawlWidth=1,
-                    plusGroup = 1, strataReport = 0){
+                    plusGroup = 1, strataReport = 0, lowMemory = 0){
   conf= list()
   conf$years = years
   conf$skipYears = skipYears
@@ -93,6 +93,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 
   conf$plusGroup =plusGroup
   conf$strataReport = strataReport
+  conf$lowMemory = lowMemory
   return(conf)
 }
 

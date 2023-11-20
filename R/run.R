@@ -11,7 +11,7 @@
 #' @return A fitted stim object
 #' @details
 #' @export
-fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,runModel = TRUE, mapSet = NULL,...){
+fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,runModel = TRUE, mapSet = NULL,intern = FALSE,...){
 
   tryCatch({
       setMKLthreads(1) #not profiting much by using more cores
@@ -86,7 +86,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     }
   }
 
-  obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map)
+  obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
 
   if(runModel){
     opt <- nlminb(obj$par, obj$fn, obj$gr,

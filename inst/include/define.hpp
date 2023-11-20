@@ -90,7 +90,7 @@ struct dataSet{
   int betaLength;
   Type trawlWidth;
   int rwBeta0_alk;
-
+  int lowMemory;
 };
 
 
