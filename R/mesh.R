@@ -10,7 +10,7 @@ createMesh <- function(conf){
   maxEdge = c(conf$cutoff,conf$cutoff*4) # Longer distances between nodes outside if inner bounderary
 
   confPredTmp = list()
-  confPredTmp$nIntPoints=4000
+  confPredTmp$cellsize=21
   intPoints = constructIntPoints(conf, confPredTmp)$locUTM #Mesh is based on integration points
 
   boundary.loc <- SpatialPoints(as.matrix(intPoints))

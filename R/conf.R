@@ -102,14 +102,14 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 ##'Configurations used for prediction.
 ##'
 ##' @param conf Configurations used when fitting the model
-##' @param nIntPoints provide number of integration points
+##' @param cellsize provide number distance between integration points
 ##' @param Depth if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration
 ##' @details
 ##' @export
-defConfPred <- function(conf,nIntPoints= 4000,Depth="Data"){
+defConfPred <- function(conf,cellsize= 20,Depth="Data"){
   confPred = list()
   confPred$Strata=1:conf$strata_number
-  confPred$nIntPoints = nIntPoints
+  confPred$cellsize = cellsize
   confPred$Depth = Depth
   return(confPred)
 }

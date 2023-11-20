@@ -4,12 +4,12 @@
 \alias{defConfPred}
 \title{defConfPred}
 \usage{
-defConfPred(conf, nIntPoints = 4000, Depth = "Data")
+defConfPred(conf, cellsize = 20, Depth = "Data")
 }
 \arguments{
 \item{conf}{Configurations used when fitting the model}
 
-\item{nIntPoints}{provide number of integration points}
+\item{cellsize}{provide number of integration points}
 
 \item{Depth}{if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration}
 }
