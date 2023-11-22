@@ -45,10 +45,10 @@ setupData = function(dataLength,conf,confPred){
 
   #Set up structure used for the SPDE-procedure
   meshS=createMesh(conf)$mesh
-  #spdeSINLA = inla.spde2.matern(meshS, alpha=2)
-  spdeS <- fmesher::fm_fem(meshS)
-  #spdeMatricesS2 = spdeSINLA$param.inla[c("M0","M1","M2")]
-  spdeMatricesS = list("M0" = spdeS$c0, "M1" = spdeS$g1, "M2" = spdeS$g2)
+  spdeS = inla.spde2.matern(meshS, alpha=2)
+#  spdeS <- fmesher::fm_fem(meshS)
+   spdeMatricesS = spdeS$param.inla[c("M0","M1","M2")]
+#  spdeMatricesS = list("M0" = spdeS$c0, "M1" = spdeS$g1, "M2" = spdeS$g2)
 
   A_ListS=list(rep(1,length(conf$years)))
   plot(meshS)
@@ -89,10 +89,10 @@ setupData = function(dataLength,conf,confPred){
     loc=cbind(dataLength$UTMX[dataLength$year==y & dataLength$lengthGroup==conf$maxLength],dataLength$UTMY[dataLength$year==y& dataLength$lengthGroup==conf$maxLength])
 
     nStationsEachYear[counter]=dim(loc)[1]
-#    A_ListS[[counter]]=inla.spde.make.A(meshS,loc)
-#    A_ListST[[counter]]=inla.spde.make.A(meshST,loc)
-    A_ListS[[counter]]= fmesher::fm_basis(meshS, loc)
-    A_ListST[[counter]]= fmesher::fm_basis(meshST, loc)
+    A_ListS[[counter]]=inla.spde.make.A(meshS,loc)
+    A_ListST[[counter]]=inla.spde.make.A(meshST,loc)
+#    A_ListS[[counter]]= fmesher::fm_basis(meshS, loc)
+#    A_ListST[[counter]]= fmesher::fm_basis(meshST, loc)
 
     counter = counter + 1
   }
@@ -266,10 +266,10 @@ setupData = function(dataLength,conf,confPred){
 #' @return
 includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
   points = constructIntPoints(conf,confPred)
-#  ApredS = inla.spde.make.A(attributes(data)$meshS,loc = as.matrix(points$locUTM))
-#  ApredST = inla.spde.make.A(attributes(data)$meshST,loc = as.matrix(points$locUTM))
-  ApredS = fmesher::fm_basis(attributes(data)$meshS,loc = as.matrix(points$locUTM))
-  ApredST = fmesher::fm_basis(attributes(data)$meshST,loc = as.matrix(points$locUTM))
+  ApredS = inla.spde.make.A(attributes(data)$meshS,loc = as.matrix(points$locUTM))
+  ApredST = inla.spde.make.A(attributes(data)$meshST,loc = as.matrix(points$locUTM))
+#  ApredS = fmesher::fm_basis(attributes(data)$meshS,loc = as.matrix(points$locUTM))
+#  ApredST = fmesher::fm_basis(attributes(data)$meshST,loc = as.matrix(points$locUTM))
 
   data$ApredS = ApredS
   data$ApredST = ApredST
@@ -385,8 +385,8 @@ combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf,confPred){
   map_joint = c(map_l,map_a)
 
   points = constructIntPoints(conf,confPred)
-#  Apred_alk = inla.spde.make.A(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
-  Apred_alk = fmesher::fm_basis(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
+  Apred_alk = inla.spde.make.A(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
+#  Apred_alk = fmesher::fm_basis(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
 
   dat_joint$Apred_alk = Apred_alk
   attributes(dat_joint)$year = attributes(dat_l)$year
