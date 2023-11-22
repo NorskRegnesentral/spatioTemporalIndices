@@ -15,7 +15,7 @@
 ##' @param minLength Minimum length, used when defining the minus group (probably never used)
 ##' @param reduceLength The resolution in length dimension used in latent effect
 ##' @param cutoff Cutoff used in mesh, first element is for spatial effect, second for spatio-temporal effect, third is 0 if same mesh is used for both spatial and spatio-temporal effect
-##' @param cbound cbound used in mesh, first element is for spatial effect, second for spatio-temporal effect
+##' @param offset How far outside of data the boundary goes.
 ##' @param pcPriorRange pc-priors for spatial and spatio-temporal effect
 ##' @param pcPriorsd pc-priors for spatial and spatio-temporal effect
 ##' @param usePcPriors If 0-No pc-priors used, 1- use pc-priors (probably never used)
@@ -30,7 +30,7 @@
 ##' @export
 defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,0),sunAlt=c(1,0),
                     maxLength = NULL,dLength = 1, minLength = NULL,reduceLength = 3,
-                    cutoff = 100, cbound = 200,
+                    cutoff = 100,offset = 100,
                     pcPriorRange = c(100,0.1),pcPriorsd = c(1,0.1), usePcPriors = 0, zeroInflated = 0,
                     obsModel = 2,rwBeta0 = 1,applyALK = 0,
                     mapRhoL = c(0,1,2), simulateProcedure = 1,
@@ -63,34 +63,26 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   }
   conf$minDepth = minDepth
   conf$maxDepth = maxDepth
-
-  #Covariates
   conf$sunAlt = sunAlt
   conf$splineDepth=splineDepth
   conf$spatial = spatial
   conf$spatioTemporal = spatioTemporal
   conf$cutoff = cutoff
-  conf$cbound = cbound
-
+  conf$offset = offset
   lTmp = rep(1:100,each = reduceLength)
   conf$lengthGroupsReduced = lTmp[1:length(conf$lengthGroups)]
   conf$reduceLength = reduceLength
-
   conf$pcPriorRange = pcPriorRange
   conf$pcPriorsd= pcPriorsd
   conf$usePcPriors = usePcPriors
-
   conf$zeroInflated = zeroInflated
-
   conf$obsModel = obsModel
   conf$nugget = nugget
   conf$mapRhoL = mapRhoL
   conf$simulateProcedure = simulateProcedure
   conf$rwBeta0 = rwBeta0
   conf$applyALK = applyALK
-
   conf$trawlWidth = trawlWidth
-
   conf$plusGroup =plusGroup
   conf$strataReport = strataReport
   conf$lowMemory = lowMemory

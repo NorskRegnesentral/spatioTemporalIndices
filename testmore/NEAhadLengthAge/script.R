@@ -18,7 +18,7 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
                  stratasystem = list(dsn="strata", layer = "Vintertoktet_nye_strata"),
                  minDepth=150,maxDepth=400,
                  applyALK = 1,
-                 cutoff =120, cbound = 130)
+                 cutoff =120,offset = 100)
 
 
 #Define configurations age part
@@ -28,11 +28,11 @@ conf_alk = defConf_alk(maxAge = 10,
                        spatial =1,
                        rwBeta0 = 1)
 
-confPred = defConfPred(conf=conf_l,Depth="DATA",nInt=5000)
+confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 20)
 
 # run model
 start_time <- Sys.time()
-run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE)
 end_time <- Sys.time()
 timeUsed = end_time - start_time
 timeUsed
