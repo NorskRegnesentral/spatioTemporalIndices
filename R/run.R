@@ -11,7 +11,7 @@
 #' @return A fitted stim object
 #' @details
 #' @export
-fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,runModel = TRUE, mapSet = NULL,intern = FALSE,...){
+fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,runModel = TRUE, mapSet = NULL,intern = FALSE,twoStage = FALSE,...){
 
   tryCatch({
       setMKLthreads(1) #not profiting much by using more cores
@@ -86,25 +86,73 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     }
   }
 
-  obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
+  if(twoStage){#Run model in two stages and combine them, may reduce computation time.
+    mapStart= map
+    mapStart$tan_rho_t = as.factor(rep(NA,length(par$tan_rho_t)))
+    mapStart$tan_rho_l = as.factor(rep(NA,length(par$tan_rho_l)))
+    obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart, intern = intern)
+    print("Start finding good starting values")
+    opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1,iter.max = 1000, eval.max = 1000))
+    print("Done finding good starting values")
+    rep <- sdreport(obj,ignore.parm.uncertainty = TRUE)
+    pl = as.list(rep,"Est")
+    par = pl
+    if(sum(is.na(map$tan_rho_l))==0)par$tan_rho_l = c(1.5,1,1)
+    if(sum(is.na(map$tan_rho_l))==0)par$tan_rho_t = 1
 
-  if(runModel){
-    opt <- nlminb(obj$par, obj$fn, obj$gr,
-                  control = list(trace = 1,iter.max = 1000, eval.max = 1000))
+    mapStart2 = map
+    if(conf_l$applyALK==1){#Optimal ALK model is already found
+      mapStart2$beta0_alk = as.factor(pl$beta0_alk*NA)
+      mapStart2$log_sigma_beta_alk = as.factor(pl$log_sigma_beta_alk*NA)
+      mapStart2$betaLength_alk = as.factor(pl$betaLength_alk*NA)
+      mapStart2$logSigma_alk = as.factor(pl$logSigma_alk*NA)
+      mapStart2$logKappa_alk = as.factor(pl$logKappa_alk*NA)
+      mapStart2$transRho_alk = as.factor(pl$transRho_alk*NA)
+      mapStart2$xS_alk = as.factor(pl$xS_alk*NA)
+      mapStart2$xST_alk = as.factor(pl$xST_alk*NA)
+    }
+    FreeADFun(obj)#Free memory from C-side
+    print("Optimizing full length model, no ALK. This is the most time consuming step")
+    obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart2, intern = intern)
+    opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1,iter.max = 1000, eval.max = 1000))
     rep <- sdreport(obj,...)
+    print("Done optimizing full length model, no ALK")
+
+    if(conf_l$applyALK==1){#Combine catch-at-length and ALK
+      pl = as.list(rep,"Est")
+      par = pl
+      FreeADFun(obj)#Free memory from C-side
+      print("Set up full model and sdreport")
+      obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
+      rep <- sdreport(obj,...)
+    }
     pl = as.list(rep,"Est")
     plSd = as.list(rep,"Std")
-
     rl = as.list(rep,"Est", report = TRUE)
     rlSd = as.list(rep,"Std", report = TRUE)
-
     FreeADFun(obj)#Free memory from C-side
     toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,
                     pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
-  }else{
-    toReturn = list(obj = obj,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk)
-  }
 
+  }else{
+    obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
+    if(runModel){
+      opt <- nlminb(obj$par, obj$fn, obj$gr,
+                    control = list(trace = 1,iter.max = 1000, eval.max = 1000))
+      rep <- sdreport(obj,...)
+      pl = as.list(rep,"Est")
+      plSd = as.list(rep,"Std")
+
+      rl = as.list(rep,"Est", report = TRUE)
+      rlSd = as.list(rep,"Std", report = TRUE)
+
+      FreeADFun(obj)#Free memory from C-side
+      toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,
+                      pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
+    }else{
+      toReturn = list(obj = obj,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk)
+    }
+  }
   class(toReturn) = "stim"
   return(toReturn)
 }
