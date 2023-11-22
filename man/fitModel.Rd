@@ -14,6 +14,7 @@ fitModel(
   runModel = TRUE,
   mapSet = NULL,
   intern = FALSE,
+  twoStage = FALSE,
   ...
 )
 }

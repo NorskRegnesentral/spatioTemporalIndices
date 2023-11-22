@@ -17,7 +17,7 @@ defConf(
   minLength = NULL,
   reduceLength = 3,
   cutoff = 100,
-  cbound = 200,
+  offset = 100,
   pcPriorRange = c(100, 0.1),
   pcPriorsd = c(1, 0.1),
   usePcPriors = 0,
@@ -59,7 +59,7 @@ defConf(
 
 \item{cutoff}{Cutoff used in mesh, first element is for spatial effect, second for spatio-temporal effect, third is 0 if same mesh is used for both spatial and spatio-temporal effect}
 
-\item{cbound}{cbound used in mesh, first element is for spatial effect, second for spatio-temporal effect}
+\item{offset}{How far outside of data the boundary goes.}
 
 \item{pcPriorRange}{pc-priors for spatial and spatio-temporal effect}
 
