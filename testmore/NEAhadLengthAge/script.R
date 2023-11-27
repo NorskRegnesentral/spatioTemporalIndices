@@ -18,7 +18,7 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
                  stratasystem = list(dsn="strata", layer = "Vintertoktet_nye_strata"),
                  minDepth=150,maxDepth=400,
                  applyALK = 1,
-                 cutoff =120,offset = 100)
+                 cutoff =120,cbound = 130)
 
 
 #Define configurations age part
