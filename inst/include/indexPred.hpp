@@ -176,6 +176,7 @@ template <class Type>
       logAgeIndex = log(ageIndex);
       logAgeIndexTotal = log(ageIndexTotal);
       ADREPORT_F(logAgeIndex, of);
+      REPORT_F(logAgeIndex, of);
       if(dat.lowMemory==0){
         ADREPORT_F(logAgeIndexTotal, of);
       }else{
