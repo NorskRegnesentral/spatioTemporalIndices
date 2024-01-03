@@ -21,7 +21,6 @@ Here is a quick example of how to generate indices-at-age with associated covari
 The length data must be in the format of a data frame with the following columns: haul ID, length group, time, distance trawled, latitude, longitude, and the number of fish caught. Note that each row represents one observed length group in a haul.
 
 ```R
-head(dat_l)
 station   lengthGroup   startdatetime   distance  latitude longitude   catch
 idHaul1   5         2018-02-02 11:10:46    0.89     73.34    18.13     0
 idHaul1   10        2018-02-02 11:10:46    0.89     73.34    18.13     20
@@ -29,11 +28,10 @@ idHaul1   15        2018-02-02 11:10:46    0.89     73.34    18.13     52
 idHaul1   20        2018-02-02 11:10:46    0.89     73.34    18.13     22
 ```
 
-"The age-at-length data must be in the format of a data frame with the following columns: haul ID, time, latitude, longitude, length of fish, and readability. Note that each row represents one observed fish. The station ID needs to match the ID given in the length data above.
+The age-at-length data must be in the format of a data frame with the following columns: haul ID, time, latitude, longitude, length of fish, and readability. Note that each row represents one observed fish. The station ID needs to match the ID given in the length data above.
 
 
 ```R
-head(dat_alk)
 station   startdatetime       latitude longitude length readability
 idHaul1   2018-02-02 11:10:46  73.34    18.13     32           1
 idHaul1   2018-02-02 11:10:46  73.34    18.13     28           1
@@ -52,8 +50,6 @@ conf_l = defConf(years = 2018:2020, # years to use,
                  spatioTemporal =2 ,
                  spatial =1,
                  rwBeta0 = 1,
-                 dLength = 5,
-                 reduceLength = 3,
                  stratasystem = list(dsn="strata", layer = "Vintertoktet_nye_strata"),
                  applyALK = 1)
 ```
