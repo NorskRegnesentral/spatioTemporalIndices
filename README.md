@@ -47,9 +47,8 @@ Set up configurations for catch-at-length model:
 conf_l = defConf(years = 2018:2020, # years to use, 
                  maxLength = 75, 
                  minLength = 20, 
-                 spatioTemporal =2 ,
+                 spatioTemporal =0 ,
                  spatial =1,
-                 rwBeta0 = 1,
                  stratasystem = list(dsn="strata", layer = "Vintertoktet_nye_strata"),
                  applyALK = 1)
 ```
@@ -60,8 +59,7 @@ Set up configurations for age-at-length model. Note that the package `spatioTemp
 conf_alk = defConf_alk(maxAge = 10,
                        minAge = 3,
                        spatioTemporal = 2,
-                       spatial =1,
-                       rwBeta0 = 1)
+                       spatial =1)
 ```
 
 For documentation of the configurations, see `?defConf` and `?defConf_alk`.
