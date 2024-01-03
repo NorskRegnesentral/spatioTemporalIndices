@@ -32,11 +32,11 @@ The age-at-length data must be in the format of a data frame with the following 
 
 
 ```R
-station   startdatetime       latitude longitude length readability
-idHaul1   2018-02-02 11:10:46  73.34    18.13     32           1
-idHaul1   2018-02-02 11:10:46  73.34    18.13     28           1
-idHaul1   2018-02-02 11:10:46  73.34    18.13     17           1
-idHaul1   2018-02-02 11:10:46  73.34    18.13     54           1
+station   startdatetime       latitude longitude length age readability
+idHaul1   2018-02-02 11:10:46  73.34    18.13     32      3         1
+idHaul1   2018-02-02 11:10:46  73.34    18.13     28      3         1
+idHaul1   2018-02-02 11:10:46  73.34    18.13     17      1         1
+idHaul1   2018-02-02 11:10:46  73.34    18.13     54      5         1
 ```
 
 ### Confgurations
