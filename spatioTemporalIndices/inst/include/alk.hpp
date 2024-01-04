@@ -169,6 +169,8 @@ template <class Type>
       }
     }
 
+    REPORT_F(ALK,of);
+
     SIMULATE_F(of){
       array<Type> xS_alk=par.xS_alk;
       array<Type> xST_alk=par.xST_alk;

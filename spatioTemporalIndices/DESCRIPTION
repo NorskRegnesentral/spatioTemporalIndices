@@ -1,7 +1,7 @@
 Package: spatioTemporalIndices
 Type: Package
 Title: Construct indices based on a standard latent Gaussian spatio-temporal model.
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: c(person(c("Olav","Nikolai"), "Breivik",role=c("aut","cre"), email="olavbr@nr.no"),
 	    person("Fredrik","Aanes",role="aut"),
             person("Fabian", "Zimmermann", role="aut", email="fabian.zimmermann@hi.no"))
