@@ -8,7 +8,7 @@ This model uses catch-at-length and age-at-length observations to construct indi
 The model is installed by typing 
 
 ```R
-devtools::install_github("NorskRegnesentral/spatioTemporalIndices")
+devtools::install_github("NorskRegnesentral/spatioTemporalIndices/spatioTemporalIndices")
 ```
 
 # Quick example
@@ -95,6 +95,6 @@ saveIndex(run,file = "index.txt", folder = "")
 This will save the files `index.txt` and `cov_index.Rda`, containing the indices and a list with all yearly covariance matrices.
 
 
-### Use index and covaraince structures in assessment
+### Use of index and covariance structures in assessment
 
 For the use of the indices and covariance structures in the state space assessment model SAM, we refer to the SAM help file at  http://www.nielsensweb.org/configurations.html.
