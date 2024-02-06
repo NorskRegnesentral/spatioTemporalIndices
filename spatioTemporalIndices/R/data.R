@@ -26,7 +26,18 @@ setupData = function(dataLength,conf,confPred){
   if(length(which(dataLength$lengthGroup> conf$maxLength)>0)){
     dataLength = dataLength[-which(dataLength$lengthGroup> conf$maxLength),]
   }
-
+  
+  # Add strata polygon if none was provided
+  if(is.null(conf$strata)) {
+     hullpol = st_convex_hull(st_union(st_as_sf(dataLength,coords=c("longitude","latitude"),crs="+proj=longlat")))
+     conf$strata = st_as_sf(hullpol)
+     conf$strata$id = 1
+     conf$zone = floor((mean(st_bbox(conf$strata)[c(1,3)]) + 180) / 6) + 1
+     conf$stratasystem = "data"
+     conf$strata_number = nrow(conf$strata)
+     print("Strata polygon created from survey data.")
+  } 
+  
   #Convert to UTM coordinates
   #loc = data.frame(dataLength$longitude,dataLength$latitude)
   loc = st_as_sf(dataLength,coords = c("longitude","latitude"),crs="+proj=longlat")
