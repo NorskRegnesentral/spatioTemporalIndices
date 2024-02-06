@@ -53,9 +53,10 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$lengthGroups = seq(conf$minLength,conf$maxLength,by = conf$dLength)
 
   if(length(stratasystem)>0) {
-    strata = readOGR(dsn = stratasystem[[1]], layer = stratasystem[[2]],verbose = FALSE) # dsn path must be adjusted to folder location
-    conf$strata = spTransform(strata,CRS("+proj=longlat"))
-    conf$zone = floor((mean(bbox(conf$strata)[1,]) + 180) / 6) + 1
+    strata = st_read(dsn = stratasystem[[1]], layer = stratasystem[[2]],quiet = TRUE) # dsn path must be adjusted to folder location
+    conf$strata = st_transform(strata,crs="+proj=longlat")
+    conf$strata$id = row.names(conf$strata)
+    conf$zone = floor((mean(st_bbox(conf$strata)[c(1,3)]) + 180) / 6) + 1
     conf$stratasystem = stratasystem
     conf$strata_number = nrow(conf$strata)
   } else {
@@ -94,7 +95,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 ##'Configurations used for prediction.
 ##'
 ##' @param conf Configurations used when fitting the model
-##' @param cellsize provide number distance between integration points
+##' @param cellsize provide distance between integration points in nautical miles
 ##' @param Depth if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration
 ##' @details
 ##' @export

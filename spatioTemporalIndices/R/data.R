@@ -28,15 +28,12 @@ setupData = function(dataLength,conf,confPred){
   }
 
   #Convert to UTM coordinates
-  loc = data.frame(dataLength$longitude,dataLength$latitude)
-  names(loc) = c("X","Y")
-  attr(loc, "projection") = "LL"
-  attr(loc, "zone") = conf$zone
-  locUTM <- PBSmapping::convUL(loc)
-  colnames(locUTM) = c("UTMX", "UTMY")
-
-  dataLength$UTMX = locUTM$UTMX
-  dataLength$UTMY = locUTM$UTMY
+  #loc = data.frame(dataLength$longitude,dataLength$latitude)
+  loc = st_as_sf(dataLength,coords = c("longitude","latitude"),crs="+proj=longlat")
+  locUTM = st_coordinates(st_transform(loc,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
+  
+  dataLength$UTMX = locUTM[,1]
+  dataLength$UTMY = locUTM[,2]
 
   dataLength$year = as.integer(format(dataLength$startdatetime, format = "%Y"))
 
@@ -47,7 +44,7 @@ setupData = function(dataLength,conf,confPred){
   meshS=createMesh(conf)$mesh
   spdeS = inla.spde2.matern(meshS, alpha=2)
 #  spdeS <- fmesher::fm_fem(meshS)
-   spdeMatricesS = spdeS$param.inla[c("M0","M1","M2")]
+  spdeMatricesS = spdeS$param.inla[c("M0","M1","M2")]
 #  spdeMatricesS = list("M0" = spdeS$c0, "M1" = spdeS$g1, "M2" = spdeS$g2)
 
   A_ListS=list(rep(1,length(conf$years)))
@@ -126,7 +123,6 @@ setupData = function(dataLength,conf,confPred){
   }
 
 
-
   sunAltTrans = sunAlt*0
   altMax = rep(-999,length(sunAlt));altMin = rep(999,length(sunAlt))
   for(t in c(seq(0,3,by = 0.1),seq(9,13,by = 0.1), seq(21,24,by = 0.1))){
@@ -190,8 +186,8 @@ setupData = function(dataLength,conf,confPred){
   }
 
   #Extract areas of each strata
-  strata_utm <- spTransform(conf$strata,CRS(paste0("+proj=utm +zone=",conf$zone," +datum=WGS84")))
-  areas <- raster::area(strata_utm)*(1/1.852)^2/1000000
+  strata_utm <- st_transform(conf$strata,crs=paste0("+proj=utm +zone=",conf$zone," +datum=WGS84"))
+  areas <- as.numeric(st_area(strata_utm))*(1/1.852)^2/1000000
 
   #Include observations as a vector (needed for keep functionality)
   obsVector = apply(fishObsMatrix, 1, rbind)
@@ -286,27 +282,19 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
         bf <- marmap::fortify.bathy(bathy)
         bf$z <- -1*bf$z
         bf <- subset(bf,z < conf$maxDepth & z > conf$minDepth)
-
-        loc = data.frame(bf$x,bf$y)
-        names(loc) = c("X","Y")
-        attr(loc, "projection") = "LL"
-        attr(loc, "zone") = conf$zone
-        locUTM <- PBSmapping::convUL(loc)
-        colnames(locUTM) = c("UTMX", "UTMY")
-
-        obs = SpatialPoints(locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-
-        intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-
-        dist = gDistance(obs,intPoints, byid=T)
-        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[1])
-
-        depthGEBCO = -bf$z
+  
+        bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
+        bfUTM = st_transform(loc,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+      
+        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+        intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
+    
+        depthGEBCO = intPoints$z
 
         depthGEBCO[depthGEBCO<conf$minDepth]=conf$minDepth
         depthGEBCO[depthGEBCO>conf$maxDepth]=conf$maxDepth
 
-        X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
+        X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthGEBCO))
         data$X_depth_int = X_depth },
       error = function(e) {
         confPred$Depth=NULL
@@ -320,22 +308,14 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
                           resolution = 3)
         bf = fortify.bathy(b)
 
-        loc = data.frame(bf$x,bf$y)
-        names(loc) = c("X","Y")
-        attr(loc, "projection") = "LL"
-        attr(loc, "zone") = conf$zone
-        locUTM <- PBSmapping::convUL(loc)
-        colnames(locUTM) = c("UTMX", "UTMY")
-
-        obs = SpatialPoints(locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-
-        intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-
-        dist = gDistance(obs,intPoints, byid=T)
-        minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[1])
-
-        depthNOAA = -bf$z
-
+        bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
+        bfUTM = st_transform(loc,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+        
+        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+        intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
+        
+        depthNOAA = intPoints$z
+        
         depthNOAA[depthNOAA<conf$minDepth]=conf$minDepth
         depthNOAA[depthNOAA>conf$maxDepth]=conf$maxDepth
 
@@ -350,14 +330,12 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
     }
   }
   if(is.null(confPred$Depth)) {
-    obs = SpatialPoints(attributes(data)$locObs,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-    intPoints = SpatialPoints(points$locUTM,CRS(paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-    dist = gDistance(obs,intPoints, byid=T)
-    minDist <- apply(dist, 1, function(x) order(x, decreasing=F)[1])
+    obs = st_as_sf(data.frame(UTMX=attributes(data)$locObs[,1],UTMY=attributes(data)$locObs[,2],depth=attributes(data)$depth),coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+    intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+   
+    intPoints= st_join(intPoints,obs,join=st_nearest_feature)
 
-    xDepth = matrix(0,dim(points$locUTM)[1],dim(data$X_depth)[1])
-    xDepth = data$X_depth[minDist,]
-    data$X_depth_int = xDepth
+    data$X_depth_int = intPoints$depth
     print("No depth information for prediction provided, using depth from observations.")
   }
 
