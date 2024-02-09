@@ -325,7 +325,7 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
         intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
         intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
         
-        depthNOAA = intPoints$z
+        depthNOAA = -intPoints$z
         
         depthNOAA[depthNOAA<conf$minDepth]=conf$minDepth
         depthNOAA[depthNOAA>conf$maxDepth]=conf$maxDepth
@@ -346,7 +346,10 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
    
     intPoints= st_join(intPoints,obs,join=st_nearest_feature)
 
-    data$X_depth_int = intPoints$depth
+    depthDATA = intPoints$depth
+    
+    X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthDATA))
+    data$X_depth_int = X_depth
     print("No depth information for prediction provided, using depth from observations.")
   }
 
