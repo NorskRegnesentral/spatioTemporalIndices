@@ -290,12 +290,12 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
     if(grepl(".nc",confPred$Depth)) {
       tryCatch({
         b <- marmap::readGEBCO.bathy(confPred$Depth,res=25)
-        bf <- marmap::fortify.bathy(bathy)
+        bf <- marmap::fortify.bathy(b)
         bf$z <- -1*bf$z
         bf <- subset(bf,z < conf$maxDepth & z > conf$minDepth)
   
         bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = st_transform(loc,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
       
         intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
         intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
@@ -320,7 +320,7 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
         bf = fortify.bathy(b)
 
         bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = st_transform(loc,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
         
         intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
         intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)

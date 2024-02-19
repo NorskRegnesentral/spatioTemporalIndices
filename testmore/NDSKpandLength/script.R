@@ -1,6 +1,6 @@
 suppressMessages(library(spatioTemporalIndices))
 
-dat_l = readRDS("NDSKpand2018-2020_length.rds")
+dat_l = readRDS("NDSKpandLength/NDSKpand2018-2020_length.rds")
 
 conf_l = defConf(years = 2018:2020,
                dLength = 1, # length intervall in mm
@@ -18,7 +18,7 @@ conf_l = defConf(years = 2018:2020,
                applyALK=0,
                strataReport=0)
 
-confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 20)
+confPred = defConfPred(conf=conf_l,Depth="NOAA",cellsize = 20)
 
 # run model
 start_time <- Sys.time()
