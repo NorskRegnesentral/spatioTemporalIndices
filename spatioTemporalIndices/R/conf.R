@@ -99,7 +99,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 ##' @param Depth if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration
 ##' @details
 ##' @export
-defConfPred <- function(conf,cellsize= 20,Depth="Data"){
+defConfPred <- function(conf,cellsize=20,Depth="Data"){
   confPred = list()
   confPred$Strata=1:conf$strata_number
   confPred$cellsize = cellsize
