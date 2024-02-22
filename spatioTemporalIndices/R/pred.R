@@ -7,7 +7,9 @@
 constructIntPoints<-function(conf,confPred){
   utmCRS = paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")
   strata_utm <- st_transform(conf$strata,utmCRS)
-  points = st_sample(strata_utm,size = round(sum(as.numeric(st_area(strata_utm)))*(1/1.852)^2/confPred$cellsize,0),type="regular")
+  cellength = sqrt(confPred$cellsize)
+  points = st_make_grid(strata_utm,cellsize=c(cellength,cellength),what="centers")
+  #points = st_sample(strata_utm,size = round(sum(as.numeric(st_area(strata_utm)))*(1/1.852)^2/confPred$cellsize,0),type="regular")
   points = st_as_sf(points)
 
   #Define data frame with integration points to be returned
