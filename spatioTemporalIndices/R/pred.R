@@ -13,10 +13,9 @@ constructIntPoints<-function(conf,confPred){
   
   #Define data frame with integration points to be returned
   points = st_join(points,st_buffer(strata_utm,1),left=FALSE)
-  
+  points = points[!duplicated(points$geometry),]
   locUTM = data.frame(st_coordinates(points)) #To be returned
   colnames(locUTM) = c("UTMX", "UTMY")
-  locUTM = locUTM[!duplicated(locUTM),]
   # idxStrata = rep(-1,dim(locUTM)[1])
   # for(i in 1:nrow(conf$strata)){
   #     insideThis =  which(!is.na(over(pointsSPXY,test[i,])[,1]))
