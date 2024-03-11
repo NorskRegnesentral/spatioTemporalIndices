@@ -9,22 +9,25 @@
 createMesh <- function(conf){
   maxEdge = c(conf$cutoff,conf$cutoff*4) # Longer distances between nodes outside if inner bounderary
 
-  confPredTmp = list(cellsize=21)
-  intPoints = constructIntPoints(conf, confPredTmp)$locUTM #Mesh is based on integration points
+  confPredTmp = list(cellsize = 1000)
+  intPoints = constructIntPoints(conf, confPredTmp)$locUTM
+  while(dim(intPoints)[1]<5000){#Set up mesh based on a fine grid of integration points
+    confPredTmp$cellsize = confPredTmp$cellsize/2
+    intPoints = constructIntPoints(conf,confPredTmp)$locUTM
+  }
   boundary.loc <- SpatialPoints(as.matrix(intPoints))
-#  interior = fmesher::fm_nonconvex_hull(coordinates(boundary.loc), 25)
-#  mesh = fmesher::fm_rcdt_2d_inla(coordinates(boundary.loc), refine = list(),interior = interior,  extend = list(offset = conf$offset),
-#                                  max.edge=maxEdge,
-#                                  cutoff=conf$cutoff)
-
   boundary <- list(
-    inla.nonconvex.hull(coordinates(boundary.loc), 20,resolution = 100),
-    inla.nonconvex.hull(coordinates(boundary.loc), conf$cbound))
+    inla.nonconvex.hull(coordinates(boundary.loc), convex  = conf$cbound[1],resolution = 120),
+    inla.nonconvex.hull(coordinates(boundary.loc), convex  = conf$cbound[2]))
   mesh <- inla.mesh.2d(boundary=boundary,
                        max.edge=maxEdge,
-                       min.angle=c(30, 15),
                        cutoff=conf$cutoff)
 
   print(paste("Mesh points:",mesh$n))
+  plot(mesh)
+#  points(intPoints)
   return(list(mesh=mesh, barrier.triangles =NULL))
 }
+
+
+

@@ -263,7 +263,7 @@ plotSunAlt<-function(run){
   }
 
   x = c(0,0.5*pi,pi,pi*3/2,2*pi)
-  text = c("Lowest (morning)", "", "Heighest", "", "Lowest (evening)")
+  text = c("Lowest (morning)", "", "Highest", "", "Lowest (evening)")
   axis(1, at=x,labels=text)
   minLength = min(run$conf_l$lengthGroups)
   maxLength = max(run$conf_l$lengthGroups)

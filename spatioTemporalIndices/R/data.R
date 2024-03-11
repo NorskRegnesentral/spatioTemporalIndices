@@ -11,71 +11,71 @@
 #' @return
 #' @export
 #' @examples
-setupData = function(dataLength,conf,confPred){
+setupData = function(dat_l,conf_l,confPred){
 
   #Remove too short lengths
-  dataLength = dataLength[dataLength$lengthGroup>=conf$minLength,]
+  dat_l = dat_l[dat_l$lengthGroup>=conf_l$minLength,]
 
   #Remove too long lengths
-  for(id in unique(dataLength$station)){
-    index =which(dataLength$station==id & dataLength$lengthGroup>=conf$maxLength)
-    if(conf$plusGroup==1){
-      dataLength$catch[index[1]] = sum(dataLength$catch[index])
+  for(id in unique(dat_l$station)){
+    index =which(dat_l$station==id & dat_l$lengthGroup>=conf_l$maxLength)
+    if(conf_l$plusGroup==1){
+      dat_l$catch[index[1]] = sum(dat_l$catch[index])
     }
   }
-  if(length(which(dataLength$lengthGroup> conf$maxLength)>0)){
-    dataLength = dataLength[-which(dataLength$lengthGroup> conf$maxLength),]
+  if(length(which(dat_l$lengthGroup> conf_l$maxLength)>0)){
+    dat_l = dat_l[-which(dat_l$lengthGroup> conf_l$maxLength),]
   }
-  
-  # Add strata polygon if none was provided
-  if(is.null(conf$strata)) {
-     hullpol = st_convex_hull(st_union(st_as_sf(dataLength,coords=c("longitude","latitude"),crs="+proj=longlat")))
-     conf$strata = st_as_sf(hullpol)
-     conf$strata$id = 1
-     conf$zone = floor((mean(st_bbox(conf$strata)[c(1,3)]) + 180) / 6) + 1
-     conf$stratasystem = "data"
-     conf$strata_number = nrow(conf$strata)
-     print("Strata polygon created from survey data.")
-  } 
-  
-  #Convert to UTM coordinates
-  #loc = data.frame(dataLength$longitude,dataLength$latitude)
-  loc = st_as_sf(dataLength,coords = c("longitude","latitude"),crs="+proj=longlat")
-  locUTM = st_coordinates(st_transform(loc,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")))
-  
-  dataLength$UTMX = locUTM[,1]
-  dataLength$UTMY = locUTM[,2]
 
-  dataLength$year = as.integer(format(dataLength$startdatetime, format = "%Y"))
+  # Add strata polygon if none was provided
+  if(is.null(conf_l$strata)) {
+     hullpol = st_convex_hull(st_union(st_as_sf(dat_l,coords=c("longitude","latitude"),crs="+proj=longlat")))
+     conf_l$strata = st_as_sf(hullpol)
+     conf_l$strata$id = 1
+     conf_l$zone = floor((mean(st_bbox(conf_l$strata)[c(1,3)]) + 180) / 6) + 1
+     conf_l$stratasystem = "data"
+     conf_l$strata_number = nrow(conf_l$strata)
+     print("Strata polygon created from survey data.")
+  }
+
+  #Convert to UTM coordinates
+  #loc = data.frame(dat_l$longitude,dat_l$latitude)
+  loc = st_as_sf(dat_l,coords = c("longitude","latitude"),crs="+proj=longlat")
+  locUTM = st_coordinates(st_transform(loc,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs")))
+
+  dat_l$UTMX = locUTM[,1]
+  dat_l$UTMY = locUTM[,2]
+
+  dat_l$year = as.integer(format(dat_l$startdatetime, format = "%Y"))
 
   #Remove observations in years not used
-  dataLength = dataLength[dataLength$year %in% conf$years, ]
+  dat_l = dat_l[dat_l$year %in% conf_l$years, ]
 
   #Set up structure used for the SPDE-procedure
-  meshS=createMesh(conf)$mesh
+  meshS=createMesh(conf_l)$mesh
   spdeS = inla.spde2.matern(meshS, alpha=2)
 #  spdeS <- fmesher::fm_fem(meshS)
   spdeMatricesS = spdeS$param.inla[c("M0","M1","M2")]
 #  spdeMatricesS = list("M0" = spdeS$c0, "M1" = spdeS$g1, "M2" = spdeS$g2)
 
-  A_ListS=list(rep(1,length(conf$years)))
+  A_ListS=list(rep(1,length(conf_l$years)))
   plot(meshS)
   meshST=meshS; spdeST= spdeS; spdeMatricesST = spdeMatricesS;  A_ListST = A_ListS; #Apply same setup for spatial and spatio-temporal part
 
-  singleHauls = which(dataLength$lengthGroup==conf$maxLength)
+  singleHauls = which(dat_l$lengthGroup==conf_l$maxLength)
 
-  dist = dataLength$distance[singleHauls]
-  yearObs = dataLength$year[singleHauls]
-  station = dataLength$station[singleHauls]
-  locObs = cbind(dataLength$UTMX[singleHauls],dataLength$UTMY[singleHauls])
-  locObsLatLon= cbind(dataLength$longitude[singleHauls],dataLength$latitude[singleHauls])
-  depth = dataLength$depth[singleHauls]
-  date =  format(dataLength$startdatetime,format="%d;%m;%Y")[singleHauls]
+  dist = dat_l$distance[singleHauls]
+  yearObs = dat_l$year[singleHauls]
+  station = dat_l$station[singleHauls]
+  locObs = cbind(dat_l$UTMX[singleHauls],dat_l$UTMY[singleHauls])
+  locObsLatLon= cbind(dat_l$longitude[singleHauls],dat_l$latitude[singleHauls])
+  depth = dat_l$depth[singleHauls]
+  date =  format(dat_l$startdatetime,format="%d;%m;%Y")[singleHauls]
 
-  fishObs=dataLength$catch
+  fishObs=dat_l$catch
 
-  DateTime = dataLength$startdatetime[singleHauls]
-  lat = dataLength$latitude[singleHauls]; lon = dataLength$longitude[singleHauls]
+  DateTime = dat_l$startdatetime[singleHauls]
+  lat = dat_l$latitude[singleHauls]; lon = dat_l$longitude[singleHauls]
   sunAlt=altOfSun(min=as.numeric(format(DateTime,format="%M")),
                   hour=as.numeric(format(DateTime,format="%H")),
                   day=as.numeric(format(DateTime,format="%d")),
@@ -92,9 +92,9 @@ setupData = function(dataLength,conf,confPred){
   sunSetting=ifelse(sunAlt>=sunAlt2,1,0)
 
   counter=1
-  nStationsEachYear=rep(0,length(conf$years))
-  for(y in conf$years){
-    loc=cbind(dataLength$UTMX[dataLength$year==y & dataLength$lengthGroup==conf$maxLength],dataLength$UTMY[dataLength$year==y& dataLength$lengthGroup==conf$maxLength])
+  nStationsEachYear=rep(0,length(conf_l$years))
+  for(y in conf_l$years){
+    loc=cbind(dat_l$UTMX[dat_l$year==y & dat_l$lengthGroup==conf_l$maxLength],dat_l$UTMY[dat_l$year==y& dat_l$lengthGroup==conf_l$maxLength])
 
     nStationsEachYear[counter]=dim(loc)[1]
     A_ListS[[counter]]=inla.spde.make.A(meshS,loc)
@@ -114,19 +114,19 @@ setupData = function(dataLength,conf,confPred){
       depth[missingDepth[i]]=depth[minimumDistanceIndex]
     }
   }
-  depth[depth<conf$minDepth]=conf$minDepth
-  depth[depth>conf$maxDepth]=conf$maxDepth
+  depth[depth<conf_l$minDepth]=conf_l$minDepth
+  depth[depth>conf_l$maxDepth]=conf_l$maxDepth
 
 
-  fishObsMatrix = t(matrix(fishObs,nrow = length(conf$lengthGroups)))#length(unique(dataLength$Station)))
-  colnames(fishObsMatrix) = as.character(seq(min(conf$lengthGroups),max(conf$lengthGroups),by = conf$dLength))
+  fishObsMatrix = t(matrix(fishObs,nrow = length(conf_l$lengthGroups)))#length(unique(dat_l$Station)))
+  colnames(fishObsMatrix) = as.character(seq(min(conf_l$lengthGroups),max(conf_l$lengthGroups),by = conf_l$dLength))
   rownames(fishObsMatrix) = paste0(yearObs,"-",station)
 
   predMatrix = fishObsMatrix *0 #If an element is 1, it is not included in the likelihood
-  predMatrix[substring(rownames(predMatrix),1,4) %in% conf$skipYears] = 1
+  predMatrix[substring(rownames(predMatrix),1,4) %in% conf_l$skipYears] = 1
 
   #Define the data and parameters given to TMB----------
-  if(conf$sunAlt[1] <2){ #Include only one Fourier basis
+  if(conf_l$sunAlt[1] <2){ #Include only one Fourier basis
     sunAltFormula = as.formula(paste( "fishObsMatrix ~ sin+cos"))
     sunAltFormulaIntRep = as.formula(paste( "sunAlt ~ sin+cos"))
   }else{
@@ -157,7 +157,7 @@ setupData = function(dataLength,conf,confPred){
                                             cos=cos(sunAltTrans*2*pi),
                                             fishObsMatrix=fishObsMatrix[,2]),fit=FALSE)
 
-  gamSetup_depth=mgcv::gam(fishObsMatrix~s(depth,bs="cs",k = conf$splineDepth[1]),
+  gamSetup_depth=mgcv::gam(fishObsMatrix~s(depth,bs="cs",k = conf_l$splineDepth[1]),
                            data=data.frame(haulID=rownames(fishObsMatrix),depth=depth,
                                            fishObsMatrix=fishObsMatrix[,2]),fit=FALSE)
 
@@ -181,12 +181,12 @@ setupData = function(dataLength,conf,confPred){
   X_depthReport = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=as.numeric(seq(min(depth),max(depth),length.out = 20))))
 
   #Weighting used when smoothing length dimension in latent effect
-  weigthLength = conf$lengthGroupsReduced*0
-  nCollaps = sum(conf$lengthGroupsReduced==1)
+  weigthLength = conf_l$lengthGroupsReduced*0
+  nCollaps = sum(conf_l$lengthGroupsReduced==1)
   counter = 1
   current = 1
   for(i in 1:length(weigthLength)){
-    if(current==conf$lengthGroupsReduced[i]){
+    if(current==conf_l$lengthGroupsReduced[i]){
       current = current +1
       weigthLength[i] = 1
       counter = 1
@@ -197,7 +197,7 @@ setupData = function(dataLength,conf,confPred){
   }
 
   #Extract areas of each strata
-  strata_utm <- st_transform(conf$strata,crs=paste0("+proj=utm +zone=",conf$zone," +datum=WGS84"))
+  strata_utm <- st_transform(conf_l$strata,crs=paste0("+proj=utm +zone=",conf_l$zone," +datum=WGS84"))
   areas <- as.numeric(st_area(strata_utm))*(1/1.852)^2/1000000
 
   #Include observations as a vector (needed for keep functionality)
@@ -210,7 +210,7 @@ setupData = function(dataLength,conf,confPred){
                fishObsMatrix = fishObsMatrix,
                obsVector = fishObs,#obsVector,
                idxStart = idxStart,
-               numberOfLengthGroups=length(conf$lengthGroups),
+               numberOfLengthGroups=length(conf_l$lengthGroups),
                spdeMatricesS = spdeMatricesS,
                spdeMatricesST = spdeMatricesST,
                nStationsEachYear=nStationsEachYear,
@@ -221,30 +221,30 @@ setupData = function(dataLength,conf,confPred){
                X_sunAlt = X_sunAlt,
                X_sunAltReport = X_sunAltReport,
                X_depthReport=X_depthReport,
-               lengthGroupsReduced = conf$lengthGroupsReduced-1,
+               lengthGroupsReduced = conf_l$lengthGroupsReduced-1,
                weigthLength = weigthLength,
                areas = areas,
-               nBasisSunAlt = max(1,conf$sunAlt[1]), #Currently only implemented with one Fourier basis
-               obsModel = conf$obsModel,
-               simulateProcedure = conf$simulateProcedure,
-               rwBeta0 = conf$rwBeta0,
-               applyALK = conf$applyALK,
-               lengthGroups = conf$lengthGroups,
-               dL = conf$dLength,
-               trawlWidth = conf$trawlWidth,
-               lowMemory = conf$lowMemory)
+               nBasisSunAlt = max(1,conf_l$sunAlt[1]), #Currently only implemented with one Fourier basis
+               obsModel = conf_l$obsModel,
+               simulateProcedure = conf_l$simulateProcedure,
+               rwBeta0 = conf_l$rwBeta0,
+               applyALK = conf_l$applyALK,
+               lengthGroups = conf_l$lengthGroups,
+               dL = conf_l$dLength,
+               trawlWidth = conf_l$trawlWidth,
+               lowMemory = conf_l$lowMemory)
 
   #Configurations used on C-side
-  data$spatial=conf$spatial
-  data$spatioTemporal=conf$spatioTemporal
-  data$splineDepth=conf$splineDepth[2]
-  data$useNugget=conf$nugget
-  data$pcPriorsRange = conf$pcPriorRange
-  data$pcPriorsSD = conf$pcPriorsd
-  data$usePCpriors = conf$usePcPriors
-  data$zeroInflated = conf$zeroInflated
-  data$sunEffect = conf$sunAlt[2]
-  data$strataReport = conf$strataReport
+  data$spatial=conf_l$spatial
+  data$spatioTemporal=conf_l$spatioTemporal
+  data$splineDepth=conf_l$splineDepth[2]
+  data$useNugget=conf_l$nugget
+  data$pcPriorsRange = conf_l$pcPriorRange
+  data$pcPriorsSD = conf_l$pcPriorsd
+  data$usePCpriors = conf_l$usePcPriors
+  data$zeroInflated = conf_l$zeroInflated
+  data$sunEffect = conf_l$sunAlt[2]
+  data$strataReport = conf_l$strataReport
 
   attributes(data)$year = yearObs
   attributes(data)$meshS = meshS
@@ -256,10 +256,10 @@ setupData = function(dataLength,conf,confPred){
   attributes(data)$sunAltTrans = sunAltTrans
 
   #Include integration points
-  data = includeIntPoints(data,conf,confPred, gamSetup_depth)
+  data = includeIntPoints(data,conf_l,confPred, gamSetup_depth)
 
-  data$selectedStratas = 1:nrow(conf$strata)
-  if(conf$applyALK ==0){
+  data$selectedStratas = 1:nrow(conf_l$strata)
+  if(conf_l$applyALK ==0){
     data = includeDummyAge(data)
   }
 
@@ -271,8 +271,8 @@ setupData = function(dataLength,conf,confPred){
 #' @export
 #' @examples
 #' @return
-includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
-  points = constructIntPoints(conf,confPred)
+includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
+  points = constructIntPoints(conf_l,confPred)
   ApredS = inla.spde.make.A(attributes(data)$meshS,loc = as.matrix(points$locUTM))
   ApredST = inla.spde.make.A(attributes(data)$meshST,loc = as.matrix(points$locUTM))
 #  ApredS = fmesher::fm_basis(attributes(data)$meshS,loc = as.matrix(points$locUTM))
@@ -292,18 +292,18 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
         b <- marmap::readGEBCO.bathy(confPred$Depth,res=25)
         bf <- marmap::fortify.bathy(b)
         bf$z <- -1*bf$z
-        bf <- subset(bf,z < conf$maxDepth & z > conf$minDepth)
-  
+        bf <- subset(bf,z < conf_l$maxDepth & z > conf_l$minDepth)
+
         bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
-      
-        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+
+        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
         intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
-    
+
         depthGEBCO = intPoints$z
 
-        depthGEBCO[depthGEBCO<conf$minDepth]=conf$minDepth
-        depthGEBCO[depthGEBCO>conf$maxDepth]=conf$maxDepth
+        depthGEBCO[depthGEBCO<conf_l$minDepth]=conf_l$minDepth
+        depthGEBCO[depthGEBCO>conf_l$maxDepth]=conf_l$maxDepth
 
         X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthGEBCO))
         data$X_depth_int = X_depth },
@@ -320,15 +320,15 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
         bf = fortify.bathy(b)
 
         bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
-        
-        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
+        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+
+        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
         intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
-        
+
         depthNOAA = -intPoints$z
-        
-        depthNOAA[depthNOAA<conf$minDepth]=conf$minDepth
-        depthNOAA[depthNOAA>conf$maxDepth]=conf$maxDepth
+
+        depthNOAA[depthNOAA<conf_l$minDepth]=conf_l$minDepth
+        depthNOAA[depthNOAA>conf_l$maxDepth]=conf_l$maxDepth
 
         X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
 
@@ -341,13 +341,13 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
     }
   }
   if(is.null(confPred$Depth)) {
-    obs = st_as_sf(data.frame(UTMX=attributes(data)$locObs[,1],UTMY=attributes(data)$locObs[,2],depth=attributes(data)$depth),coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
-    intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs"))
-   
+    obs = st_as_sf(data.frame(UTMX=attributes(data)$locObs[,1],UTMY=attributes(data)$locObs[,2],depth=attributes(data)$depth),coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+    intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+
     intPoints= st_join(intPoints,obs,join=st_nearest_feature)
 
     depthDATA = intPoints$depth
-    
+
     X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthDATA))
     data$X_depth_int = X_depth
     print("No depth information for prediction provided, using depth from observations.")
@@ -370,13 +370,13 @@ includeIntPoints<-function(data,conf,confPred, gamSetup_depth){
 #' @export
 #' @examples
 #' @return
-combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf,confPred){
+combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf_l,confPred){
 
   dat_joint = c(dat_l,dat_a)
   par_joint = c(par_l,par_a)
   map_joint = c(map_l,map_a)
 
-  points = constructIntPoints(conf,confPred)
+  points = constructIntPoints(conf_l,confPred)
   Apred_alk = inla.spde.make.A(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
 #  Apred_alk = fmesher::fm_basis(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
 

@@ -30,7 +30,7 @@
 ##' @export
 defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,0),sunAlt=c(1,0),
                     maxLength = NULL,dLength = 1, minLength = NULL,reduceLength = 3,
-                    cutoff = 100,cbound = 200,
+                    cutoff = 100,cbound = c(18,130),
                     pcPriorRange = c(100,0.1),pcPriorsd = c(1,0.1), usePcPriors = 0, zeroInflated = 0,
                     obsModel = 2,rwBeta0 = 1,applyALK = 0,
                     mapRhoL = c(0,1,2), simulateProcedure = 1,
