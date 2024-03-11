@@ -18,7 +18,7 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
                  stratasystem = list(dsn="strata", layer = "Vintertoktet_nye_strata"),
                  minDepth=150,maxDepth=400,
                  applyALK = 1,
-                 cutoff =120,cbound = 130)
+                 cutoff =120)
 
 
 #Define configurations age part
@@ -42,6 +42,4 @@ cat(run$opt$objective,"\n", file="res.out")
 #cat(run$opt$objective,"\n", file="res.EXP")
 apply(round(run$rl$logAgeIndex,3),1, function(f)cat(f,"\n", file="res.out", append = TRUE))
 #apply(round(run$rl$logAgeIndex,3),1, function(f)cat(f,"\n", file="res.EXP", append = TRUE))
-
-
 
