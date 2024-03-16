@@ -178,7 +178,7 @@ setupData = function(dat_l,conf_l,confPred){
                                                  cos = cos(rep(maxSunAlt,2)*2*pi)),fit=FALSE)
   X_sunAltIntegrate = gamSetup_sunAltIntegrate$X[,-1]
 
-  X_depthReport = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=as.numeric(seq(min(depth),max(depth),length.out = 20))))
+  X_depthReport = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=as.numeric(seq(min(depth),max(depth),length.out = 40))))
 
   #Weighting used when smoothing length dimension in latent effect
   weigthLength = conf_l$lengthGroupsReduced*0
