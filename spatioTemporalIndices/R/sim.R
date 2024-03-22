@@ -75,12 +75,12 @@ fitModelSim<-function(run,simData){
 
   opt <- nlminb(obj$par, obj$fn, obj$gr,
                 control = list(trace = 1,iter.max = 1000, eval.max = 1000))
-  rep <- sdreport(obj)
+  rep <- sdreport(obj, ignore.parm.uncertainty = TRUE,getReportCovariance = FALSE,skip.delta.method = TRUE)
   pl = as.list(rep,"Est")
-  plSd = as.list(rep,"Std")
+  plSd = NULL
 
   rl = as.list(rep,"Est", report = TRUE)
-  rlSd = as.list(rep,"Std", report = TRUE)
+  rlSd = NULL
 
   FreeADFun(obj)#Free memory from C-side
 
