@@ -27,6 +27,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
   par = setPar(data_l,conf_l)
   map = setMap(par,conf_l)
 
+
   if(conf_l$applyALK==1){
     print("Set up age data")
 
@@ -159,7 +160,6 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
 
 
 
-
 #' jit
 #' @param run The result of running fitModel
 #' @param njit Number of jitter runs
@@ -185,16 +185,11 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
   par <- lapply(1:njit, function(i)relist(pOriginal+rnorm(length(pOriginal),sd=sd), run$par))
 
   #Set to spatio-temporal parameters to arrays as needed in the current implementation
-
-
   for(i in 1:length(par)){
-    scaleS = 1/((4*3.14159265)*exp(par[[i]]$logKappa)*exp(par[[i]]$logKappa))
-    scaleS_alk = 1/((4*3.14159265)*exp(par[[i]]$logKappa_alk)*exp(par[[i]]$logKappa_alk))
-
-    par[[i]]$xS = array(par[[i]]$xS, dim = dim(parOriginal$xS))* sqrt(scaleS[1])
-    par[[i]]$xST = array(par[[i]]$xST, dim = dim(parOriginal$xST))* sqrt(scaleS[2])
-    par[[i]]$xST_alk = array(par[[i]]$xST_alk, dim = dim(parOriginal$xST_alk))* sqrt(scaleS_alk[1])
-    par[[i]]$xS_alk = array(par[[i]]$xS_alk, dim = dim(parOriginal$xS_alk))* sqrt(scaleS_alk[2])
+    par[[i]]$xS = array(par[[i]]$xS, dim = dim(parOriginal$xS))
+    par[[i]]$xST = array(par[[i]]$xST, dim = dim(parOriginal$xST))
+    par[[i]]$xST_alk = array(par[[i]]$xST_alk, dim = dim(parOriginal$xST_alk))
+    par[[i]]$xS_alk = array(par[[i]]$xS_alk, dim = dim(parOriginal$xS_alk))
   }
 
   #Set those who are mapped as NA to its initial value
@@ -223,7 +218,7 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
     cl <-makeCluster(min(njit,ncores),outfile = "")
     clusterExport(cl,varlist=c("run","par"),envir=environment())
     clusterEvalQ(cl, library("spatioTemporalIndices"))
-    runs=parLapply(cl,par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f))
+    runs=parLapply(cl,par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f, ignore.parm.uncertainty = TRUE,getReportCovariance = FALSE,skip.delta.method = TRUE))
     stopCluster(cl)
   }
 
