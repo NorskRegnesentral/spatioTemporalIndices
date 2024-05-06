@@ -95,7 +95,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 ##'Configurations used for prediction.
 ##'
 ##' @param conf Configurations used when fitting the model
-##' @param cellsize provide distance between integration points in nautical miles
+##' @param cellsize provide distance between integration points
 ##' @param Depth if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration
 ##' @details
 ##' @export

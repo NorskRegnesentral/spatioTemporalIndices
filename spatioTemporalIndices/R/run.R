@@ -116,15 +116,17 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     print("Optimizing full length model, no ALK. This is the most time consuming step")
     obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart2, intern = intern)
     opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1,iter.max = 1000, eval.max = 1000))
-    rep <- sdreport(obj,...)
     print("Done optimizing full length model, no ALK")
 
     if(conf_l$applyALK==1){#Combine catch-at-length and ALK
+      print("Set up full model and sdreport")
+      rep <- sdreport(obj,ignore.parm.uncertainty = TRUE)
       pl = as.list(rep,"Est")
       par = pl
       FreeADFun(obj)#Free memory from C-side
-      print("Set up full model and sdreport")
       obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
+      rep <- sdreport(obj,...)
+    }else{
       rep <- sdreport(obj,...)
     }
     pl = as.list(rep,"Est")

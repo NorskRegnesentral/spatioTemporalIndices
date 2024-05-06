@@ -267,6 +267,10 @@ setupData = function(dat_l,conf_l,confPred){
 }
 
 #' includeIntPoints
+#' @param data data in model
+#' @param conf_l configurations in model
+#' @param confPred prediction configurations
+#' @param gamSetup_depth gam setup for depth, needed to set up the spline for integration points
 #' @return
 #' @export
 #' @examples
@@ -365,8 +369,16 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
 
 
 
-#' combineLengthALK
-#' @return
+#' combineLengthALK combines data needed for length and age needed in the joint model for catch-at-length and the age-at-length model
+#' @param dat_l data in catch-at-length model
+#' @param par_l parameters in catch-at-length model
+#' @param map_l map-variable in catch-at-length model
+#' @param dat_a data in age-at-length model
+#' @param par_a parameters in age-at-length model
+#' @param map_a map-variable in age-at-length model
+#' @param conf_l configurations in catch-at-length model
+#' @param confPred prediction configurations
+#' @return A list with combined data for catch-at-length and age-at-length needed by the joint model.
 #' @export
 #' @examples
 #' @return

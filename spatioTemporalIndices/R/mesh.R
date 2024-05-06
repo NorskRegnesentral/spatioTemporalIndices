@@ -2,8 +2,9 @@
 #'
 #' This function creates the mesh to represent the Matern covariance strucutre
 #'
-#' @param  conf
-#' @return Mesh used
+#' @param  conf configurations in the model.
+#' @details The resolution of the mesh depends on the cutoff configuration. The mesh is constructed based on integration points with high resolution. How much outside of the area is included in the mesh depends on the cbound configuration.
+#' @return Returns the mesh used with the SPDE-procedure
 #'
 #' @export
 createMesh <- function(conf){
@@ -25,7 +26,6 @@ createMesh <- function(conf){
 
   print(paste("Mesh points:",mesh$n))
   plot(mesh)
-#  points(intPoints)
   return(list(mesh=mesh, barrier.triangles =NULL))
 }
 

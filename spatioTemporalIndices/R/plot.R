@@ -234,7 +234,7 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
 #' plotTimeofDay
 #'
 #' Plot time in day effect
-#' @param run
+#' @param run Fitted model returned by, \code{\link{fitModel}}
 #' @export
 plotSunAlt<-function(run){
 

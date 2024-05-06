@@ -13,12 +13,16 @@ logLik.stim<-function(object, ...){
   beta0 = 0
   if(object$conf_l$rwBeta0==0){
     beta0 = beta0+ length(object$conf_l$lengthGroups)*length(object$conf_l$years)
+  }else{
+    beta0 = beta0+ length(object$conf_l$lengthGroups)
   }
 
   betaLengthALK = 0
   if(object$conf_l$applyALK!=0){
     if(object$conf_alk$rwBeta0==0){
       beta0 = beta0+ length(object$conf_alk$minAge:object$conf_alk$maxAge )*length(object$conf_l$years)
+    }else{
+      beta0 = beta0+ length(object$conf_alk$minAge:object$conf_alk$maxAge) + length(object$conf_l$years) -1
     }
     betaLengthALK = length(object$pl$betaLength_alk)
 
@@ -57,8 +61,13 @@ simulate.stim<-function(run, nsim=1, seed=NULL, ...){
 }
 
 
-##' Find sun heigth and sun rise. Thanks to Espen Johnsen who provided the code.
-##' @param
+##' Find sun height and sun rise. Thanks to Espen Johnsen who provided the code.
+##' @param min Minutes in hour
+##' @param hour Hour in day
+##' @param day Day of month
+##' @param month Month of year
+##' @param lat Latitude of station
+##' @param lon Longitude of station
 ##' @details
 ##' @export
 altOfSun <- function(min, hour, day, month,lat, lon){
@@ -90,8 +99,8 @@ altOfSun <- function(min, hour, day, month,lat, lon){
 }
 
 ##' Includes dummy variables for age
-##' @param
-##' @details
+##' @param data Data for catch-at-length model internally used by TMB
+##' @details This is just a dummy function to include empty variables in age-at-length model.
 ##' @export
 includeDummyAge = function(data){
 

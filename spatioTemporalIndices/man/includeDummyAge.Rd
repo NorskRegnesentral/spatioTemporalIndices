@@ -6,6 +6,12 @@
 \usage{
 includeDummyAge(data)
 }
+\arguments{
+\item{data}{Data for catch-at-length model internally used by TMB}
+}
 \description{
 Includes dummy variables for age
+}
+\details{
+This is just a dummy function to include empty variables in age-at-length model.
 }

@@ -2,10 +2,30 @@
 % Please edit documentation in R/data.R
 \name{combineLengthALK}
 \alias{combineLengthALK}
-\title{combineLengthALK}
+\title{combineLengthALK combines data needed for length and age needed in the joint model for catch-at-length and the age-at-length model}
 \usage{
-combineLengthALK(dat_l, par_l, map_l, dat_a, par_a, map_a, conf, confPred)
+combineLengthALK(dat_l, par_l, map_l, dat_a, par_a, map_a, conf_l, confPred)
+}
+\arguments{
+\item{dat_l}{data in catch-at-length model}
+
+\item{par_l}{parameters in catch-at-length model}
+
+\item{map_l}{map-variable in catch-at-length model}
+
+\item{dat_a}{data in age-at-length model}
+
+\item{par_a}{parameters in age-at-length model}
+
+\item{map_a}{map-variable in age-at-length model}
+
+\item{conf_l}{configurations in catch-at-length model}
+
+\item{confPred}{prediction configurations}
+}
+\value{
+A list with combined data for catch-at-length and age-at-length needed by the joint model.
 }
 \description{
-combineLengthALK
+combineLengthALK combines data needed for length and age needed in the joint model for catch-at-length and the age-at-length model
 }

@@ -7,11 +7,14 @@
 createMesh(conf)
 }
 \arguments{
-\item{conf}{}
+\item{conf}{configurations in the model.}
 }
 \value{
-Mesh used
+Returns the mesh used with the SPDE-procedure
 }
 \description{
 This function creates the mesh to represent the Matern covariance strucutre
+}
+\details{
+The resolution of the mesh depends on the cutoff configuration. The mesh is constructed based on integration points with high resolution. How much outside of the area is included in the mesh depends on the cbound configuration.
 }

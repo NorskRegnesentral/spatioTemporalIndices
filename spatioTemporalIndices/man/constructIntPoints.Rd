@@ -6,6 +6,14 @@
 \usage{
 constructIntPoints(conf, confPred)
 }
+\arguments{
+\item{conf}{Configurations for catch-at-length}
+
+\item{confPred}{Prediction configurations}
+}
+\value{
+A list with integration points. Strata number for each integration point is included.
+}
 \description{
 constructIntPoints
 }

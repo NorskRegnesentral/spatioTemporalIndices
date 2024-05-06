@@ -4,7 +4,16 @@
 \alias{includeIntPoints}
 \title{includeIntPoints}
 \usage{
-includeIntPoints(data, conf, confPred, gamSetup_depth)
+includeIntPoints(data, conf_l, confPred, gamSetup_depth)
+}
+\arguments{
+\item{data}{data in model}
+
+\item{conf_l}{configurations in model}
+
+\item{confPred}{prediction configurations}
+
+\item{gamSetup_depth}{gam setup for depth, needed to set up the spline for integration points}
 }
 \description{
 includeIntPoints

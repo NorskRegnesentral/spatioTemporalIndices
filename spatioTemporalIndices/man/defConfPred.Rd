@@ -9,7 +9,7 @@ defConfPred(conf, cellsize = 20, Depth = "Data")
 \arguments{
 \item{conf}{Configurations used when fitting the model}
 
-\item{cellsize}{provide number distance between integration points}
+\item{cellsize}{provide distance between integration points}
 
 \item{Depth}{if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration}
 }

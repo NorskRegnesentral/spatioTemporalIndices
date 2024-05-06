@@ -6,6 +6,9 @@
 \usage{
 plotSunAlt(run)
 }
+\arguments{
+\item{run}{Fitted model returned by, \code{\link{fitModel}}}
+}
 \description{
 Plot time in day effect
 }

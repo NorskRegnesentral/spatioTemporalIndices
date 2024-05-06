@@ -2,10 +2,23 @@
 % Please edit documentation in R/utils.R
 \name{altOfSun}
 \alias{altOfSun}
-\title{Find sun heigth and sun rise. Thanks to Espen Johnsen who provided the code.}
+\title{Find sun height and sun rise. Thanks to Espen Johnsen who provided the code.}
 \usage{
 altOfSun(min, hour, day, month, lat, lon)
 }
+\arguments{
+\item{min}{Minutes in hour}
+
+\item{hour}{Hour in day}
+
+\item{day}{Day of month}
+
+\item{month}{Month of year}
+
+\item{lat}{Latitude of station}
+
+\item{lon}{Longitude of station}
+}
 \description{
-Find sun heigth and sun rise. Thanks to Espen Johnsen who provided the code.
+Find sun height and sun rise. Thanks to Espen Johnsen who provided the code.
 }

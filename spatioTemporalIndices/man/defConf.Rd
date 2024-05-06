@@ -17,7 +17,7 @@ defConf(
   minLength = NULL,
   reduceLength = 3,
   cutoff = 100,
-  offset = 100,
+  cbound = c(18, 130),
   pcPriorRange = c(100, 0.1),
   pcPriorsd = c(1, 0.1),
   usePcPriors = 0,
@@ -59,8 +59,6 @@ defConf(
 
 \item{cutoff}{Cutoff used in mesh, first element is for spatial effect, second for spatio-temporal effect, third is 0 if same mesh is used for both spatial and spatio-temporal effect}
 
-\item{offset}{How far outside of data the boundary goes.}
-
 \item{pcPriorRange}{pc-priors for spatial and spatio-temporal effect}
 
 \item{pcPriorsd}{pc-priors for spatial and spatio-temporal effect}
@@ -80,6 +78,8 @@ defConf(
 \item{plusGroup}{Include plus goup? 1:yes, 0: No}
 
 \item{strataReport}{ADREPORT index in each strata? 1:yes, 0: No. NB!: Currenlty not working in combination with ALK}
+
+\item{offset}{How far outside of data the boundary goes.}
 }
 \description{
 Configurations used. The object returned is

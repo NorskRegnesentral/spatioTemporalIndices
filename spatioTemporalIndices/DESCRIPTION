@@ -1,11 +1,16 @@
 Package: spatioTemporalIndices
 Type: Package
-Title: Construct indices based on a standard latent Gaussian spatio-temporal model.
+Title: Construct abundance indices based on a latent Gaussian spatio-temporal model.
 Version: 1.0.0
 Authors@R: c(person(c("Olav","Nikolai"), "Breivik",role=c("aut","cre"), email="olavbr@nr.no"),
 	    person("Fredrik","Aanes",role="aut"),
             person("Fabian", "Zimmermann", role="aut", email="fabian.zimmermann@hi.no"))
-Description: Predict indices with a standard spatio-temporal Gaussian model. Indices may be constructed by length which are furter mapped to age with an internally estimated spatial age length key.
+Author: Olav Nikolai Breivik [aut, cre],
+	Fredik Aanes [aut],
+	Fabian Zimmermann [aut]
+Maintainer: Olav Nikolai Breivik <olavbr@nr.no>,
+	Fabian Zimmermann <fabian.zimmermann@hi.no>
+Description: Estimate indices with a spatio-temporal Gaussian model. Indices may be constructed by length which are furter converted to age with an internally estimated spatio-temporal age-length-key.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: TRUE
