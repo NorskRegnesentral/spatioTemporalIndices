@@ -13,10 +13,14 @@ constructIntPoints<-function(conf,confPred){
 
   #Define data frame with integration points to be returned
   points = st_join(points,st_buffer(strata_utm,1),left=FALSE)
-  points = points[!duplicated(points$geometry),]
   locUTM = data.frame(st_coordinates(points)) #To be returned
   colnames(locUTM) = c("UTMX", "UTMY")
   idxStrata = as.numeric(points$id)
+
+  #Remove possible duplicates
+  noDuplicats =!duplicated(locUTM)
+  locUTM = locUTM[noDuplicats,]
+  idxStrata = idxStrata[noDuplicats]
 
   return(list(locUTM = locUTM, idxStrata = idxStrata))
 }
