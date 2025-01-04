@@ -2,7 +2,7 @@
 % Please edit documentation in R/pred.R
 \name{constructIntPoints}
 \alias{constructIntPoints}
-\title{constructIntPoints}
+\title{constructIntPoints is used to set up the spatial locations for the integration points.}
 \usage{
 constructIntPoints(conf, confPred)
 }
@@ -15,5 +15,5 @@ constructIntPoints(conf, confPred)
 A list with integration points. Strata number for each integration point is included.
 }
 \description{
-constructIntPoints
+constructIntPoints is used to set up the spatial locations for the integration points.
 }

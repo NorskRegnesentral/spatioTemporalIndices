@@ -1,7 +1,6 @@
-## Return AIC, used by stats::AIC()
+##' loglik
 ##'
-##' @param object
-##' @details
+##' @param object The fitted model retuned by fitModel
 ##' @export
 logLik.stim<-function(object, ...){
   ret<- -object$opt$objective
@@ -68,7 +67,6 @@ simulate.stim<-function(run, nsim=1, seed=NULL, ...){
 ##' @param month Month of year
 ##' @param lat Latitude of station
 ##' @param lon Longitude of station
-##' @details
 ##' @export
 altOfSun <- function(min, hour, day, month,lat, lon){
   # altitude of sun

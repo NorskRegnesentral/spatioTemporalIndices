@@ -15,6 +15,9 @@ retroSTIM(run, nyears, years = NULL, ncores = 1)
 
 \item{ncores}{Number of cores to use.}
 }
+\value{
+The fitted model within each peal in the retrospective analysis
+}
 \description{
-retroSTIM
+This function do a retrospective analysis and returns the fitted models within each peal
 }

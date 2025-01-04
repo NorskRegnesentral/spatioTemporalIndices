@@ -1,4 +1,8 @@
 #' Run model
+#'
+#' This funtion runs the index model given the data on catch-at-length and age-at-length.
+#' Indices with corresponding covariance matrices and uncertianty estimates can be extracted using the \code{\link{saveIndex}} function.
+#'
 #' @importFrom TMB MakeADFun sdreport
 #' @importFrom stats nlminb
 #' @param dat_l Data frame with length data
@@ -8,8 +12,8 @@
 #' @param conf_alk Configurations for ALK model.
 #' @param ... Parameters sendt to sdreport.
 #' @useDynLib spatioTemporalIndices
-#' @return A fitted stim object
-#' @details
+#' @return A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{saveIndex}} function. Or manually by inspecting the fit$rl object.
+#' @details This model runs estimate the index model, and returns the fitted model.
 #' @export
 fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,runModel = TRUE, mapSet = NULL,intern = FALSE,twoStage = FALSE,...){
 
@@ -163,12 +167,14 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
 
 
 #' jit
+#'
+#' This model takes the fitted returned by \code{\link{fitModel}}, and do a jitter-analysis to verify that the model is not sensitive to starting values.
+#'
 #' @param run The result of running fitModel
 #' @param njit Number of jitter runs
 #' @param ncores Number of cores to use
-#' @param sd Standard deviation of noise to start values
-#' @details
-#' @return
+#' @param sd Standard deviation of noise to starting values
+#' @return A list with fitted runs and maximum difference in parameter estimates
 #' @export
 #'
 jit<-function(run,njit,ncores = 1,sd = 0.1){
@@ -308,12 +314,14 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
 
 
 #' retroSTIM
+#'
+#' This function do a retrospective analysis and returns the fitted models within each peal
+#'
 #' @param run The result of running fitModel
 #' @param nyears The number of years to remove sequentially
 #' @param years Default NULL, will overwrite nyears and select which years to remove sequentially
 #' @param ncores Number of cores to use.
-#' @details
-#' @return
+#' @return The fitted model within each peal in the retrospective analysis
 #' @export
 #'
 retroSTIM = function(run,nyears,years = NULL,ncores = 1){

@@ -15,5 +15,5 @@ fitModelSim(run, simData)
 Returns a STIM object fitted with the simulated data
 }
 \description{
-Simulation study, run models
+Re-estimate the model for each sampled data set returned by simStudy.
 }

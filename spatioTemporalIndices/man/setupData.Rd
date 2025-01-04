@@ -7,14 +7,17 @@
 setupData(dat_l, conf_l, confPred)
 }
 \arguments{
-\item{confPred}{Prediction configurations}
+\item{dat_l}{A list of the data object returned by getBaseline, where each element of the list is a year}
 
-\item{data}{A list of the data object returned by getBaseline, where each element of the list is a year}
+\item{conf_l}{Configurations returned by \code{\link{defConf}}}
 
-\item{conf}{Configurations, see \code{\link{defConf}} for details.}
+\item{confPred}{Prediction configurations returned by \code{\link{defConfPred}}}
+}
+\value{
+This function return the length part of the data-list used by TMB
 }
 \description{
-setupData
+This function sets up the length part of the data-list used by TMB.
 }
 \details{
 Set up data used by model

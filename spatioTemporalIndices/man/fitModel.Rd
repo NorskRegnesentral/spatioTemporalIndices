@@ -32,8 +32,12 @@ fitModel(
 \item{conf}{Configurations for length part of model}
 }
 \value{
-A fitted stim object
+A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{saveIndex}} function. Or manually by inspecting the fit$rl object.
 }
 \description{
-Run model
+This funtion runs the index model given the data on catch-at-length and age-at-length.
+Indices with corresponding covariance matrices and uncertianty estimates can be extracted using the \code{\link{saveIndex}} function.
+}
+\details{
+This model runs estimate the index model, and returns the fitted model.
 }

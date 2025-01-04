@@ -15,5 +15,5 @@ simStudy(run, nsim = 5)
 A runSim object containtin all runs based on simulated data
 }
 \description{
-Simulation study
+This function conduct a simulation study; all random effects are sampled based on their prior. Given the sampled random effects, the observations are sampled.
 }

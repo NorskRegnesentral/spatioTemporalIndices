@@ -15,6 +15,11 @@ includeIntPoints(data, conf_l, confPred, gamSetup_depth)
 
 \item{gamSetup_depth}{gam setup for depth, needed to set up the spline for integration points}
 }
+\value{
+This function includes integration points (for constructing the index-at-length and index-at-age) in the data-list used by TMB.
+
+This function returns the data-list used by TMB
+}
 \description{
 includeIntPoints
 }

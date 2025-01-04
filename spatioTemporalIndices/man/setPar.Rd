@@ -12,8 +12,11 @@ setPar(data, conf)
 \item{conf}{Configurations}
 }
 \value{
-a list containing initial values for all model parameters and random effects in the model.
+A list containing initial values for all model parameters and random effects in the model.
 }
 \description{
 Initialie values for all model parameters and random effects.
+}
+\details{
+This function sets up the initial values for the parameters
 }

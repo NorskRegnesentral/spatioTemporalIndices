@@ -26,7 +26,7 @@
 ##' @param trawlWidth Swept width of trawl
 ##' @param plusGroup Include plus goup? 1:yes, 0: No
 ##' @param strataReport ADREPORT index in each strata? 1:yes, 0: No. NB!: Currenlty not working in combination with ALK
-##' @details
+##' @details This function sets up the configurations for the catch-at-length model
 ##' @export
 defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,0),sunAlt=c(1,0),
                     maxLength = NULL,dLength = 1, minLength = NULL,reduceLength = 3,
@@ -97,7 +97,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 ##' @param conf Configurations used when fitting the model
 ##' @param cellsize provide distance between integration points
 ##' @param Depth if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration
-##' @details
+##' @details This function sets up the configurations for the predictions, i.e. the index-at-length and index-at-age.
 ##' @export
 defConfPred <- function(conf,cellsize=20,Depth="Data"){
   confPred = list()
@@ -113,7 +113,7 @@ defConfPred <- function(conf,cellsize=20,Depth="Data"){
 ##'
 ##' @param par Parameters included
 ##' @param conf Configurations
-##' @details
+##' @details This function sets up the map-list used to couple and simplify the model with the map-argument used by MakeADFun in TMB
 ##' @export
 setMap <- function(par, conf){
   map= list()
