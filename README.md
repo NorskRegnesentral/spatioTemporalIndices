@@ -53,7 +53,7 @@ conf_l = defConf(years = 2018:2020, # years to use,
                  applyALK = 1)
 ```
 
-Set up configurations for age-at-length model. Note that the package `spatioTemporalALK` needs to be installed (https://github.com/NorskRegnesentral/spatioTemporalALK). 
+Set up configurations for age-at-length model.
 
 ```R
 conf_alk = defConf_alk(maxAge = 10,
