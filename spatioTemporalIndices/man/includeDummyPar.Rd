@@ -10,7 +10,7 @@ includeDummyPar(par)
 \item{par}{Parameters}
 }
 \value{
-...
+This function includes dummy parameters when ALK in not applied.
 }
 \description{
 Includes dummy-parameters if ALK is not applied.

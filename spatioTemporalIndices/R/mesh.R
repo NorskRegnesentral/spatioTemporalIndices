@@ -16,16 +16,14 @@ createMesh <- function(conf){
     confPredTmp$cellsize = confPredTmp$cellsize/2
     intPoints = constructIntPoints(conf,confPredTmp)$locUTM
   }
-  boundary.loc <- SpatialPoints(as.matrix(intPoints))
-  boundary <- list(
-    inla.nonconvex.hull(coordinates(boundary.loc), convex  = conf$cbound[1],resolution = 120),
-    inla.nonconvex.hull(coordinates(boundary.loc), convex  = conf$cbound[2]))
-  mesh <- inla.mesh.2d(boundary=boundary,
-                       max.edge=maxEdge,
-                       cutoff=conf$cutoff)
 
-  print(paste("Mesh points:",mesh$n))
-  plot(mesh)
+  boundary <- list(
+    fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
+    fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
+  mesh <- fmesher::fm_mesh_2d(boundary=boundary,
+                               max.edge=maxEdge,
+                               cutoff=conf$cutoff)
+
   return(list(mesh=mesh, barrier.triangles =NULL))
 }
 

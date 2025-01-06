@@ -16,3 +16,6 @@ defConfPred(conf, cellsize = 20, Depth = "Data")
 \description{
 Configurations used for prediction.
 }
+\details{
+This function sets up the configurations for the predictions, i.e. the index-at-length and index-at-age.
+}

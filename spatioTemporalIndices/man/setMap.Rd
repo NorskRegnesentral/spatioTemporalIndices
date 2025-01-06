@@ -14,3 +14,6 @@ setMap(par, conf)
 \description{
 \code{setMap} defines the map-argument used in MakeADFun.
 }
+\details{
+This function sets up the map-list used to couple and simplify the model with the map-argument used by MakeADFun in TMB
+}

@@ -1,10 +1,9 @@
 
-#' constructIntPoints
+#' constructIntPoints is used to set up the spatial locations for the integration points.
 #' @param conf Configurations for catch-at-length
 #' @param confPred Prediction configurations
 #' @return A list with integration points. Strata number for each integration point is included.
 #' @export
-#' @examples
 constructIntPoints<-function(conf,confPred){
   utmCRS = paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")
   strata_utm <- st_transform(conf$strata,utmCRS)

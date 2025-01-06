@@ -1,8 +1,10 @@
 #' Simulation study
+#'
+#' This function conduct a simulation study; all random effects are sampled based on their prior. Given the sampled random effects, the observations are sampled.
+#'
 #' @param run Run retruned by fitModel
 #' @param nsim Number of simulations
 #' @return A runSim object containtin all runs based on simulated data
-#' @details
 #' @export
 simStudy = function(run,nsim = 5){
   simData = list()
@@ -29,10 +31,12 @@ simStudy = function(run,nsim = 5){
 }
 
 #' Simulation study, run models
+#'
+#'Re-estimate the model for each sampled data set returned by simStudy.
+#'
 #' @param run Run retruned by fitModel
 #' @param simData One set of simulated data
 #' @return Returns a STIM object fitted with the simulated data
-#' @details
 #' @export
 fitModelSim<-function(run,simData){
   data = run$data

@@ -13,8 +13,11 @@ jit(run, njit, ncores = 1, sd = 0.1)
 
 \item{ncores}{Number of cores to use}
 
-\item{sd}{Standard deviation of noise to start values}
+\item{sd}{Standard deviation of noise to starting values}
+}
+\value{
+A list with fitted runs and maximum difference in parameter estimates
 }
 \description{
-jit
+This model takes the fitted returned by \code{\link{fitModel}}, and do a jitter-analysis to verify that the model is not sensitive to starting values.
 }

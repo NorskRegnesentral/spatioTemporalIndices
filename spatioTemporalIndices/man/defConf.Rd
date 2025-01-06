@@ -85,3 +85,6 @@ defConf(
 Configurations used. The object returned is
 used in \code{\link{setupData}} and in  \code{\link{setPar}}.
 }
+\details{
+This function sets up the configurations for the catch-at-length model
+}

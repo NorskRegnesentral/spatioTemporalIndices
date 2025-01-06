@@ -4,13 +4,12 @@
 #'
 #' Set up data used by model
 #'
-#' @description
-#' @param data A list of the data object returned by getBaseline, where each element of the list is a year
-#' @param conf Configurations, see \code{\link{defConf}} for details.
-#' @param confPred Prediction configurations
-#' @return
+#' @description This function sets up the length part of the data-list used by TMB.
+#' @param dat_l A list of the data object returned by getBaseline, where each element of the list is a year
+#' @param conf_l Configurations returned by \code{\link{defConf}}
+#' @param confPred Prediction configurations returned by \code{\link{defConfPred}}
+#' @return This function return the length part of the data-list used by TMB
 #' @export
-#' @examples
 setupData = function(dat_l,conf_l,confPred){
 
   #Remove too short lengths
@@ -39,27 +38,20 @@ setupData = function(dat_l,conf_l,confPred){
   }
 
   #Convert to UTM coordinates
-  #loc = data.frame(dat_l$longitude,dat_l$latitude)
   loc = st_as_sf(dat_l,coords = c("longitude","latitude"),crs="+proj=longlat")
   locUTM = st_coordinates(st_transform(loc,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs")))
-
   dat_l$UTMX = locUTM[,1]
   dat_l$UTMY = locUTM[,2]
 
-  dat_l$year = as.integer(format(dat_l$startdatetime, format = "%Y"))
-
   #Remove observations in years not used
+  dat_l$year = as.integer(format(dat_l$startdatetime, format = "%Y"))
   dat_l = dat_l[dat_l$year %in% conf_l$years, ]
 
   #Set up structure used for the SPDE-procedure
   meshS=createMesh(conf_l)$mesh
-  spdeS = inla.spde2.matern(meshS, alpha=2)
-#  spdeS <- fmesher::fm_fem(meshS)
-  spdeMatricesS = spdeS$param.inla[c("M0","M1","M2")]
-#  spdeMatricesS = list("M0" = spdeS$c0, "M1" = spdeS$g1, "M2" = spdeS$g2)
-
+  spdeS <- fmesher::fm_fem(meshS)
+  spdeMatricesS = list("M0" = spdeS$c0, "M1" = spdeS$g1, "M2" = spdeS$g2)
   A_ListS=list(rep(1,length(conf_l$years)))
-  plot(meshS)
   meshST=meshS; spdeST= spdeS; spdeMatricesST = spdeMatricesS;  A_ListST = A_ListS; #Apply same setup for spatial and spatio-temporal part
 
   singleHauls = which(dat_l$lengthGroup==conf_l$maxLength)
@@ -97,10 +89,8 @@ setupData = function(dat_l,conf_l,confPred){
     loc=cbind(dat_l$UTMX[dat_l$year==y & dat_l$lengthGroup==conf_l$maxLength],dat_l$UTMY[dat_l$year==y& dat_l$lengthGroup==conf_l$maxLength])
 
     nStationsEachYear[counter]=dim(loc)[1]
-    A_ListS[[counter]]=inla.spde.make.A(meshS,loc)
-    A_ListST[[counter]]=inla.spde.make.A(meshST,loc)
-#    A_ListS[[counter]]= fmesher::fm_basis(meshS, loc)
-#    A_ListST[[counter]]= fmesher::fm_basis(meshST, loc)
+    A_ListS[[counter]]= fmesher::fm_basis(meshS, loc)
+    A_ListST[[counter]]= fmesher::fm_basis(meshST, loc)
 
     counter = counter + 1
   }
@@ -271,16 +261,13 @@ setupData = function(dat_l,conf_l,confPred){
 #' @param conf_l configurations in model
 #' @param confPred prediction configurations
 #' @param gamSetup_depth gam setup for depth, needed to set up the spline for integration points
-#' @return
+#' @return This function includes integration points (for constructing the index-at-length and index-at-age) in the data-list used by TMB.
 #' @export
-#' @examples
-#' @return
+#' @return This function returns the data-list used by TMB
 includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
   points = constructIntPoints(conf_l,confPred)
-  ApredS = inla.spde.make.A(attributes(data)$meshS,loc = as.matrix(points$locUTM))
-  ApredST = inla.spde.make.A(attributes(data)$meshST,loc = as.matrix(points$locUTM))
-#  ApredS = fmesher::fm_basis(attributes(data)$meshS,loc = as.matrix(points$locUTM))
-#  ApredST = fmesher::fm_basis(attributes(data)$meshST,loc = as.matrix(points$locUTM))
+  ApredS = fmesher::fm_basis(attributes(data)$meshS,loc = as.matrix(points$locUTM))
+  ApredST = fmesher::fm_basis(attributes(data)$meshST,loc = as.matrix(points$locUTM))
 
   data$ApredS = ApredS
   data$ApredST = ApredST
@@ -380,8 +367,6 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
 #' @param confPred prediction configurations
 #' @return A list with combined data for catch-at-length and age-at-length needed by the joint model.
 #' @export
-#' @examples
-#' @return
 combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf_l,confPred){
 
   dat_joint = c(dat_l,dat_a)
@@ -389,8 +374,7 @@ combineLengthALK<-function(dat_l, par_l,map_l,dat_a, par_a,map_a,conf_l,confPred
   map_joint = c(map_l,map_a)
 
   points = constructIntPoints(conf_l,confPred)
-  Apred_alk = inla.spde.make.A(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
-#  Apred_alk = fmesher::fm_basis(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
+  Apred_alk = fmesher::fm_basis(attributes(dat_a)$mesh,loc = as.matrix(points$locUTM))
 
   dat_joint$Apred_alk = Apred_alk
   attributes(dat_joint)$year = attributes(dat_l)$year

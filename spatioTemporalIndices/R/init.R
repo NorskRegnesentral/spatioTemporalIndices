@@ -1,8 +1,8 @@
 #' Initialie values for all model parameters and random effects.
 #' @param data Data
 #' @param conf Configurations
-#' @details
-#' @return a list containing initial values for all model parameters and random effects in the model.
+#' @details This function sets up the initial values for the parameters
+#' @return A list containing initial values for all model parameters and random effects in the model.
 #' @export
 setPar <- function(data,conf){
 
@@ -47,8 +47,7 @@ setPar <- function(data,conf){
 
 #' Includes dummy-parameters if ALK is not applied.
 #' @param par Parameters
-#' @details
-#' @return ...
+#' @return This function includes dummy parameters when ALK in not applied.
 #' @export
 includeDummyPar <- function(par){
 
