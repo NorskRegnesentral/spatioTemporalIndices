@@ -1,6 +1,4 @@
 suppressMessages(library(spatioTemporalIndices))
-suppressMessages(library(spatioTemporalALK))
-
 
 dat_l = readRDS("haddock2018-2020_length_ex_rus.rds")
 dat_alk = readRDS("haddock2018-2020_age_ex_rus.rds")
