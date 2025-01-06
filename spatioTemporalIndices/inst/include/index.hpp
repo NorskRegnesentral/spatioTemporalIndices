@@ -148,9 +148,9 @@ template <class Type>
         }
       }
 
-      Type muZero;//Used if applying zero inflation
-      Type pZero;//Used if applying zero inflation
-      Type pPos;//Used if applying zero inflation
+      Type muZero = 0;//Used if applying zero inflation
+      Type pZero = 0;//Used if applying zero inflation
+      Type pPos = 0;//Used if applying zero inflation
       for(int s=0; s<dat.nStationsEachYear(y);++s){
         for(int l=0; l <dat.numberOfLengthGroups;++l){
           covariatesConvexW = (dat.numberOfLengthGroups-l-1)/(dat.numberOfLengthGroups-1);
