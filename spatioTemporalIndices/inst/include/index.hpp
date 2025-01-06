@@ -188,7 +188,7 @@ template <class Type>
                 }
               }else{
                 //Not implemented
-                pPos = 0
+                pPos = 0;
               }
 
               if(dat.fishObsMatrix(counter,l)==0){
