@@ -8,7 +8,7 @@ This model uses catch-at-length and age-at-length observations to construct indi
 The model is installed by typing 
 
 ```R
-devtools::install_github("NorskRegnesentral/spatioTemporalIndices/spatioTemporalIndices")
+remotes::install_github("NorskRegnesentral/spatioTemporalIndices/spatioTemporalIndices")
 ```
 
 # Quick example
