@@ -2,15 +2,15 @@
 % Please edit documentation in R/init.R
 \name{includeDummyPar}
 \alias{includeDummyPar}
-\title{Includes dummy-parameters if ALK is not applied.}
+\title{includeDummyPar}
 \usage{
 includeDummyPar(par)
 }
 \arguments{
-\item{par}{Parameters}
+\item{par}{Parameters for the age-at-length model}
 }
 \value{
-This function includes dummy parameters when ALK in not applied.
+This function includes dummy parameters for age-at-length model when age data is not used.
 }
 \description{
 Includes dummy-parameters if ALK is not applied.

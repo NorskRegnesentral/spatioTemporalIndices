@@ -2,7 +2,7 @@
 % Please edit documentation in R/alk_functions.R
 \name{defConf_alk}
 \alias{defConf_alk}
-\title{Set up conf}
+\title{defConf_alk}
 \usage{
 defConf_alk(
   years = NULL,
@@ -20,26 +20,36 @@ defConf_alk(
 )
 }
 \arguments{
-\item{years}{years to include}
+\item{years}{Years to include}
+
+\item{minAge}{minimum age}
 
 \item{maxAge}{max age}
 
 \item{spatioTemporal}{include spatio-tempora: 0-no 1-yes 2- yes but without correlation structure in time}
 
-\item{meshSimilar}{If true we apply the same mesh as in the package spatitemporalIndices}
+\item{spatial}{include spatial effect: 0-no 1-yes}
+
+\item{rwBeta0}{random walk for intercelt within cohorts:  0-no 1-yes}
+
+\item{betaLength}{Time varying regression coefficients for length: 1-no, 2-yes}
+
+\item{meshSimilar}{If TRUE; apply the same mesh as in the package spatitemporalIndices, this is typically the case}
 
 \item{readability}{If 1: Utilize age reading quality, if 0: Do not utilize age reading quality}
 
-\item{cutoff}{mesh spesific, min distance between points}
+\item{usePCpriorsALK}{Use pc-priors: 0-no 1-yes. Probably never used; in case it is used, we need set pcPriorsALKRange and pcPriorsALKSD to reasonable values}
 
-\item{cbound}{mesh spesific, size of boundary meshSimilar}
+\item{pcPriorsALKRange}{pc-priors for range}
+
+\item{pcPriorsALKSD}{pc-priors for standard deviations}
 }
 \value{
-Configurations to set up the model
+Configurations to set up the age-at-length part of the model
 }
 \description{
-Set up conf
+Set up the configurations for the age-at-length model
 }
 \details{
-defines the configurations
+Defines the configurations
 }

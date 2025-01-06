@@ -2,21 +2,21 @@
 % Please edit documentation in R/alk_functions.R
 \name{defpar_alk}
 \alias{defpar_alk}
-\title{Set up data}
+\title{defpar_alk}
 \usage{
-defpar_alk(data, conf)
+defpar_alk(data_alk, conf_alk)
 }
 \arguments{
-\item{data}{data}
+\item{data_alk}{data-list for the age-at-length model}
 
-\item{conf}{configurations}
+\item{conf_alk}{configurations for the age-at-length model}
 }
 \value{
-Prameters to be provided to TMB
+The age-at-length model parameter list with initial values.
 }
 \description{
-Set up data
+Set up the age-at-length model parameter list used by TMB.
 }
 \details{
-define parameters
+Set up the age-at-length model parameter list used by TMB.
 }

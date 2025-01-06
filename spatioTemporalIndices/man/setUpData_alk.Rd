@@ -2,21 +2,23 @@
 % Please edit documentation in R/alk_functions.R
 \name{setUpData_alk}
 \alias{setUpData_alk}
-\title{Set up data}
+\title{setUpData_alk}
 \usage{
 setUpData_alk(dat_alk, conf_alk, conf_l = NULL)
 }
 \arguments{
-\item{df}{raw data}
+\item{dat_alk}{age data, a data table with one line for each fish}
 
-\item{conf}{configurations}
+\item{conf_alk}{configurations for age-at-length model}
+
+\item{conf_l}{configurations for length-at-age model}
 }
 \value{
 Data to be provided to TMB
 }
 \description{
-Set up data
+Set up age data in the format needed by TMB.
 }
 \details{
-Prepare data
+Prepare data list for the age part. This data-list will be merged with the length data-list later.
 }

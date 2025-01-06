@@ -13,8 +13,8 @@ defConf(
   splineDepth = c(6, 0),
   sunAlt = c(1, 0),
   maxLength = NULL,
-  dLength = 1,
   minLength = NULL,
+  dLength = 1,
   reduceLength = 3,
   cutoff = 100,
   cbound = c(18, 130),
@@ -22,12 +22,12 @@ defConf(
   pcPriorsd = c(1, 0.1),
   usePcPriors = 0,
   zeroInflated = 0,
+  stratasystem = list(),
   obsModel = 2,
   rwBeta0 = 1,
   applyALK = 0,
   mapRhoL = c(0, 1, 2),
   simulateProcedure = 1,
-  stratasystem = list(),
   minDepth = 50,
   maxDepth = 600,
   trawlWidth = 1,
@@ -37,53 +37,67 @@ defConf(
 )
 }
 \arguments{
-\item{years}{Years of data included}
+\item{years}{A numeric vector specifying the range of years to include. All years between the earliest and latest values in the vector are used. For example, if `years = c(2018, 2020)`, the data for 2018, 2019, and 2020 is included. Use the `skipYears` parameter to exclude specific years within this range.}
 
-\item{skipYears}{Years to skip in the estimation}
+\item{skipYears}{Years to skip in the estimation within the range of `years`.}
 
 \item{spatial}{If 0-no spatial effect, 1-Include spatial effect}
 
-\item{spatioTemporal}{If 0-no spatial-temporal effect, 1-Include spatial-temporal effect, 2-Include spatial-temporal effect with independence between years}
+\item{spatioTemporal}{If 0-no spatial-temporal effect, 1-Include spatial-temporal effect, 2-Include spatial-temporal effect with independence between years. Note: Setting this to 1 makes inference time consuming and include correlation between years.}
 
-\item{nugget}{If 0-no nugget effect, 1-Include nugget effect}
+\item{nugget}{If 0-no nugget effect, 1-Include nugget effect. Note that this nugget effect includes correlation between length groups within the haul.}
 
 \item{splineDepth}{Vector with depth configurations, first element is the k-variable in spline (6 means 6 basis function). Second element: 0: no depth effect, 1: depth effect(length independent), 2:length dependent depth effect.}
 
-\item{sunAlt}{Vector with sun altitude configurations, first element is the numberof basis functions. Second element: 0: No sun effect, 1:sun effect (length independent), 2: length dependent sun effect.}
+\item{sunAlt}{Vector with sun altitude configurations, first element is the number of basis functions. Second element: 0: No sun effect, 1:sun effect (length independent), 2: length dependent sun effect.}
 
 \item{maxLength}{Maximum length, used when defining the pluss group}
 
 \item{minLength}{Minimum length, used when defining the minus group (probably never used)}
 
-\item{reduceLength}{The resolution in length dimension used in latent effect}
+\item{dLength}{Length of each length group bin}
 
-\item{cutoff}{Cutoff used in mesh, first element is for spatial effect, second for spatio-temporal effect, third is 0 if same mesh is used for both spatial and spatio-temporal effect}
+\item{reduceLength}{The resolution in length dimension used in latent effect. If 1: all length groups are included as in latent effect. If 2: latent dimension for length group is defined as every second length group... Including all length groups in latent effect often result in high memory usage and computation time.}
 
-\item{pcPriorRange}{pc-priors for spatial and spatio-temporal effect}
+\item{cutoff}{Cutoff used in mesh, a smaller value results in a more dense mesh.}
 
-\item{pcPriorsd}{pc-priors for spatial and spatio-temporal effect}
+\item{cbound}{boundary configurations for the mesh. The first element is how far to extend the inner boundary, and the second is for the outer boundary.}
 
-\item{usePcPriors}{If 0-No pc-priors used, 1- use pc-priors (probably never used)}
+\item{pcPriorRange}{pc-priors for spatial and spatio-temporal effect (probably never used).}
 
-\item{zeroInflated}{If 0-No zero inflation, 1- use zero inflation (NB!! not fully implemented)}
+\item{pcPriorsd}{pc-priors for spatial and spatio-temporal effect (probably never used).}
+
+\item{usePcPriors}{If 0-No pc-priors used, 1- use pc-priors (probably never used).}
+
+\item{zeroInflated}{If 0-No zero inflation, 1- use zero inflation (NB!! not fully implemented).}
 
 \item{stratasystem}{List containing dsn and layer of shapefile}
+
+\item{obsModel}{Observation model: 1- negative binomial (not fully implemented), 2-Poisson (most relevant when including a nugget effect), 3-Tweedie (not fully implemented)}
+
+\item{rwBeta0}{Include intercept of catch-at-length as a random walk? 0-No, 1-Yes}
+
+\item{applyALK}{Calculate indices-at-age by using the age-at-length model: 0-No , 1-yes}
+
+\item{mapRhoL}{How to couple correlation parameters for length in space, space-time and nugget; For experimental use}
+
+\item{simulateProcedure}{How to do simulations; For experimental use}
 
 \item{minDepth}{Minimum depth considered}
 
 \item{maxDepth}{Maximum depth considered}
 
-\item{trawlWidth}{Swept width of trawl}
+\item{trawlWidth}{Swept width of trawl; Used when defining the unit when comparing with other estimation methods.}
 
-\item{plusGroup}{Include plus goup? 1:yes, 0: No}
+\item{plusGroup}{Include plus group? 1:yes, 0: No}
 
-\item{strataReport}{ADREPORT index in each strata? 1:yes, 0: No. NB!: Currenlty not working in combination with ALK}
+\item{strataReport}{ADREPORT index in each strata? 1:yes, 0: No. NB!: Currently not working in combination with ALK}
 
-\item{offset}{How far outside of data the boundary goes.}
+\item{lowMemory}{0-No, 1-Yes. If 1: Uses less memory by not reporting uncertainties of splines and more.}
 }
 \description{
-Configurations used. The object returned is
-used in \code{\link{setupData}} and in  \code{\link{setPar}}.
+Configurations used for catch-at-length. The object returned is
+used in \code{\link{setupData}} and in \code{\link{setPar}}.
 }
 \details{
 This function sets up the configurations for the catch-at-length model

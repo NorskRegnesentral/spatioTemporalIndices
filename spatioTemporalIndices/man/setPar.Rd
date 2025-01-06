@@ -2,7 +2,7 @@
 % Please edit documentation in R/init.R
 \name{setPar}
 \alias{setPar}
-\title{Initialie values for all model parameters and random effects.}
+\title{setPar}
 \usage{
 setPar(data, conf)
 }
@@ -15,7 +15,7 @@ setPar(data, conf)
 A list containing initial values for all model parameters and random effects in the model.
 }
 \description{
-Initialie values for all model parameters and random effects.
+Initial values for model parameters and random effects for the catch-at-length model.
 }
 \details{
 This function sets up the initial values for the parameters

@@ -1,7 +1,12 @@
-##' Set up data
-##' @param df raw data
-##' @param conf  configurations
-##' @details Prepare data
+##' setUpData_alk
+##'
+##' Set up age data in the format needed by TMB.
+##'
+##'
+##' @param dat_alk age data, a data table with one line for each fish
+##' @param conf_alk  configurations for age-at-length model
+##' @param conf_l  configurations for length-at-age model
+##' @details Prepare data list for the age part. This data-list will be merged with the length data-list later.
 ##' @return Data to be provided to TMB
 ##' @export
 setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
@@ -82,62 +87,73 @@ setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
 }
 
 
-##' Set up conf
-##' @param years years to include
+##' defConf_alk
+##'
+##' Set up the configurations for the age-at-length model
+##'
+##' @param years Years to include
+##' @param minAge minimum age
 ##' @param maxAge max age
 ##' @param spatioTemporal include spatio-tempora: 0-no 1-yes 2- yes but without correlation structure in time
-##' @param cutoff mesh spesific, min distance between points
-##' @param cbound mesh spesific, size of boundary meshSimilar
-##' @param meshSimilar If true we apply the same mesh as in the package spatitemporalIndices
+##' @param spatial include spatial effect: 0-no 1-yes
+##' @param rwBeta0 random walk for intercelt within cohorts:  0-no 1-yes
+##' @param betaLength Time varying regression coefficients for length: 1-no, 2-yes
+##' @param meshSimilar If TRUE; apply the same mesh as in the package spatitemporalIndices, this is typically the case
 ##' @param readability If 1: Utilize age reading quality, if 0: Do not utilize age reading quality
-##' @details defines the configurations
-##' @return Configurations to set up the model
+##' @param usePCpriorsALK Use pc-priors: 0-no 1-yes. Probably never used; in case it is used, we need set pcPriorsALKRange and pcPriorsALKSD to reasonable values
+##' @param pcPriorsALKRange pc-priors for range
+##' @param pcPriorsALKSD pc-priors for standard deviations
+##' @details Defines the configurations
+##' @return Configurations to set up the age-at-length part of the model
 ##' @export
 defConf_alk = function(years= NULL,minAge,maxAge, spatioTemporal = 0,spatial = 0,rwBeta0 = 1, betaLength = 1,
                        meshSimilar = TRUE,
                        readability = 1,
                        usePCpriorsALK = 0, pcPriorsALKRange = c(300,0.1), pcPriorsALKSD = c(1,0.1)){
-  conf = list()
-  conf$minAge = minAge
-  conf$maxAge = maxAge
-  conf$rwBeta0 = rwBeta0
-  conf$meshSimilar = meshSimilar
-  conf$years = years
-  conf$readability = readability
-  conf$usePCpriorsALK = usePCpriorsALK
-  conf$pcPriorsALKRange = pcPriorsALKRange
-  conf$pcPriorsALKSD = pcPriorsALKSD
-  conf$spatioTemporal = spatioTemporal
-  conf$spatial = spatial
-  conf$betaLength= betaLength
+  conf_alk = list()
+  conf_alk$minAge = minAge
+  conf_alk$maxAge = maxAge
+  conf_alk$rwBeta0 = rwBeta0
+  conf_alk$meshSimilar = meshSimilar
+  conf_alk$years = years
+  conf_alk$readability = readability
+  conf_alk$usePCpriorsALK = usePCpriorsALK
+  conf_alk$pcPriorsALKRange = pcPriorsALKRange
+  conf_alk$pcPriorsALKSD = pcPriorsALKSD
+  conf_alk$spatioTemporal = spatioTemporal
+  conf_alk$spatial = spatial
+  conf_alk$betaLength= betaLength
 
-  return(conf)
+  return(conf_alk)
 }
 
 
 
-##' Set up map variable
-##' @param conf Configurations
-##' @param par Parameters
+##' setMap_alk
+##'
+##' Set up map-variable based on the configurations for the age-at-length model.
+##'
+##' @param conf_alk Configurations
+##' @param par_alk Parameters
 ##' @details Sets up the map-variable
 ##' @return Returns the map-variable
 ##' @export
-setMap_alk = function(conf,par){
+setMap_alk = function(conf_alk,par_alk){
   map = list()
   map$logKappa_alk = c(1,2)
   map$logSigma_alk = c(1,2)
 
-  if(conf$spatial==0){
-    map$xS_alk = as.factor(rep(NA,length(par$xS_alk)))
+  if(conf_alk$spatial==0){
+    map$xS_alk = as.factor(rep(NA,length(par_alk$xS_alk)))
     map$logKappa_alk[1] = NA
     map$logSigma_alk[1] = NA
   }
 
-  if(conf$spatioTemporal==2){#No use of ar1 structure in time
+  if(conf_alk$spatioTemporal==2){#No use of ar1 structure in time
     map$transRho_alk = as.factor(NA)
-  }else if(conf$spatioTemporal==0){#Turn off spatio-temporal structures
+  }else if(conf_alk$spatioTemporal==0){#Turn off spatio-temporal structures
     map$transRho_alk = as.factor(NA)
-    map$xST_alk = as.factor(rep(NA,length(par$xST_alk)))
+    map$xST_alk = as.factor(rep(NA,length(par_alk$xST_alk)))
     map$logKappa_alk[2] = NA
     map$logSigma_alk[2] = NA
   }
@@ -145,30 +161,33 @@ setMap_alk = function(conf,par){
   map$logKappa_alk = as.factor(map$logKappa_alk)
   map$logSigma_alk = as.factor(map$logSigma_alk)
 
-  if(conf$rwBeta0==0){
+  if(conf_alk$rwBeta0==0){
     map$log_sigma_beta_alk = as.factor(c(NA,NA))
   }else{
-    if(conf$betaLength==1){
+    if(conf_alk$betaLength==1){
       map$log_sigma_beta_alk = as.factor(c(1,NA))
     }
   }
   return(map)
 }
 
-##' Set up data
-##' @param data data
-##' @param conf  configurations
-##' @details define parameters
-##' @return Prameters to be provided to TMB
+##' defpar_alk
+##'
+##' Set up the age-at-length model parameter list used by TMB.
+##'
+##' @param data_alk data-list for the age-at-length model
+##' @param conf_alk  configurations for the age-at-length model
+##' @details Set up the age-at-length model parameter list used by TMB.
+##' @return The age-at-length model parameter list with initial values.
 ##' @export
-defpar_alk = function(data, conf){
+defpar_alk = function(data_alk, conf_alk){
 
-  nAge = data$ageRange[2]-data$ageRange[1] + 1
+  nAge = data_alk$ageRange[2]-data_alk$ageRange[1] + 1
 
-  xS_alk = array(0.0, dim = c(dim(data$A_alk_list[[1]])[2],nAge-1))
-  xST_alk = array(0.0, dim = c(dim(data$A_alk_list[[1]])[2],length(conf$years),nAge-1))
+  xS_alk = array(0.0, dim = c(dim(data_alk$A_alk_list[[1]])[2],nAge-1))
+  xST_alk = array(0.0, dim = c(dim(data_alk$A_alk_list[[1]])[2],length(conf_alk$years),nAge-1))
 
-  par = list(beta0_alk = array(0,dim=c(length(conf$years),nAge-1)),
+  par = list(beta0_alk = array(0,dim=c(length(conf_alk$years),nAge-1)),
              log_sigma_beta_alk = c(0,0),
              betaLength_alk = rep(0,nAge-1),
              logSigma_alk = c(2,2),
@@ -177,8 +196,8 @@ defpar_alk = function(data, conf){
              xS_alk = xS_alk,
              xST_alk = xST_alk)
 
-  if(conf$betaLength == 2){
-    par$betaLength_alk = rep(0,(nAge-1)*length(conf$years))
+  if(conf_alk$betaLength == 2){
+    par$betaLength_alk = rep(0,(nAge-1)*length(conf_alk$years))
   }
 
   return(par)

@@ -1,4 +1,7 @@
-#' Initialie values for all model parameters and random effects.
+#' setPar
+#'
+#' Initial values for model parameters and random effects for the catch-at-length model.
+#'
 #' @param data Data
 #' @param conf Configurations
 #' @details This function sets up the initial values for the parameters
@@ -45,9 +48,12 @@ setPar <- function(data,conf){
   return(parameters)
 }
 
+#' includeDummyPar
+#'
 #' Includes dummy-parameters if ALK is not applied.
-#' @param par Parameters
-#' @return This function includes dummy parameters when ALK in not applied.
+#'
+#' @param par Parameters for the age-at-length model
+#' @return This function includes dummy parameters for age-at-length model when age data is not used.
 #' @export
 includeDummyPar <- function(par){
 

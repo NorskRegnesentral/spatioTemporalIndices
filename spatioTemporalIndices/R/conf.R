@@ -1,49 +1,56 @@
 
 ##' defConf
 ##'
-##' Configurations used. The object returned is
-##' used in \code{\link{setupData}} and in  \code{\link{setPar}}.
+##' Configurations used for catch-at-length. The object returned is
+##' used in \code{\link{setupData}} and in \code{\link{setPar}}.
 ##'
-##' @param years Years of data included
-##' @param skipYears Years to skip in the estimation
+##' @param years A numeric vector specifying the range of years to include. All years between the earliest and latest values in the vector are used. For example, if `years = c(2018, 2020)`, the data for 2018, 2019, and 2020 is included. Use the `skipYears` parameter to exclude specific years within this range.
+##' @param skipYears Years to skip in the estimation within the range of `years`.
 ##' @param spatial If 0-no spatial effect, 1-Include spatial effect
-##' @param spatioTemporal If 0-no spatial-temporal effect, 1-Include spatial-temporal effect, 2-Include spatial-temporal effect with independence between years
-##' @param nugget If 0-no nugget effect, 1-Include nugget effect
+##' @param spatioTemporal If 0-no spatial-temporal effect, 1-Include spatial-temporal effect, 2-Include spatial-temporal effect with independence between years. Note: Setting this to 1 makes inference time consuming and include correlation between years.
+##' @param nugget If 0-no nugget effect, 1-Include nugget effect. Note that this nugget effect includes correlation between length groups within the haul.
 ##' @param splineDepth Vector with depth configurations, first element is the k-variable in spline (6 means 6 basis function). Second element: 0: no depth effect, 1: depth effect(length independent), 2:length dependent depth effect.
-##' @param sunAlt Vector with sun altitude configurations, first element is the numberof basis functions. Second element: 0: No sun effect, 1:sun effect (length independent), 2: length dependent sun effect.
+##' @param sunAlt Vector with sun altitude configurations, first element is the number of basis functions. Second element: 0: No sun effect, 1:sun effect (length independent), 2: length dependent sun effect.
 ##' @param maxLength Maximum length, used when defining the pluss group
 ##' @param minLength Minimum length, used when defining the minus group (probably never used)
-##' @param reduceLength The resolution in length dimension used in latent effect
-##' @param cutoff Cutoff used in mesh, first element is for spatial effect, second for spatio-temporal effect, third is 0 if same mesh is used for both spatial and spatio-temporal effect
-##' @param offset How far outside of data the boundary goes.
-##' @param pcPriorRange pc-priors for spatial and spatio-temporal effect
-##' @param pcPriorsd pc-priors for spatial and spatio-temporal effect
-##' @param usePcPriors If 0-No pc-priors used, 1- use pc-priors (probably never used)
-##' @param zeroInflated If 0-No zero inflation, 1- use zero inflation (NB!! not fully implemented)
+##' @param dLength Length of each length group bin
+##' @param reduceLength The resolution in length dimension used in latent effect. If 1: all length groups are included as in latent effect. If 2: latent dimension for length group is defined as every second length group... Including all length groups in latent effect often result in high memory usage and computation time.
+##' @param cutoff Cutoff used in mesh, a smaller value results in a more dense mesh.
+##' @param cbound boundary configurations for the mesh. The first element is how far to extend the inner boundary, and the second is for the outer boundary.
+##' @param pcPriorRange pc-priors for spatial and spatio-temporal effect (probably never used).
+##' @param pcPriorsd pc-priors for spatial and spatio-temporal effect (probably never used).
+##' @param usePcPriors If 0-No pc-priors used, 1- use pc-priors (probably never used).
+##' @param zeroInflated If 0-No zero inflation, 1- use zero inflation (NB!! not fully implemented).
 ##' @param stratasystem List containing dsn and layer of shapefile
+##' @param obsModel Observation model: 1- negative binomial (not fully implemented), 2-Poisson (most relevant when including a nugget effect), 3-Tweedie (not fully implemented)
+##' @param rwBeta0 Include intercept of catch-at-length as a random walk? 0-No, 1-Yes
+##' @param applyALK Calculate indices-at-age by using the age-at-length model: 0-No , 1-yes
+##' @param mapRhoL How to couple correlation parameters for length in space, space-time and nugget; For experimental use
+##' @param simulateProcedure How to do simulations; For experimental use
 ##' @param minDepth Minimum depth considered
 ##' @param maxDepth Maximum depth considered
-##' @param trawlWidth Swept width of trawl
-##' @param plusGroup Include plus goup? 1:yes, 0: No
-##' @param strataReport ADREPORT index in each strata? 1:yes, 0: No. NB!: Currenlty not working in combination with ALK
+##' @param trawlWidth Swept width of trawl; Used when defining the unit when comparing with other estimation methods.
+##' @param plusGroup Include plus group? 1:yes, 0: No
+##' @param strataReport ADREPORT index in each strata? 1:yes, 0: No. NB!: Currently not working in combination with ALK
+##' @param lowMemory 0-No, 1-Yes. If 1: Uses less memory by not reporting uncertainties of splines and more.
 ##' @details This function sets up the configurations for the catch-at-length model
 ##' @export
 defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,0),sunAlt=c(1,0),
-                    maxLength = NULL,dLength = 1, minLength = NULL,reduceLength = 3,
+                    maxLength = NULL,minLength = NULL,dLength = 1, reduceLength = 3,
                     cutoff = 100,cbound = c(18,130),
                     pcPriorRange = c(100,0.1),pcPriorsd = c(1,0.1), usePcPriors = 0, zeroInflated = 0,
+                    stratasystem = list(),
                     obsModel = 2,rwBeta0 = 1,applyALK = 0,
                     mapRhoL = c(0,1,2), simulateProcedure = 1,
-                    stratasystem = list(),
                     minDepth=50,maxDepth=600,trawlWidth=1,
                     plusGroup = 1, strataReport = 0, lowMemory = 0){
   conf= list()
-  conf$years = years
+  conf$years = min(years):max(years)
   conf$skipYears = skipYears
   # Numeric = use directly; Data = use input data to determine
   if(is.numeric(minLength)) conf$minLength = minLength
-  if(!is.numeric(minLength)) conf$minLength = ifelse(floor(min(ld$IndividualTotalLength,na.rm=T)) %% dLength == 0,
-                     floor(min(ld$IndividualTotalLength,na.rm=T)),floor(min(ld$IndividualTotalLength,na.rm=T))-(dLength-1))
+  if(!is.numeric(minLength)) conf$minLength = ifelse(floor(min(ld$IndividualTotalLength,na.rm=TRUE)) %% dLength == 0,
+                     floor(min(ld$IndividualTotalLength,na.rm=TRUE)),floor(min(ld$IndividualTotalLength,na.rm=TRUE))-(dLength-1))
 
   if(is.numeric(maxLength)) conf$maxLength=maxLength
   if(!is.numeric(maxLength)) {
@@ -77,6 +84,9 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$pcPriorsd= pcPriorsd
   conf$usePcPriors = usePcPriors
   conf$zeroInflated = zeroInflated
+  if(zeroInflated==1){
+    warning("Zero-inflation not fully implemented")
+  }
   conf$obsModel = obsModel
   conf$nugget = nugget
   conf$mapRhoL = mapRhoL
