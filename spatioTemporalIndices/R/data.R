@@ -99,8 +99,8 @@ setupData = function(dat_l,conf_l,confPred){
   missingDepth=which(is.na(depth))
   if(sum(missingDepth>0)>0){
     for(i in 1:length(missingDepth)){
-      distances=spDistsN1(locObs,locObs[missingDepth[i],])#TODO: use sf instead of sp
-      minimumDistanceIndex=which(order(distances)==2)
+      distances =    sqrt((locObs[,1]-locObs[missingDepth[i],1])^2 + (locObs[,2]-locObs[missingDepth[i],2])^2)
+      minimumDistanceIndex=order(distances)[2]
       depth[missingDepth[i]]=depth[minimumDistanceIndex]
     }
   }
