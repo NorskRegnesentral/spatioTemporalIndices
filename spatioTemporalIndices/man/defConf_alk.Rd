@@ -10,7 +10,7 @@ defConf_alk(
   maxAge,
   spatioTemporal = 0,
   spatial = 0,
-  rwBeta0 = 1,
+  rwBeta0 = 0,
   betaLength = 1,
   meshSimilar = TRUE,
   readability = 1,

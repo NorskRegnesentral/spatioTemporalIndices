@@ -4,10 +4,12 @@
 \alias{print.stim}
 \title{Print stim object}
 \usage{
-\method{print}{stim}(x)
+\method{print}{stim}(x, ...)
 }
 \arguments{
 \item{x}{fitted model}
+
+\item{...}{Extra argument}
 }
 \description{
 Print stim object

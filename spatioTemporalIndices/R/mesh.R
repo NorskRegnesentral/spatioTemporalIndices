@@ -17,7 +17,7 @@ createMesh <- function(conf){
     intPoints = constructIntPoints(conf,confPredTmp)$locUTM
   }
 
-  requireNamespace("splancs")#Needed in fmesher::fm_nonconvex_hull_inla
+  splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
   boundary <- list(
     fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
     fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))

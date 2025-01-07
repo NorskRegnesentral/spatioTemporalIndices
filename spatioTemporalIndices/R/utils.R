@@ -1,8 +1,9 @@
 ##' loglik
 ##'
 ##' @param object The fitted model retuned by fitModel
+##' @param ... Extra argument
 ##' @export
-logLik.stim<-function(object){
+logLik.stim<-function(object, ...){
   ret<- -object$opt$objective
 
   sunCov = 0
@@ -35,9 +36,10 @@ logLik.stim<-function(object){
 ##' Print stim object
 ##' @method print stim
 ##' @param  x fitted model
+##' @param  ... Extra argument
 ##' @details Print log-likelihood and the main convergence criteria
 ##' @export
-print.stim<-function(x){
+print.stim<-function(x,...){
   cat("STIM model: log likelihood is", logLik.stim(x),"Convergence", ifelse(0==x$opt$convergence, "OK\n", "failed\n"))
 }
 

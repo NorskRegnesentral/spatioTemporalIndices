@@ -4,10 +4,12 @@
 \alias{logLik.stim}
 \title{loglik}
 \usage{
-\method{logLik}{stim}(object)
+\method{logLik}{stim}(object, ...)
 }
 \arguments{
 \item{object}{The fitted model retuned by fitModel}
+
+\item{...}{Extra argument}
 }
 \description{
 loglik
