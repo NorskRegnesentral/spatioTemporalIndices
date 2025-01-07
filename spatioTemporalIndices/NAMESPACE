@@ -2,7 +2,6 @@
 
 S3method(logLik,stim)
 S3method(print,stim)
-S3method(simulate,stim)
 export(altOfSun)
 export(combineLengthALK)
 export(constructIntPoints)

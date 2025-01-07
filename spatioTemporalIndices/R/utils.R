@@ -2,7 +2,7 @@
 ##'
 ##' @param object The fitted model retuned by fitModel
 ##' @export
-logLik.stim<-function(object, ...){
+logLik.stim<-function(object){
   ret<- -object$opt$objective
 
   sunCov = 0
@@ -34,30 +34,30 @@ logLik.stim<-function(object, ...){
 
 ##' Print stim object
 ##' @method print stim
-##' @param  x
+##' @param  x fitted model
 ##' @details Print log-likelihood and the main convergence criteria
 ##' @export
-print.stim<-function(x, ...){
-  cat("STIM model: log likelihood is", logLik.stim(x,...),"Convergence", ifelse(0==x$opt$convergence, "OK\n", "failed\n"))
+print.stim<-function(x){
+  cat("STIM model: log likelihood is", logLik.stim(x),"Convergence", ifelse(0==x$opt$convergence, "OK\n", "failed\n"))
 }
 
-##' Simulate from a STIM object
-##' @param  run
-##' @param  nsim
-##' @param  seed
-##' @details Simulate observations from STIM as explained in Breiviek et al. (2020).
-##' @export
-simulate.stim<-function(run, nsim=1, seed=NULL, ...){
-  if(!is.null(seed)) set.seed(seed)
-  pl <- as.list(run$rep,"Est")
-  est <- unlist(pl)
-  ret <- replicate(nsim,
-                   c(run$data[names(run$data)!="fishObsMatrix"],#all the old data
-                     run$obj$simulate()["fishObsMatrix"])#simulated observations
-                   , simplify=FALSE)
-
-  ret
-}
+# ##' Simulate from a STIM object
+# ##' @param  run
+# ##' @param  nsim
+# ##' @param  seed
+# ##' @details Simulate observations from STIM as explained in Breiviek et al. (2020).
+# ##' @export
+#simulate.stim<-function(run, nsim=1, seed=NULL, ...){
+#  if(!is.null(seed)) set.seed(seed)
+#  pl <- as.list(run$rep,"Est")
+#  est <- unlist(pl)
+#  ret <- replicate(nsim,
+#                   c(run$data[names(run$data)!="fishObsMatrix"],#all the old data
+#                     run$obj$simulate()["fishObsMatrix"])#simulated observations
+#                   , simplify=FALSE)
+#
+#  ret
+#}
 
 
 ##' Find sun height and sun rise. Thanks to Espen Johnsen who provided the code.

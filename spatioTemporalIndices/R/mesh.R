@@ -17,12 +17,15 @@ createMesh <- function(conf){
     intPoints = constructIntPoints(conf,confPredTmp)$locUTM
   }
 
+  requireNamespace("splancs")#Needed in fmesher::fm_nonconvex_hull_inla
   boundary <- list(
     fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
     fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
   mesh <- fmesher::fm_mesh_2d(boundary=boundary,
-                               max.edge=maxEdge,
-                               cutoff=conf$cutoff)
+                              max.edge=maxEdge,
+                              cutoff=conf$cutoff)
+
+
 
   return(list(mesh=mesh, barrier.triangles =NULL))
 }

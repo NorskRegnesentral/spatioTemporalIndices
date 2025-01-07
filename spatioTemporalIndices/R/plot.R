@@ -3,6 +3,7 @@
 #' plotResults Plot results
 #' @param run fitted object returned by \code{\link{fitModel}}
 #' @param what what to plot, options in first element "sunAlt", "depth", "S", "ST" and "SST". If spatial effect is plotted, year and length must be provided
+#' @param legend include legend
 #'
 #' @export
 plotResults  <- function(run,what=NULL, legend = FALSE){
@@ -71,21 +72,8 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
     contour(proj$x, proj$y,inla.mesh.project(proj, latentFieldMAP) ,add = T,labcex  = 1,cex = 1)
     points(attributes(run$data)$locObs[attributes(run$data)$year == as.numeric(what[2]),],cex = 0.01,col = 'blue')
 
-    #Convert map to UTM coordinates-------------------------------------------------------------------------
-    newmap <- maps::map("world", c("Norway","Sweden","Finland","Russia"),fill = TRUE,plot = FALSE, col = "transparent")
-    mapTmp = data.frame(newmap$x,newmap$y)
-    mapTmp[which(is.na(mapTmp[,1])),] = 3.141592 #Need something different from NA
-    names(mapTmp) = c("X","Y")
-    attr(mapTmp, "projection") = "LL"
-    attr(mapTmp, "zone") = conf_l$zone
-    ddpcr::quiet(mapTmp <- PBSmapping::convUL(mapTmp))
-    colnames(mapTmp) = c("UTMX", "UTMY")
-    mapTmp[which(is.na(newmap$x)),] = NA
-    polygon(mapTmp,col = 'lightgrey')
-    #----------------------------------------------------------------------------------------------------
-
     if(legend == TRUE){
-      image.plot(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
+      fields::image.plot(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
                  add = TRUE,legend.width = 5,legend.only = TRUE, cex = 1.6,
                  zlim = c(range[1],range[2]), axis.args = list(cex.axis = 1.3))
     }
@@ -129,23 +117,10 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
     points(attributes(run$data)$locObs[attributes(run$data)$year == year,],cex = log(cex+2),col = 'blue')
 
 
-    #Convert map to UTM coordinates-------------------------------------------------------------------------
-    newmap <- maps::map("world", c("Norway","Sweden","Finland","Russia"),fill = TRUE,plot = FALSE, col = "transparent")
-    mapTmp = data.frame(newmap$x,newmap$y)
-    mapTmp[which(is.na(mapTmp[,1])),] = 3.141592 #Need something different from NA
-    names(mapTmp) = c("X","Y")
-    attr(mapTmp, "projection") = "LL"
-    attr(mapTmp, "zone") = conf_l$zone
-    ddpcr::quiet(mapTmp <- PBSmapping::convUL(mapTmp))
-    colnames(mapTmp) = c("UTMX", "UTMY")
-    mapTmp[which(is.na(newmap$x)),] = NA
-    polygon(mapTmp,col = 'lightgrey')
-    #----------------------------------------------------------------------------------------------------
-
     title(main=what[2],line = -1,cex.main=1.2,outer=FALSE)
 
     if(legend == TRUE){
-      image.plot(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
+      fields::image.plot(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
             xlab = '', ylab = "",
             main = "",
             xlim = c(floor(min(proj$x)),ceiling(max(proj$x))),
@@ -203,20 +178,8 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
       cex = rowMeans(run$data$fishObsMatrix[which(attributes(run$data)$year == year), (lD-1):(lD+1)])
       points(attributes(run$data)$locObs[attributes(run$data)$year == year,],cex = log(cex+2)/2,col = 'blue')
 
-      #Convert map to UTM coordinates-------------------------------------------------------------------------
-      newmap <- maps::map("world", c("Norway","Sweden","Finland","Russia"),fill = TRUE,plot = FALSE, col = "transparent")
-      mapTmp = data.frame(newmap$x,newmap$y)
-      mapTmp[which(is.na(mapTmp[,1])),] = 3.141592 #Need something different from NA
-      names(mapTmp) = c("X","Y")
-      attr(mapTmp, "projection") = "LL"
-      attr(mapTmp, "zone") = conf_l$zone
-      ddpcr::quiet(mapTmp <- PBSmapping::convUL(mapTmp))
-      colnames(mapTmp) = c("UTMX", "UTMY")
-      mapTmp[which(is.na(newmap$x)),] = NA
-      polygon(mapTmp,col = 'lightgrey')
-      #----------------------------------------------------------------------------------------------------
       if(legend == TRUE){
-        image.plot(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
+        fields::image.plot(proj$x,proj$y, inla.mesh.project(proj, latentFieldMAP),col =  colorRampPalette(c("white","yellow", "red"))(12),
                    xlab = '', ylab = "",
                   # zlim = c(range[1],range[2]),
                    main = "",

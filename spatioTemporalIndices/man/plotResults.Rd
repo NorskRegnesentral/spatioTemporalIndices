@@ -10,6 +10,8 @@ plotResults(run, what = NULL, legend = FALSE)
 \item{run}{fitted object returned by \code{\link{fitModel}}}
 
 \item{what}{what to plot, options in first element "sunAlt", "depth", "S", "ST" and "SST". If spatial effect is plotted, year and length must be provided}
+
+\item{legend}{include legend}
 }
 \description{
 plotResults Plot results

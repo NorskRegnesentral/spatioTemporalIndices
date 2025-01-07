@@ -11,9 +11,8 @@ fitModel(
   dat_alk = NULL,
   conf_alk = NULL,
   parSet = NULL,
-  runModel = TRUE,
   mapSet = NULL,
-  intern = FALSE,
+  runModel = TRUE,
   twoStage = FALSE,
   ...
 )
@@ -21,15 +20,23 @@ fitModel(
 \arguments{
 \item{dat_l}{Data frame with length data}
 
+\item{conf_l}{Configurations for length part of model}
+
 \item{confPred}{Configurations for predictions}
 
 \item{dat_alk}{Data frame with age data}
 
 \item{conf_alk}{Configurations for ALK model.}
 
-\item{...}{Parameters sendt to sdreport.}
+\item{parSet}{Initial values; only used if not using default values (only for experimental use)}
 
-\item{conf}{Configurations for length part of model}
+\item{mapSet}{Map-list; Used to overwrite default Map-list. (only for experimental use)}
+
+\item{runModel}{Estimate the model if TRUE, if not we only set up the model}
+
+\item{twoStage}{Estimate the model in two steps. May reduce computation time if we use temporal correlation in spatio-temporal effect}
+
+\item{...}{Parameters sent to TMB::sdreport.}
 }
 \value{
 A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{saveIndex}} function. Or manually by inspecting the fit$rl object.
