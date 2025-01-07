@@ -106,7 +106,7 @@ setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
 ##' @details Defines the configurations
 ##' @return Configurations to set up the age-at-length part of the model
 ##' @export
-defConf_alk = function(years= NULL,minAge,maxAge, spatioTemporal = 0,spatial = 0,rwBeta0 = 1, betaLength = 1,
+defConf_alk = function(years= NULL,minAge,maxAge, spatioTemporal = 0,spatial = 0,rwBeta0 = 0, betaLength = 1,
                        meshSimilar = TRUE,
                        readability = 1,
                        usePCpriorsALK = 0, pcPriorsALKRange = c(300,0.1), pcPriorsALKSD = c(1,0.1)){
