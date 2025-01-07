@@ -11,7 +11,7 @@ Author: Olav Nikolai Breivik [aut, cre],
 Maintainer: Olav Nikolai Breivik <olavbr@nr.no>,
 	Fabian Zimmermann <fabian.zimmermann@hi.no>
 Description: Estimate indices with a spatio-temporal Gaussian model. Indices may be constructed by length which are furter converted to age with an internally estimated spatio-temporal age-length-key.
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: TRUE
 Imports: TMB, fmesher, mgcv, fields, marmap, sf, splancs
