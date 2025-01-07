@@ -28,18 +28,18 @@ setupData = function(dat_l,conf_l,confPred){
 
   # Add strata polygon if none was provided
   if(is.null(conf_l$strata)) {
-     hullpol = st_convex_hull(st_union(st_as_sf(dat_l,coords=c("longitude","latitude"),crs="+proj=longlat")))
-     conf_l$strata = st_as_sf(hullpol)
+     hullpol = sf::st_convex_hull(sf::st_union(sf::st_as_sf(dat_l,coords=c("longitude","latitude"),crs="+proj=longlat")))
+     conf_l$strata = sf::st_as_sf(hullpol)
      conf_l$strata$id = 1
-     conf_l$zone = floor((mean(st_bbox(conf_l$strata)[c(1,3)]) + 180) / 6) + 1
+     conf_l$zone = floor((mean(sf::st_bbox(conf_l$strata)[c(1,3)]) + 180) / 6) + 1
      conf_l$stratasystem = "data"
      conf_l$strata_number = nrow(conf_l$strata)
      print("Strata polygon created from survey data.")
   }
 
   #Convert to UTM coordinates
-  loc = st_as_sf(dat_l,coords = c("longitude","latitude"),crs="+proj=longlat")
-  locUTM = st_coordinates(st_transform(loc,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs")))
+  loc = sf::st_as_sf(dat_l,coords = c("longitude","latitude"),crs="+proj=longlat")
+  locUTM = sf::st_coordinates(sf::st_transform(loc,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs")))
   dat_l$UTMX = locUTM[,1]
   dat_l$UTMY = locUTM[,2]
 
@@ -99,7 +99,7 @@ setupData = function(dat_l,conf_l,confPred){
   missingDepth=which(is.na(depth))
   if(sum(missingDepth>0)>0){
     for(i in 1:length(missingDepth)){
-      distances=spDistsN1(locObs,locObs[missingDepth[i],])
+      distances=spDistsN1(locObs,locObs[missingDepth[i],])#TODO: use sf instead of sp
       minimumDistanceIndex=which(order(distances)==2)
       depth[missingDepth[i]]=depth[minimumDistanceIndex]
     }
@@ -156,19 +156,19 @@ setupData = function(dat_l,conf_l,confPred){
   S_depth=as(gamSetup_depth$smooth[[1]]$S[[1]], "TsparseMatrix")
   Sdim=nrow(S_depth)
 
-  gamSetup_sunAltReport = gam(sunAltFormulaIntRep,
+  gamSetup_sunAltReport = mgcv::gam(sunAltFormulaIntRep,
                               data=data.frame(sunAlt=seq(0,1,by = 0.025),sin=sin(seq(0,1,by = 0.025) *2*pi),
                                               cos = cos(seq(0,1,by = 0.025)*2*pi)),fit=FALSE)
   X_sunAltReport = gamSetup_sunAltReport$X[,-1]
 
   #Maximum sun height is used in index calculation
   maxSunAlt = 0.5
-  gamSetup_sunAltIntegrate = gam(sunAltFormulaIntRep,
+  gamSetup_sunAltIntegrate = mgcv::gam(sunAltFormulaIntRep,
                                  data=data.frame(sunAlt=rep(maxSunAlt,2),sin=sin(rep(maxSunAlt,2) *2*pi),
                                                  cos = cos(rep(maxSunAlt,2)*2*pi)),fit=FALSE)
   X_sunAltIntegrate = gamSetup_sunAltIntegrate$X[,-1]
 
-  X_depthReport = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=as.numeric(seq(min(depth),max(depth),length.out = 40))))
+  X_depthReport = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=as.numeric(seq(min(depth),max(depth),length.out = 40))))
 
   #Weighting used when smoothing length dimension in latent effect
   weigthLength = conf_l$lengthGroupsReduced*0
@@ -187,8 +187,8 @@ setupData = function(dat_l,conf_l,confPred){
   }
 
   #Extract areas of each strata
-  strata_utm <- st_transform(conf_l$strata,crs=paste0("+proj=utm +zone=",conf_l$zone," +datum=WGS84"))
-  areas <- as.numeric(st_area(strata_utm))*(1/1.852)^2/1000000
+  strata_utm <- sf::st_transform(conf_l$strata,crs=paste0("+proj=utm +zone=",conf_l$zone," +datum=WGS84"))
+  areas <- as.numeric(sf::st_area(strata_utm))*(1/1.852)^2/1000000
 
   #Include observations as a vector (needed for keep functionality)
   obsVector = apply(fishObsMatrix, 1, rbind)
@@ -285,18 +285,18 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
         bf$z <- -1*bf$z
         bf <- subset(bf,z < conf_l$maxDepth & z > conf_l$minDepth)
 
-        bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+        bf = sf::st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
+        bfUTM = sf::st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
 
-        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-        intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
+        intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+        intPoints= sf::st_join(intPoints,bfUTM,join=sf::st_nearest_feature)
 
         depthGEBCO = intPoints$z
 
         depthGEBCO[depthGEBCO<conf_l$minDepth]=conf_l$minDepth
         depthGEBCO[depthGEBCO>conf_l$maxDepth]=conf_l$maxDepth
 
-        X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthGEBCO))
+        X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthGEBCO))
         data$X_depth_int = X_depth },
       error = function(e) {
         confPred$Depth=NULL
@@ -305,23 +305,23 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
     # with depth data from NOAA database
     else if(confPred$Depth == "NOAA") {
       tryCatch({
-        b = getNOAA.bathy(lon1 = floor(min(attributes(data)$locObsLatLon[,1])), lon2 = ceiling(max(attributes(data)$locObsLatLon[,1])),
+        b = marmap::getNOAA.bathy(lon1 = floor(min(attributes(data)$locObsLatLon[,1])), lon2 = ceiling(max(attributes(data)$locObsLatLon[,1])),
                           lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
                           resolution = 3)
-        bf = fortify.bathy(b)
+        bf = marmap::fortify.bathy(b)
 
-        bf = st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+        bf = sf::st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
+        bfUTM = sf::st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
 
-        intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-        intPoints= st_join(intPoints,bfUTM,join=st_nearest_feature)
+        intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+        intPoints= sf::st_join(intPoints,bfUTM,join=sf::st_nearest_feature)
 
         depthNOAA = -intPoints$z
 
         depthNOAA[depthNOAA<conf_l$minDepth]=conf_l$minDepth
         depthNOAA[depthNOAA>conf_l$maxDepth]=conf_l$maxDepth
 
-        X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
+        X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
 
         data$X_depth_int = X_depth },
         error = function(e) {
@@ -332,14 +332,14 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
     }
   }
   if(is.null(confPred$Depth)) {
-    obs = st_as_sf(data.frame(UTMX=attributes(data)$locObs[,1],UTMY=attributes(data)$locObs[,2],depth=attributes(data)$depth),coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-    intPoints = st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+    obs = sf::st_as_sf(data.frame(UTMX=attributes(data)$locObs[,1],UTMY=attributes(data)$locObs[,2],depth=attributes(data)$depth),coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+    intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
 
-    intPoints= st_join(intPoints,obs,join=st_nearest_feature)
+    intPoints= sf::st_join(intPoints,obs,join=sf::st_nearest_feature)
 
     depthDATA = intPoints$depth
 
-    X_depth = PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthDATA))
+    X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthDATA))
     data$X_depth_int = X_depth
     print("No depth information for prediction provided, using depth from observations.")
   }

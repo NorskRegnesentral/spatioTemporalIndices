@@ -41,6 +41,10 @@ simStudy = function(run,nsim = 5){
 fitModelSim<-function(run,simData){
   data = run$data
   map = run$map
+  conf_l = run$conf_l
+  confPred = run$confPred
+  dat_l = run$dat_l
+
 
   data$obsVector = simData$obsVector
   data$age =simData$age
@@ -57,6 +61,9 @@ fitModelSim<-function(run,simData){
     profile = c(profile,"beta0")
   }
   if(conf_l$applyALK ==1){
+    conf_alk = run$conf_alk
+    dat_alk = run$dat_alk
+
     random = c(random, "xS_alk","xST_alk")
     profile = c(profile,"betaLength_alk")
     if(data$rwBeta0_alk==1){
@@ -73,20 +80,20 @@ fitModelSim<-function(run,simData){
     }
   }
 
-  obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map)
+  obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map)
 
 
 
   opt <- nlminb(obj$par, obj$fn, obj$gr,
                 control = list(trace = 1,iter.max = 1000, eval.max = 1000))
-  rep <- sdreport(obj, ignore.parm.uncertainty = TRUE,getReportCovariance = FALSE,skip.delta.method = TRUE)
+  rep <- TMB::sdreport(obj, ignore.parm.uncertainty = TRUE,getReportCovariance = FALSE,skip.delta.method = TRUE)
   pl = as.list(rep,"Est")
   plSd = NULL
 
   rl = as.list(rep,"Est", report = TRUE)
   rlSd = NULL
 
-  FreeADFun(obj)#Free memory from C-side
+  TMB::FreeADFun(obj)#Free memory from C-side
 
   toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,
                   pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)

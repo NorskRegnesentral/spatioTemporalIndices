@@ -6,13 +6,13 @@
 #' @export
 constructIntPoints<-function(conf,confPred){
   utmCRS = paste0("+proj=utm +zone=", conf$zone," +datum=WGS84 +units=km +no_defs")
-  strata_utm <- st_transform(conf$strata,utmCRS)
-  points = st_make_grid(strata_utm,cellsize=c(confPred$cellsize,confPred$cellsize),what="centers")
-  points = st_as_sf(points)
+  strata_utm <- sf::st_transform(conf$strata,utmCRS)
+  points = sf::st_make_grid(strata_utm,cellsize=c(confPred$cellsize,confPred$cellsize),what="centers")
+  points = sf::st_as_sf(points)
 
   #Define data frame with integration points to be returned
-  points = st_join(points,st_buffer(strata_utm,1),left=FALSE)
-  locUTM = data.frame(st_coordinates(points)) #To be returned
+  points = sf::st_join(points,sf::st_buffer(strata_utm,1),left=FALSE)
+  locUTM = data.frame(sf::st_coordinates(points)) #To be returned
   colnames(locUTM) = c("UTMX", "UTMY")
   idxStrata = as.numeric(points$id)
 

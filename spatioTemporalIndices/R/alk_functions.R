@@ -39,8 +39,8 @@ setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
   }
 
   #Convert to UTM coordinates
-  loc = st_as_sf(dat_alk,coords = c("longitude","latitude"),crs="+proj=longlat")
-  locUTM = st_coordinates(st_transform(loc,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs")))
+  loc = sf::st_as_sf(dat_alk,coords = c("longitude","latitude"),crs="+proj=longlat")
+  locUTM = sf::st_coordinates(sf::st_transform(loc,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs")))
   dat_alk$UTMX = locUTM[,1]
   dat_alk$UTMY = locUTM[,2]
 

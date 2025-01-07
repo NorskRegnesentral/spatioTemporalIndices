@@ -3,7 +3,7 @@
 #' This funtion runs the index model given the data on catch-at-length and age-at-length.
 #' Indices with corresponding covariance matrices and uncertianty estimates can be extracted using the \code{\link{saveIndex}} function.
 #'
-#' @importFrom TMB MakeADFun sdreport
+#' @importFrom TMB MakeADFun sdreport FreeADFun
 #' @importFrom stats nlminb
 #' @param dat_l Data frame with length data
 #' @param conf Configurations for length part of model
@@ -18,10 +18,10 @@
 fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,runModel = TRUE, mapSet = NULL,intern = FALSE,twoStage = FALSE,...){
 
   tryCatch({
-      setMKLthreads(1) #not profiting much by using more cores
+#      setMKLthreads(1) #not profiting much by using more cores
     },
     error=function(cond) {
-      message("MKL library not used, couputation time may be reduced by using MLK library")
+#      message("MKL library not used, couputation time may be reduced by using MLK library")
     }
   )
 
@@ -95,11 +95,11 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     mapStart= map
     mapStart$tan_rho_t = as.factor(rep(NA,length(par$tan_rho_t)))
     mapStart$tan_rho_l = as.factor(rep(NA,length(par$tan_rho_l)))
-    obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart, intern = intern)
+    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart, intern = intern)
     print("Start finding good starting values")
     opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1,iter.max = 1000, eval.max = 1000))
     print("Done finding good starting values")
-    rep <- sdreport(obj,ignore.parm.uncertainty = TRUE)
+    rep <- TMB::sdreport(obj,ignore.parm.uncertainty = TRUE)
     pl = as.list(rep,"Est")
     par = pl
     if(sum(is.na(map$tan_rho_l))==0)par$tan_rho_l = c(1.5,1,1)
@@ -118,20 +118,20 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     }
     FreeADFun(obj)#Free memory from C-side
     print("Optimizing full length model, no ALK. This is the most time consuming step")
-    obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart2, intern = intern)
+    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart2, intern = intern)
     opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1,iter.max = 1000, eval.max = 1000))
     print("Done optimizing full length model, no ALK")
 
     if(conf_l$applyALK==1){#Combine catch-at-length and ALK
       print("Set up full model and sdreport")
-      rep <- sdreport(obj,ignore.parm.uncertainty = TRUE)
+      rep <- TMB::sdreport(obj,ignore.parm.uncertainty = TRUE)
       pl = as.list(rep,"Est")
       par = pl
-      FreeADFun(obj)#Free memory from C-side
-      obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
-      rep <- sdreport(obj,...)
+      TMB::FreeADFun(obj)#Free memory from C-side
+      obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
+      rep <- TMB::sdreport(obj,...)
     }else{
-      rep <- sdreport(obj,...)
+      rep <- TMB::sdreport(obj,...)
     }
     pl = as.list(rep,"Est")
     plSd = as.list(rep,"Std")
@@ -142,18 +142,18 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
                     pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
 
   }else{
-    obj <- MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
+    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, intern = intern)
     if(runModel){
       opt <- nlminb(obj$par, obj$fn, obj$gr,
                     control = list(trace = 1,iter.max = 1000, eval.max = 1000))
-      rep <- sdreport(obj,...)
+      rep <- TMB::sdreport(obj,...)
       pl = as.list(rep,"Est")
       plSd = as.list(rep,"Std")
 
       rl = as.list(rep,"Est", report = TRUE)
       rlSd = as.list(rep,"Std", report = TRUE)
 
-      FreeADFun(obj)#Free memory from C-side
+      TMB::FreeADFun(obj)#Free memory from C-side
       toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,
                       pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
     }else{

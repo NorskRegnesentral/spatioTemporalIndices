@@ -60,10 +60,10 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$lengthGroups = seq(conf$minLength,conf$maxLength,by = conf$dLength)
 
   if(length(stratasystem)>0) {
-    strata = st_read(dsn = stratasystem[[1]], layer = stratasystem[[2]],quiet = TRUE) # dsn path must be adjusted to folder location
-    conf$strata = st_transform(strata,crs="+proj=longlat")
+    strata = sf::st_read(dsn = stratasystem[[1]], layer = stratasystem[[2]],quiet = TRUE) # dsn path must be adjusted to folder location
+    conf$strata = sf::st_transform(strata,crs="+proj=longlat")
     conf$strata$id = row.names(conf$strata)
-    conf$zone = floor((mean(st_bbox(conf$strata)[c(1,3)]) + 180) / 6) + 1
+    conf$zone = floor((mean(sf::st_bbox(conf$strata)[c(1,3)]) + 180) / 6) + 1
     conf$stratasystem = stratasystem
     conf$strata_number = nrow(conf$strata)
   } else {
