@@ -50,4 +50,4 @@ jobs:
         with:
           upload-snapshots: true
           working-directory: spatioTemporalIndices  # Specify the path to your package
-          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf --no-warnings")'
+          build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
