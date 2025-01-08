@@ -1,6 +1,6 @@
 Package: spatioTemporalIndices
 Type: Package
-Title: Construct abundance indices based on a latent Gaussian spatio-temporal model.
+Title: Spatio-temporal abundance indices-at-lenght and indices-at-age
 Version: 1.1.2
 Authors@R: c(person(c("Olav","Nikolai"), "Breivik",role=c("aut","cre"), email="olavbr@nr.no"),
 	    person("Fredrik","Aanes",role="aut"),
