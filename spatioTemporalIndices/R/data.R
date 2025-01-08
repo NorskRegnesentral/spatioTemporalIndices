@@ -325,6 +325,7 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
         depthNOAA[depthNOAA<conf_l$minDepth]=conf_l$minDepth
         depthNOAA[depthNOAA>conf_l$maxDepth]=conf_l$maxDepth
 
+        #NB: devtools::check() complains: includeIntPoints: no visible binding for global variable 'minDist'
         X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
 
         data$X_depth_int = X_depth },
