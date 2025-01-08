@@ -44,10 +44,10 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          path: spatioTemporalIndices  # Specify the path to your package
+          working-directory: spatioTemporalIndices  # Specify the path to your package
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          path: spatioTemporalIndices  # Specify the path to your package
+          working-directory: spatioTemporalIndices  # Specify the path to your package
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
