@@ -15,6 +15,10 @@ setupData = function(dat_l,conf_l,confPred){
   #Remove too short lengths
   dat_l = dat_l[dat_l$lengthGroup>=conf_l$minLength,]
 
+  if(dat_l$lengthGroup[2]-dat_l$lengthGroup[1] !=  conf_l$dLength){
+    stop("length group in data and in conf_l do not correspond")
+  }
+
   #Remove too long lengths
   for(id in unique(dat_l$station)){
     index =which(dat_l$station==id & dat_l$lengthGroup>=conf_l$maxLength)

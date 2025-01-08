@@ -48,14 +48,18 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$years = min(years):max(years)
   conf$skipYears = skipYears
   # Numeric = use directly; Data = use input data to determine
-  if(is.numeric(minLength)) conf$minLength = minLength
-  if(!is.numeric(minLength)) conf$minLength = ifelse(floor(min(ld$IndividualTotalLength,na.rm=TRUE)) %% dLength == 0,
-                     floor(min(ld$IndividualTotalLength,na.rm=TRUE)),floor(min(ld$IndividualTotalLength,na.rm=TRUE))-(dLength-1))
+  if(is.numeric(minLength)){
+    conf$minLength = minLength
+  }else{
+    stop("Need minLength")
+  }
 
-  if(is.numeric(maxLength)) conf$maxLength=maxLength
-  if(!is.numeric(maxLength)) {
-    print("Using maximum observed length as maxLength")
-    conf$maxLength = ceiling(max(ld$IndividualTotalLength)) }
+  if(is.numeric(maxLength)){
+    conf$maxLength=maxLength
+  }else{
+    stop("Need maxLength")
+  }
+
   conf$dLength = dLength
   conf$lengthGroups = seq(conf$minLength,conf$maxLength,by = conf$dLength)
 
