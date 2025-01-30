@@ -81,7 +81,9 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   conf$spatioTemporal = spatioTemporal
   conf$cutoff = cutoff
   conf$cbound = cbound
-  if(length(conf$cbound)<2) conf$cbound[2]<-conf$cbound[1]*2;print("Only one cbound value provided, re-using the first value to define mesh.")
+  if(length(conf$cbound)<2) {
+    conf$cbound[2]<-conf$cbound[1]*2;print("Only one cbound value provided, re-using the first value to define mesh.")
+  }
   lTmp = rep(1:100,each = reduceLength)
   conf$lengthGroupsReduced = lTmp[1:length(conf$lengthGroups)]
   conf$reduceLength = reduceLength
