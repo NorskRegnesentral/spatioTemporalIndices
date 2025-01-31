@@ -11,6 +11,7 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
                  rwBeta0 = 1,
                  sunAlt = c(1,2),
                  splineDepth = c(6,2),
+                 cbound = c(18,130),
                  dLength = 5,
                  reduceLength = 3,
                  stratasystem = list(dsn="NEAhadLengthAge/strata", layer = "Vintertoktet_nye_strata"),
@@ -67,12 +68,39 @@ expect_equal(covYearsExp,
              covYears,tolerance = 1e-2)
 
 
+#test simulation
+set.seed(1)
+sim = simStudy(run,nsim = 1)
+objectiveSimExp = sim[[1]]$opt$objective
+resultsOut$objectiveSimExp = objectiveSimExp
+expect_equal(resultsOut$objectiveSimExp, resultsExp$objectiveSimExp,tolerance = 1e-4)
+
+#test jitter
+set.seed(1)
+jj = jit(run,njit = 1)
+resultsJitter = jj$maxVecAll
+load("NEAhadLengthAge/resultsJitterExp.RData")
+expect_equal(resultsJitter, resultsJitterExp,tolerance = 1e-4)
+
+#Test retro
+ret = retroSTIM(run,nyears = 1)
+resultsRetro = ret[[1]]$opt$objective
+load("NEAhadLengthAge/resultsRetroExp.RData")
+expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
+
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
                     rlIndex = rlIndex,
                     rlIndexSd = rlIndexSd,
-                    par = par)
+                    par = par,
+                    objectiveSimExp = objectiveSimExp)
   save(resultsExp,file = "NEAhadLengthAge/resultsExp.RData")
   saveIndex(run,file = "testthatExp.txt", folder = "NEAhadLengthAge/")
+
+  resultsJitterExp = resultsJitter
+  save(resultsJitterExp,file = "NEAhadLengthAge/resultsJitterExp.RData")
+
+  resultsRetroExp = resultsRetro
+  save(resultsRetroExp,file = "NEAhadLengthAge/resultsRetroExp.RData")
 
 }
