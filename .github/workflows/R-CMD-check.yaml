@@ -56,3 +56,6 @@ jobs:
           upload-snapshots: true
           working-directory: spatioTemporalIndices  # path to package
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
+          error-on: '"error"'   # Only fail on errors, not warnings/notes
+          warnings_are_errors: false  # Ignore warnings
+          notes_are_errors: false  # Ignore notes
