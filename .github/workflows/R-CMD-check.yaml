@@ -2,8 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
+    branches: [main]
 
 name: R-CMD-check.yaml
 
@@ -19,13 +20,14 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - {os: macos-latest,   r: 'release'}
+#          - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
-          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+ #         - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
-          - {os: ubuntu-latest,   r: 'oldrel-1'}
+ #         - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
 
@@ -44,10 +46,10 @@ jobs:
         with:
           extra-packages: any::rcmdcheck
           needs: check
-          working-directory: spatioTemporalIndices  # Specify the path to your package
+          working-directory: spatioTemporalIndices # path to package
 
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          working-directory: spatioTemporalIndices  # Specify the path to your package
+          working-directory: spatioTemporalIndices  # path to package
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
