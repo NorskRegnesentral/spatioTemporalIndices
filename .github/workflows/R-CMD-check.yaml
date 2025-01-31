@@ -20,16 +20,18 @@ jobs:
       fail-fast: false
       matrix:
         config:
-#          - {os: macos-latest,   r: 'release'}
+          - {os: macos-latest,   r: 'release'}
           - {os: windows-latest, r: 'release'}
- #         - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
+          - {os: ubuntu-latest,   r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-latest,   r: 'release'}
- #         - {os: ubuntu-latest,   r: 'oldrel-1'}
+          - {os: ubuntu-latest,   r: 'oldrel-1'}
 
     env:
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
+      OPENBLAS_NUM_THREADS: 1
+      OMP_NUM_THREADS: 1
 
     steps:
       - uses: actions/checkout@v4
@@ -57,5 +59,3 @@ jobs:
           working-directory: spatioTemporalIndices  # path to package
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
           error-on: '"error"'   # Only fail on errors, not warnings/notes
-          warnings_are_errors: false  # Ignore warnings
-          notes_are_errors: false  # Ignore notes
