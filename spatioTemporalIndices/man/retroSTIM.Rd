@@ -4,14 +4,12 @@
 \alias{retroSTIM}
 \title{retroSTIM}
 \usage{
-retroSTIM(run, nyears, ncores = 1)
+retroSTIM(run, nyears)
 }
 \arguments{
 \item{run}{The result of running fitModel}
 
 \item{nyears}{The number of years to remove sequentially}
-
-\item{ncores}{Number of cores to use.}
 }
 \value{
 The fitted model within each peal in the retrospective analysis
