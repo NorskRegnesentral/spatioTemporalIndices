@@ -4,14 +4,12 @@
 \alias{retroSTIM}
 \title{retroSTIM}
 \usage{
-retroSTIM(run, nyears, years = NULL, ncores = 1)
+retroSTIM(run, nyears, ncores = 1)
 }
 \arguments{
 \item{run}{The result of running fitModel}
 
 \item{nyears}{The number of years to remove sequentially}
-
-\item{years}{Default NULL, will overwrite nyears and select which years to remove sequentially}
 
 \item{ncores}{Number of cores to use.}
 }
