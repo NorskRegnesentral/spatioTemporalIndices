@@ -179,6 +179,8 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
 #' @param ncores Number of cores to use
 #' @param sd Standard deviation of noise to starting values
 #' @return A list with fitted runs and maximum difference in parameter estimates
+#' @importFrom stats rnorm
+#' @importFrom utils relist
 #' @export
 #'
 jit<-function(run,njit,ncores = 1,sd = 0.1){
@@ -227,11 +229,6 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
     runs=lapply(par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f))
   }else{
     stop("not working with several cores, TODO")
-    cl <-makeCluster(min(njit,ncores),outfile = "")
-    clusterExport(cl,varlist=c("run","par"),envir=environment())
-    clusterEvalQ(cl, library("spatioTemporalIndices"))
-    runs=parLapply(cl,par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f, ignore.parm.uncertainty = TRUE,getReportCovariance = FALSE,skip.delta.method = TRUE))
-    stopCluster(cl)
   }
 
   attributes(runs)$runOriginal = run
@@ -325,6 +322,7 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
 #' @param nyears The number of years to remove sequentially
 #' @param years Default NULL, will overwrite nyears and select which years to remove sequentially
 #' @param ncores Number of cores to use.
+#' @importFrom parallel makeCluster parLapply stopCluster clusterEvalQ clusterExport
 #' @return The fitted model within each peal in the retrospective analysis
 #' @export
 #'

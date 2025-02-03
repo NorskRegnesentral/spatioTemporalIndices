@@ -4,7 +4,7 @@
 #' @param run fitted object returned by \code{\link{fitModel}}
 #' @param what what to plot, options in first element "sunAlt", "depth", "S", "ST" and "SST". If spatial effect is plotted, year and length must be provided
 #' @param legend include legend
-#'
+#' @importFrom graphics abline legend lines
 #' @export
 plotResults  <- function(run,what=NULL, legend = FALSE){
   pl = as.list(run$rep,what = "Est")
@@ -48,6 +48,7 @@ plotResults  <- function(run,what=NULL, legend = FALSE){
 #'
 #' Plot time in day effect
 #' @param run Fitted model returned by, \code{\link{fitModel}}
+#' @importFrom graphics abline axis legend lines
 #' @export
 plotSunAlt<-function(run){
 

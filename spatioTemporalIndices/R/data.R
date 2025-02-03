@@ -9,6 +9,8 @@
 #' @param conf_l Configurations returned by \code{\link{defConf}}
 #' @param confPred Prediction configurations returned by \code{\link{defConfPred}}
 #' @return This function return the length part of the data-list used by TMB
+#' @importFrom stats as.formula
+#' @importFrom methods as
 #' @export
 setupData = function(dat_l,conf_l,confPred){
 
@@ -287,7 +289,7 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
         b <- marmap::readGEBCO.bathy(confPred$Depth,res=25)
         bf <- marmap::fortify.bathy(b)
         bf$z <- -1*bf$z
-        bf <- subset(bf,z < conf_l$maxDepth & z > conf_l$minDepth)
+        bf <- subset(bf,z < conf_l$maxDepth & z > conf_l$minDepth) #R-CMD-check notes that there are no visible binding for global variable z ?
 
         bf = sf::st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
         bfUTM = sf::st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
@@ -309,26 +311,29 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
     # with depth data from NOAA database
     else if(confPred$Depth == "NOAA") {
       tryCatch({
-        b = marmap::getNOAA.bathy(lon1 = floor(min(attributes(data)$locObsLatLon[,1])), lon2 = ceiling(max(attributes(data)$locObsLatLon[,1])),
-                          lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
-                          resolution = 3)
-        bf = marmap::fortify.bathy(b)
-
-        bf = sf::st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = sf::st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-
-        intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-        intPoints= sf::st_join(intPoints,bfUTM,join=sf::st_nearest_feature)
-
-        depthNOAA = -intPoints$z
-
-        depthNOAA[depthNOAA<conf_l$minDepth]=conf_l$minDepth
-        depthNOAA[depthNOAA>conf_l$maxDepth]=conf_l$maxDepth
-
-        #NB: devtools::check() complains: includeIntPoints: no visible binding for global variable 'minDist'
-        X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
-
-        data$X_depth_int = X_depth },
+#        b = marmap::getNOAA.bathy(lon1 = floor(min(attributes(data)$locObsLatLon[,1])), lon2 = ceiling(max(attributes(data)$locObsLatLon[,1])),
+#                          lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
+#                          resolution = 3)
+#        bf = marmap::fortify.bathy(b)
+#
+#        bf = sf::st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
+#        bfUTM = sf::st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+#
+#        intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
+#        intPoints= sf::st_join(intPoints,bfUTM,join=sf::st_nearest_feature)
+#
+#        depthNOAA = -intPoints$z
+#
+#        depthNOAA[depthNOAA<conf_l$minDepth]=conf_l$minDepth
+#        depthNOAA[depthNOAA>conf_l$maxDepth]=conf_l$maxDepth
+#
+#        #NB: devtools::check() complains: includeIntPoints: no visible binding for global variable 'minDist'
+#        X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
+#
+#        data$X_depth_int = X_depth
+        confPred$Depth=NULL
+        print("Using NOAA database not implemented, using depth information from survey stations.")
+        },
         error = function(e) {
           confPred$Depth=NULL
           print("Not able to access NOAA database, using depth information from survey stations.") })

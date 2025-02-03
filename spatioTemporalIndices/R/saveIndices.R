@@ -3,6 +3,7 @@
 ##' @param  file name of file with index.
 ##' @param  folder Path to the folder the index is saved.
 ##' @details Saves the esitmated index with assosiated variance estimates and covariance structures in a format that can be directly utilized by SAM.
+##' @importFrom utils write.table
 ##' @export
 saveIndex = function(run,file,folder = ""){
 
