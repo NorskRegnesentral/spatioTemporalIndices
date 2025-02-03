@@ -1,3 +1,8 @@
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/NorskRegnesentral/spatioTemporalIndices/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NorskRegnesentral/spatioTemporalIndices/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
 ## spatioTemporalIndices
 Git page for the R-package `spatioTemporalIndices`. 
 
@@ -101,8 +106,4 @@ This will save the files `index.txt` and `cov_index.Rda`, containing the indices
 
 For the use of the indices and covariance structures in the state space assessment model SAM, we refer to the SAM help file at  http://www.nielsensweb.org/configurations.html.
 
-### testthat
-  <!-- badges: start -->
-  [![R-CMD-check](https://github.com/NorskRegnesentral/spatioTemporalIndices/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NorskRegnesentral/spatioTemporalIndices/actions/workflows/R-CMD-check.yaml)
-  <!-- badges: end -->
 
