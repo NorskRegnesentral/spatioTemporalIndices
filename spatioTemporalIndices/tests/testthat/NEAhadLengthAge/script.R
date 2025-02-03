@@ -88,6 +88,13 @@ resultsRetro = ret[[1]]$opt$objective
 load("NEAhadLengthAge/resultsRetroExp.RData")
 expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
 
+#Test no errors in plots
+test_that("Plot runs without error", {
+  expect_silent(plotResults(run, what = "sunAlt"))
+  expect_silent(plotResults(run, what = "depth"))
+})
+
+
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
                     rlIndex = rlIndex,

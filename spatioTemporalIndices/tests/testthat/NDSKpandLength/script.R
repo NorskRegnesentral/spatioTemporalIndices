@@ -40,6 +40,8 @@ expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-2)
 expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-2)
 expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-2)
 
+runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncertainty = TRUE)
+expect_equal(runTwoStage$opt$objective, resultsExp$objectiveExp,tolerance = 1e-4)
 
 
 if(FALSE){
