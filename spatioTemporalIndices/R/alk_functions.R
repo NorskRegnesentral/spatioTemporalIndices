@@ -17,7 +17,7 @@ setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
 
   #Use age reading quality if false
   if(conf_alk$readability==0){#Do not utilize age reading quality
-    dat_alk$readability[dat_alk$readability==5 | d$readability==6] = 1
+    dat_alk$readability[dat_alk$readability==5 | dat_alk$readability==6] = 1
   }
 
   #Truncate age
