@@ -44,11 +44,25 @@ runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncerta
 expect_equal(runTwoStage$opt$objective, resultsExp$objectiveExp,tolerance = 1e-4)
 
 
+saveIndex(run,file = "testthat.txt", folder = "NDSKpandLength/")
+expect_equal(read.table("NDSKpandLength/testthat.txt"),
+             read.table("NDSKpandLength/testthatExp.txt"),tolerance = 1e-2)
+expect_equal(read.table("NDSKpandLength/sdtestthat.txt"),
+             read.table("NDSKpandLength/sdtestthatExp.txt"),tolerance = 1e-2)
+#Verify that saved correlation structures are not changed
+load("NDSKpandLength/cov_testthatExp.Rda")
+covYearsExp = covYears
+load("NDSKpandLength/cov_testthat.Rda")
+expect_equal(covYearsExp,
+             covYears,tolerance = 1e-2)
+
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
                     rlIndex = rlIndex,
                     rlIndexSd = rlIndexSd,
                     par = par)
   save(resultsExp,file = "NDSKpandLength/resultsExp.RData")
+
+  saveIndex(run,file = "testthatExp.txt", folder = "NDSKpandLength/")
 }
 
