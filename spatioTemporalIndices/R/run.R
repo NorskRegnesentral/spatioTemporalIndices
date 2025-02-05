@@ -14,7 +14,7 @@
 #' @param mapSet Map-list; Used to overwrite default Map-list. (only for experimental use)
 #' @param runModel Estimate the model if TRUE, if not we only set up the model
 #' @param twoStage Estimate the model in two steps. May reduce computation time if we use temporal correlation in spatio-temporal effect
-#' @param silent Sent to TMB::MakeADfun
+#' @param silent Boolean that is sent to TMB::MakeADfun, and deactivates trace in nlminb if TRUE.
 #' @param ... Parameters sent to TMB::sdreport.
 #' @useDynLib spatioTemporalIndices
 #' @return A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{saveIndex}} function. Or manually by inspecting the fit$rl object.

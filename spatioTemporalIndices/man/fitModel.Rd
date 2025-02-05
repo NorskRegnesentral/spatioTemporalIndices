@@ -37,7 +37,7 @@ fitModel(
 
 \item{twoStage}{Estimate the model in two steps. May reduce computation time if we use temporal correlation in spatio-temporal effect}
 
-\item{silent}{Sent to TMB::MakeADfun}
+\item{silent}{Boolean that is sent to TMB::MakeADfun, and deactivates trace in nlminb if TRUE.}
 
 \item{...}{Parameters sent to TMB::sdreport.}
 }
