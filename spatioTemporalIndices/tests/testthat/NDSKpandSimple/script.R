@@ -23,10 +23,10 @@ conf_l = defConf(years = 2020:2020,
 confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 20)
 
 # run model
-run = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE)
+run = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 conf_l$nugget = 0
-run2 = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE)
+run2 = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 resultsOut = list(AIC = AIC(run,run2))
 

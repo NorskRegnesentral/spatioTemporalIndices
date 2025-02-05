@@ -21,7 +21,7 @@ conf_l = defConf(years = 2018:2020,
 confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 20)
 
 # run model
-run = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE)
+run = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 objectiveExp = run$opt$objective
 rlIndex = round(run$rl$logLengthIndex,5)
@@ -40,7 +40,7 @@ expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-2)
 expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-2)
 expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-2)
 
-runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncertainty = TRUE)
+runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncertainty = TRUE,silent = TRUE)
 expect_equal(runTwoStage$opt$objective, resultsExp$objectiveExp,tolerance = 1e-4)
 
 

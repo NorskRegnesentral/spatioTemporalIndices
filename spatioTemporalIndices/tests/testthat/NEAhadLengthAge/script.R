@@ -30,7 +30,7 @@ conf_alk = defConf_alk(maxAge = 10,
 confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 20)
 
 # run model
-run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE)
+run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 
 objectiveExp = run$opt$objective
