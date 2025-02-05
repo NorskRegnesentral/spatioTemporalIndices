@@ -63,7 +63,7 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
       if(is.null(zlim)) zlim = c(0,log(max(report[year,age,])))
     }
 
-    col = colorRampPalette(c("#FFFFCC", "#FFEDA0", "#FEB24C", "#F03B20", "#BD0026"))(20)
+    col = colorRamp::colorRampPalette(c("#FFFFCC", "#FFEDA0", "#FEB24C", "#F03B20", "#BD0026"))(20)
 
     x = sort(unique(run$data$xInt))
     y = sort(unique(run$data$yInt))
