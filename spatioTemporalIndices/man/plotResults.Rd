@@ -4,14 +4,18 @@
 \alias{plotResults}
 \title{plotResults Plot results}
 \usage{
-plotResults(run, what = NULL, legend = FALSE)
+plotResults(run, what = NULL, xlim = NULL, ylim = NULL, zlim = NULL)
 }
 \arguments{
 \item{run}{fitted object returned by \code{\link{fitModel}}}
 
-\item{what}{what to plot, options in first element "sunAlt", "depth", "S", "ST" and "SST". If spatial effect is plotted, year and length must be provided}
+\item{what}{What to plot. Options in first element: "sunAlt", "depth", "space". If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").}
 
-\item{legend}{include legend}
+\item{xlim}{optional xlim sent to fields::image.plot}
+
+\item{ylim}{optional xlim sent to fields::image.plot}
+
+\item{zlim}{optional zlim sent to fields::image.plot}
 }
 \description{
 plotResults Plot results
