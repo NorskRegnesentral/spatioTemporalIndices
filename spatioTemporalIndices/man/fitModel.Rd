@@ -14,6 +14,7 @@ fitModel(
   mapSet = NULL,
   runModel = TRUE,
   twoStage = FALSE,
+  silent = FALSE,
   ...
 )
 }
@@ -35,6 +36,8 @@ fitModel(
 \item{runModel}{Estimate the model if TRUE, if not we only set up the model}
 
 \item{twoStage}{Estimate the model in two steps. May reduce computation time if we use temporal correlation in spatio-temporal effect}
+
+\item{silent}{Sent to TMB::MakeADfun}
 
 \item{...}{Parameters sent to TMB::sdreport.}
 }

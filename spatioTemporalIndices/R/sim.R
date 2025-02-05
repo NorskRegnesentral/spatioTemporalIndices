@@ -80,12 +80,12 @@ fitModelSim<-function(run,simData){
     }
   }
 
-  obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map)
+  obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map,silent = TRUE)
 
 
 
   opt <- nlminb(obj$par, obj$fn, obj$gr,
-                control = list(trace = 1,iter.max = 1000, eval.max = 1000))
+                control = list(trace = 0,iter.max = 1000, eval.max = 1000))
   rep <- TMB::sdreport(obj, ignore.parm.uncertainty = TRUE,getReportCovariance = FALSE,skip.delta.method = TRUE)
   pl = as.list(rep,"Est")
   plSd = NULL

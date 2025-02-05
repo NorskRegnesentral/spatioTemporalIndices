@@ -14,12 +14,13 @@
 #' @param mapSet Map-list; Used to overwrite default Map-list. (only for experimental use)
 #' @param runModel Estimate the model if TRUE, if not we only set up the model
 #' @param twoStage Estimate the model in two steps. May reduce computation time if we use temporal correlation in spatio-temporal effect
+#' @param silent Sent to TMB::MakeADfun
 #' @param ... Parameters sent to TMB::sdreport.
 #' @useDynLib spatioTemporalIndices
 #' @return A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{saveIndex}} function. Or manually by inspecting the fit$rl object.
 #' @details This model runs estimate the index model, and returns the fitted model.
 #' @export
-fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,mapSet = NULL,runModel = TRUE,twoStage = FALSE,...){
+fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,mapSet = NULL,runModel = TRUE,twoStage = FALSE,silent = FALSE,...){
 
   print("Set up length data")
 
@@ -87,13 +88,16 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     }
   }
 
+  trace = 1
+  if(silent)trace = 0
+
   if(twoStage){#Run model in two stages and combine them, may reduce computation time.
     mapStart= map
     mapStart$tan_rho_t = as.factor(rep(NA,length(par$tan_rho_t)))
     mapStart$tan_rho_l = as.factor(rep(NA,length(par$tan_rho_l)))
-    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart)
+    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart,silent = silent)
     print("Start finding good starting values")
-    opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1,iter.max = 1000, eval.max = 1000))
+    opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = trace,iter.max = 1000, eval.max = 1000))
     print("Done finding good starting values")
     rep <- TMB::sdreport(obj,ignore.parm.uncertainty = TRUE)
     pl = as.list(rep,"Est")
@@ -114,8 +118,8 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     }
     FreeADFun(obj)#Free memory from C-side
     print("Optimizing full length model, no ALK. This is the most time consuming step")
-    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart2)
-    opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = 1,iter.max = 1000, eval.max = 1000))
+    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart2, silent = silent)
+    opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = trace,iter.max = 1000, eval.max = 1000))
     print("Done optimizing full length model, no ALK")
 
     if(conf_l$applyALK==1){#Combine catch-at-length and ALK
@@ -124,7 +128,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
       pl = as.list(rep,"Est")
       par = pl
       TMB::FreeADFun(obj)#Free memory from C-side
-      obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map)
+      obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, silent = silent)
       rep <- TMB::sdreport(obj,...)
     }else{
       rep <- TMB::sdreport(obj,...)
@@ -138,10 +142,10 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
                     pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
 
   }else{
-    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map)
+    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = map, silent = silent)
     if(runModel){
       opt <- nlminb(obj$par, obj$fn, obj$gr,
-                    control = list(trace = 1,iter.max = 1000, eval.max = 1000))
+                    control = list(trace = trace,iter.max = 1000, eval.max = 1000))
       rep <- TMB::sdreport(obj,...)
       pl = as.list(rep,"Est")
       plSd = as.list(rep,"Std")
@@ -218,7 +222,7 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
   }
 
   if(ncores ==1){
-    runs=lapply(par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f))
+    runs=lapply(par,function(f) fitModel(run$dat_l,conf_l = run$conf_l,confPred = run$confPred, dat_alk = run$dat_alk,conf_alk = run$conf_alk,parSet = f,silent = silent))
   }else{
     stop("not working with several cores, TODO")
   }
@@ -326,7 +330,7 @@ retroSTIM = function(run,nyears){
     dat_l = dat_l[which(yy_l<= (maxYear-y)),]
     dat_alk = dat_alk[which(yy_alk<= (maxYear-y)),]
     conf_l$years = conf_l$years[conf_l$years <= ((maxYear-y))]
-    runTmp = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk)
+    runTmp = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,silent = TRUE)
     runTmp})
 
 
