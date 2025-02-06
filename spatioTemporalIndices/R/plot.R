@@ -127,7 +127,7 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
     }
 
     plot(lengthInt,ALK[,1], type = "l", ylab = "Probability", xlab = "Length",
-         ylim = c(0,1), main = paste0("Spatially averaged ALK in  year ",year),
+         ylim = c(0,1), main = paste0("Spatially averaged ALK in  year ",what[2]),
          col = col[1],lwd = 3, cex.main = 1.5,cex.lab = 1.4, cex.axis =1.2)
     for(l in 2:nAges){
       lines(lengthInt,ALK[,l],col = col[l],lwd = 3)
