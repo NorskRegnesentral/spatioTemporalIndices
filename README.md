@@ -203,7 +203,6 @@ For the use of the indices and covariance structures in the state space assessme
 
 ### Refernces
 
-Breivik, O. N., Aanes, F., Søvik, G., Aglen, A., Mehl, S., & Johnsen, E. (2021). Predicting abundance indices in areas without coverage with a latent spatio-temporal Gaussian model. ICES Journal of Marine Science, 78(6), 2031-2042. https://doi.org/10.1093/icesjms/fsab073
+Breivik, O. N., Aanes, F., Søvik, G., Aglen, A., Mehl, S., & Johnsen, E. (2021). Predicting abundance indices in areas without coverage with a latent spatio-temporal Gaussian model, ICES Journal of Marine Science, Volume 78, Issue 6, September 2021, Pages 2031–2042, https://doi.org/10.1093/icesjms/fsab073
 
-Breivik (2024) ICES Journal of Marine Science, Volume 81, Issue 7, September 2024, Pages 1195–1208,
-https://doi.org/10.1093/icesjms/fsae079
+Breivik, O. N., Zimmermann, F., Johannesen, E., Ono, K., Fall, J.,  Howell D., Nielsen, A., Incorporation of observation uncertainty in stock assessment using spatio-temporal modeling of catch-at-length and age-at-length survey data, ICES Journal of Marine Science, Volume 81, Issue 7, September 2024, Pages 1195–1208, https://doi.org/10.1093/icesjms/fsae079
