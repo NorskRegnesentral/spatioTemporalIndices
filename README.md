@@ -117,7 +117,7 @@ Download example data:
 
 ```R
 setwd(tempdir())
-files = c("haddock2018-2020_age_ex_rus.rds", "haddock2018-2020_length_ex_rus.rds")
+files = c("haddock2018-2020_age_ex_rus_reduced.rds", "haddock2018-2020_length_ex_rus_reduced.rds")
 url <- "https://raw.githubusercontent.com/NorskRegnesentral/spatioTemporalIndices/main/spatioTemporalIndices/tests/testthat/NEAhadLengthAge/"
 d <- lapply(files, function(f)download.file(paste(url,f,sep=""), f))
 dat_length <- readRDS("haddock2018-2020_length_ex_rus.rds")

@@ -1,7 +1,7 @@
 suppressMessages(library(spatioTemporalIndices))
 
-dat_l = readRDS("NEAhadLengthAge/haddock2018-2020_length_ex_rus.rds")
-dat_alk = readRDS("NEAhadLengthAge/haddock2018-2020_age_ex_rus.rds")
+dat_l = readRDS("NEAhadLengthAge/haddock2018-2020_length_ex_rus_reduced.rds")
+dat_alk = readRDS("NEAhadLengthAge/haddock2018-2020_age_ex_rus_reduced.rds")
 
 conf_l = defConf(years = 2018:2020, # years to use, use all years with data by default
                  maxLength = 60, # Numeric = use directly; NULL = use input data to determine
