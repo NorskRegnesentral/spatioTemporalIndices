@@ -9,7 +9,7 @@ plotResults(run, what = NULL, xlim = NULL, ylim = NULL, zlim = NULL)
 \arguments{
 \item{run}{fitted object returned by \code{\link{fitModel}}}
 
-\item{what}{What to plot. Options in first element: "sunAlt", "depth", "space". If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").}
+\item{what}{What to plot. Options in first element: "sunAlt", "depth", "ALK", or "space". If "ALK" is selected, year also must be provided, e.g., what = c("ALK",2020). If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").}
 
 \item{xlim}{optional xlim sent to fields::image.plot}
 

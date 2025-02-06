@@ -2,7 +2,7 @@
 
 #' plotResults Plot results
 #' @param run fitted object returned by \code{\link{fitModel}}
-#' @param what What to plot. Options in first element: "sunAlt", "depth", "space". If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").
+#' @param what What to plot. Options in first element: "sunAlt", "depth", "ALK", or "space". If "ALK" is selected, year also must be provided, e.g., what = c("ALK",2020). If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").
 #' @param xlim optional xlim sent to fields::image.plot
 #' @param ylim optional xlim sent to fields::image.plot
 #' @param zlim optional zlim sent to fields::image.plot
@@ -89,21 +89,59 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
             cex = 1.6,zlim = zlim, xlim = xlim,ylim = ylim,
             xlab = "Eastern direction (km)", ylab = "Northern direction (km)",
             main = paste0("Log CPUE at length ", lengthOriginal, " in year ", yearOriginal ),
-            cex.lab = 1.5,cex.main = 1.5)
+            cex.lab = 1.4,cex.main = 1.5)
     }else{
       fields::image.plot(x,y, z,col =  col,
             cex = 1.6,zlim = zlim, xlim = xlim,ylim = ylim,
             xlab = "Eastern direction (km)", ylab = "Northern direction (km)",
             main = paste0("Log CPUE at age ", ageOriginal, " in year ",yearOriginal ),
-            cex.lab = 1.5,cex.main = 2)
+            cex.lab = 1.4,cex.main = 1.5)
     }
 
-#    if(includeMap){
-#      world <- rnaturalearth::ne_countries(scale = scale, returnclass = "sf")
-#      utm_crs <- paste0("+proj=utm +zone=", run$conf_l$zone," +datum=WGS84 +units=km +no_defs")
-#      world_utm <- sf::st_transform(world, crs = utm_crs)
-#      plot(sf::st_geometry(world_utm),add = TRUE)
-#    }
+  }else if(what[1] == "ALK"){
+
+    lengthInt = seq(min(run$data$length), max(run$data$length), length.out = 200)
+    nAges = run$data$ageRange[2]- run$data$ageRange[1] + 1
+
+    col <- grDevices::rainbow(nAges, start = 0, end = 0.95)
+
+    linPredMatrix = matrix(0,length(lengthInt), nAges-1)
+    for(a in 1:(nAges-1)){
+      linPredMatrix[,a] = run$pl$beta0_alk[which(run$conf_alk$years == what[2]), a] + run$pl$betaLength_alk[a]*lengthInt
+    }
+    ALK = matrix(0,length(lengthInt), nAges)
+    for(a in 1:nAges){
+      probLess = rep(0,dim(ALK)[1])
+      if(a>1){
+        for(b in 1:(a-1)){
+          tmp = ALK[,b];
+          probLess = probLess + tmp;
+        }
+      }
+      if(a <(nAges)){
+        tmp2 = linPredMatrix[,a];
+        ALK[,a] = stats::plogis(tmp2)*(1-probLess);
+      }else{
+        ALK[,nAges] = (1-probLess);
+      }
+    }
+
+    plot(lengthInt,ALK[,1], type = "l", ylab = "Probability", xlab = "Length",
+         ylim = c(0,1), main = paste0("Spatially averaged ALK in  year ",year),
+         col = col[1],lwd = 3, cex.main = 1.5,cex.lab = 1.4, cex.axis =1.2)
+    for(l in 2:nAges){
+      lines(lengthInt,ALK[,l],col = col[l],lwd = 3)
+    }
+    #Include labels
+    ages = run$conf_alk$minAge:run$conf_alk$maxAge
+    for(i in 0:length(ages)){
+      graphics::text(x = graphics::par("usr")[1] + 0.02 * diff(graphics::par("usr")[1:2]),  # 2% from the left boundary
+           y = i / (length(ages) + 1) + 0.05,
+           labels = paste("a =", i + ages[1] - 1),
+           col = col[i + 1],
+           cex = 1.3,
+           adj = 0)  # Left alignment
+    }
   }
 }
 
