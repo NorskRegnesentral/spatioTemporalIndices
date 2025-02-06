@@ -105,26 +105,26 @@ This will save the files `index.txt` and `cov_index.Rda`, containing the indices
 
 # A quick runable example
 
-As a runable example we will use data on North East Arctic haddock collected by Norwegian vessels.
+As a runnable example, we will use data on North East Arctic haddock collected by Norwegian vessels.
 
-First we need to library the package:
+First, we need to load the package:
 
 ```R
 library(spatioTemporalIndices)
 ```
 
-Download example data:
+Then we download the example data:
 
 ```R
 setwd(tempdir())
 files = c("haddock2018-2020_age_ex_rus_reduced.rds", "haddock2018-2020_length_ex_rus_reduced.rds")
 url <- "https://raw.githubusercontent.com/NorskRegnesentral/spatioTemporalIndices/main/spatioTemporalIndices/tests/testthat/NEAhadLengthAge/"
 d <- lapply(files, function(f)download.file(paste(url,f,sep=""), f))
-dat_length <- readRDS("haddock2018-2020_length_ex_rus.rds")
-dat_age <- readRDS("haddock2018-2020_age_ex_rus.rds")
+dat_length <- readRDS("haddock2018-2020_length_ex_rus_reduced.rds")
+dat_age <- readRDS("haddock2018-2020_age_ex_rus_reduced.rds")
 ```
 
-Download example survey domain:
+Also download the survey domain:
 
 
 ```R
@@ -136,7 +136,7 @@ shapefile_files <- c("Vintertoktet_nye_strata.shp",
 lapply(shapefile_files, function(f) download.file(paste0(base_url, f), f, mode = "wb"))
 ```
 
-Set up configurations for catch-at-length model:
+The we set up configurations for the `catch-at-length` model:
 
 ```R
 conf_l = defConf(years = 2018:2020, # years to use, 
@@ -150,7 +150,7 @@ conf_l = defConf(years = 2018:2020, # years to use,
                  )
 ```
 
-Set up configurations for age-at-lenght model:
+Similarly for the `age-at-length` model:
 
 ```R
 conf_alk = defConf_alk(maxAge = 10, #Maximum age (plus group) for index calculation
@@ -160,7 +160,7 @@ conf_alk = defConf_alk(maxAge = 10, #Maximum age (plus group) for index calculat
                        )
 ```
 
-Set up prediciton configurations:
+The we set up prediction configurations:
 
 ```R
 confPred = defConfPred(conf=conf_l,
@@ -168,7 +168,7 @@ confPred = defConfPred(conf=conf_l,
                        )
 ```
 
-Fit the model
+Now everyting is set to fit the model:
 
 ```R
 run = fitModel(dat_length,conf_l, 
@@ -178,30 +178,38 @@ run = fitModel(dat_length,conf_l,
                ignore.parm.uncertainty = TRUE)
 ```
 
-Look at results:
+We can then extract the indices and plot structures:
 
 ```R
 run$rl$logAgeIndex
-#saveIndex(run,file = "index.txt", folder = "...") #Save indices and corresponding yarly covariance structures
+#saveIndex(run,file = "index.txt", folder = "...") #Save indices and corresponding yearly covariance structures that both can be used in e.g., SAM
 ```
 
-Plot structures, e.g., spatial CPUE at both lenght and age:
+Plot structures, for example spatial CPUE-at-length, spatially averaged ALK and spatial CPUE-at-age:
 
 ```R
 plotResults(run,what = c("space",2020,50,"length"))
+plotResults(run,what = c("ALK",2020))
 plotResults(run,what = c("space",2020,5,"age"))
+
+#Add map to plot
+world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
+utm_crs <- paste0("+proj=utm +zone=", run$conf_l$zone," +datum=WGS84 +units=km +no_defs")
+world_utm <- sf::st_transform(world, crs = utm_crs)
+plot(sf::st_geometry(world_utm),add = TRUE)
 ```
+<div style="display: flex;">
+  <img src="figures/cpueLength40.png" alt="CPUE at length 50" width="250"/>
+  <img src="figures/ALK2020.png" alt="spatially averaged ALK in 2020" width="250"/>
+  <img src="figures/cpueAge5.png" alt="CPUE at age 5" width="250"/>
+</div>
 
-<img src="figures/cpueLength40.png" alt="CPUE at length 50" width="200"/>
-<img src="figures/cpueAge5.png" alt="CPUE at age 5" width="200"/>
-
-
-### Use of index and covariance structures in assessment
+## Use of index and covariance structures in assessment
 
 For the use of the indices and covariance structures in the state space assessment model SAM, we refer to the SAM help file at  http://www.nielsensweb.org/configurations.html.
 
 
-### Refernces
+## References
 
 Breivik, O. N., Aanes, F., Søvik, G., Aglen, A., Mehl, S., & Johnsen, E. (2021). Predicting abundance indices in areas without coverage with a latent spatio-temporal Gaussian model, ICES Journal of Marine Science, Volume 78, Issue 6, September 2021, Pages 2031–2042, https://doi.org/10.1093/icesjms/fsab073
 
