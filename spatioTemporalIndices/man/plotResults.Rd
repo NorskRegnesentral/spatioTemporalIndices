@@ -4,12 +4,30 @@
 \alias{plotResults}
 \title{plotResults Plot results}
 \usage{
-plotResults(run, what = NULL, xlim = NULL, ylim = NULL, zlim = NULL)
+plotResults(
+  run,
+  what = NULL,
+  year = NULL,
+  age = NULL,
+  length = NULL,
+  lon_lat = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  zlim = NULL
+)
 }
 \arguments{
 \item{run}{fitted object returned by \code{\link{fitModel}}}
 
 \item{what}{What to plot. Options in first element: "sunAlt", "depth", "ALK", or "space". If "ALK" is selected, year also must be provided, e.g., what = c("ALK",2020). If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").}
+
+\item{year}{year of interest}
+
+\item{age}{age of interest for spatial CPUE plot}
+
+\item{length}{length of interest for spatial CPUE plot}
+
+\item{lon_lat}{longitude and latitude of interest for age-length-key plot}
 
 \item{xlim}{optional xlim sent to fields::image.plot}
 

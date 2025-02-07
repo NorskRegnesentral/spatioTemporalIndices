@@ -3,12 +3,16 @@
 #' plotResults Plot results
 #' @param run fitted object returned by \code{\link{fitModel}}
 #' @param what What to plot. Options in first element: "sunAlt", "depth", "ALK", or "space". If "ALK" is selected, year also must be provided, e.g., what = c("ALK",2020). If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").
+#' @param year year of interest
+#' @param age age of interest for spatial CPUE plot
+#' @param length length of interest for spatial CPUE plot
+#' @param lon_lat longitude and latitude of interest for age-length-key plot
 #' @param xlim optional xlim sent to fields::image.plot
 #' @param ylim optional xlim sent to fields::image.plot
 #' @param zlim optional zlim sent to fields::image.plot
 #' @importFrom graphics abline legend lines
 #' @export
-plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
+plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_lat = NULL, xlim = NULL, ylim = NULL, zlim = NULL){
   pl = as.list(run$rep,what = "Est")
   if(what[1] == "sunAlt"){
     plotSunAlt(run)
@@ -48,19 +52,22 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
     if(is.null(xlim)) xlim = range(xInt) + c(-diff(range(xInt))/10,diff(range(xInt))/10)
     if(is.null(ylim)) ylim = range(yInt) + c(-diff(range(yInt))/10,diff(range(yInt))/10)
 
-    yearOriginal = what[2]
-    year = which(run$conf_l$years == yearOriginal)
-
-    if(what[4] == "length"){
-      report = run$obj$report()$lengthIndexDetailed
-      lengthOriginal = as.numeric(what[3])
-      length = max(which(run$conf_l$lengthGroups < lengthOriginal))
-      if(is.null(zlim)) zlim = c(0,log(max(report[year,length,])))
+    if(!is.null(year)){
+      yearInternal = which(run$conf_l$years == year)
     }else{
+      stop("Year must be provided for spatial CPUE plot")
+    }
+
+    if(!is.null(length)){
+      report = run$obj$report()$lengthIndexDetailed
+      lengthInternal = max(which(run$conf_l$lengthGroups < length))
+      if(is.null(zlim)) zlim = c(0,log(max(report[yearInternal,lengthInternal,])))
+    }else if(!is.null(age)){
       report = run$obj$report()$ageIndexDetailed
-      ageOriginal = as.numeric(what[3])
-      age = ageOriginal - run$conf_alk$minAge + 2
-      if(is.null(zlim)) zlim = c(0,log(max(report[year,age,])))
+      ageInternal = age - run$conf_alk$minAge + 2
+      if(is.null(zlim)) zlim = c(0,log(max(report[yearInternal,ageInternal,])))
+    }else{
+      stop("length or age must be provided for spatial CPUE plot")
     }
 
     col = grDevices::colorRampPalette(c("#FFFFCC", "#FFEDA0", "#FEB24C", "#F03B20", "#BD0026"))(20)
@@ -73,10 +80,10 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
       yC = 1
       for(yy in y){
         if(length(which(run$data$xInt ==xx & run$data$yInt ==yy))>0){
-          if(what[4] == "length"){
-            z[xC,yC] = log(report[year,length,which(run$data$xInt ==xx & run$data$yInt ==yy)])
+          if(!is.null(length)){
+            z[xC,yC] = log(report[yearInternal,lengthInternal,which(run$data$xInt ==xx & run$data$yInt ==yy)])
           }else{
-            z[xC,yC] = log(report[year,age,which(run$data$xInt ==xx & run$data$yInt ==yy)])
+            z[xC,yC] = log(report[yearInternal,ageInternal,which(run$data$xInt ==xx & run$data$yInt ==yy)])
           }
         }
         yC = yC+1
@@ -84,21 +91,23 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
       xC = xC +1
     }
 
-    if(what[4] == "length"){
+    if(!is.null(length)){
       fields::image.plot(x,y, z,col =  col,
             cex = 1.6,zlim = zlim, xlim = xlim,ylim = ylim,
             xlab = "Eastern direction (km)", ylab = "Northern direction (km)",
-            main = paste0("Log CPUE at length ", lengthOriginal, " in year ", yearOriginal ),
+            main = paste0("Log CPUE at length ", length, " in year ", year ),
             cex.lab = 1.4,cex.main = 1.5)
     }else{
       fields::image.plot(x,y, z,col =  col,
             cex = 1.6,zlim = zlim, xlim = xlim,ylim = ylim,
             xlab = "Eastern direction (km)", ylab = "Northern direction (km)",
-            main = paste0("Log CPUE at age ", ageOriginal, " in year ",yearOriginal ),
+            main = paste0("Log CPUE at age ", age, " in year ",year ),
             cex.lab = 1.4,cex.main = 1.5)
     }
 
   }else if(what[1] == "ALK"){
+
+    if(is.null(year))stop("Year must be provided for ALK plot")
 
     lengthInt = seq(min(run$data$length), max(run$data$length), length.out = 200)
     nAges = run$data$ageRange[2]- run$data$ageRange[1] + 1
@@ -107,7 +116,7 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
 
     linPredMatrix = matrix(0,length(lengthInt), nAges-1)
     for(a in 1:(nAges-1)){
-      linPredMatrix[,a] = run$pl$beta0_alk[which(run$conf_alk$years == what[2]), a] + run$pl$betaLength_alk[a]*lengthInt
+      linPredMatrix[,a] = run$pl$beta0_alk[which(run$conf_alk$years == year), a] + run$pl$betaLength_alk[a]*lengthInt
     }
     ALK = matrix(0,length(lengthInt), nAges)
     for(a in 1:nAges){
@@ -127,7 +136,7 @@ plotResults  <- function(run,what=NULL, xlim = NULL, ylim = NULL, zlim = NULL){
     }
 
     plot(lengthInt,ALK[,1], type = "l", ylab = "Probability", xlab = "Length",
-         ylim = c(0,1), main = paste0("Spatially averaged ALK in  year ",what[2]),
+         ylim = c(0,1), main = paste0("Spatially averaged ALK in  year ",year),
          col = col[1],lwd = 3, cex.main = 1.5,cex.lab = 1.4, cex.axis =1.2)
     for(l in 2:nAges){
       lines(lengthInt,ALK[,l],col = col[l],lwd = 3)
