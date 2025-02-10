@@ -33,6 +33,3 @@ jobs:
           Rscript -e 'covr::codecov(quiet = FALSE)'
         working-directory: spatioTemporalIndices
 
-      - uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
