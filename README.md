@@ -1,6 +1,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/NorskRegnesentral/spatioTemporalIndices/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NorskRegnesentral/spatioTemporalIndices/actions/workflows/R-CMD-check.yaml)
+[![codecov](https://codecov.io/gh/NorskRegnesentral/spatioTemporalIndices/graph/badge.svg?)](https://codecov.io/gh/NorskRegnesentral/spatioTemporalIndices)
 <!-- badges: end -->
 
 ## spatioTemporalIndices
