@@ -30,7 +30,7 @@ jobs:
 
       - name: Test coverage
         run: 
-          Rscript -e 'covr::codecov()'
+          Rscript -e 'covr::codecov(quiet = FALSE)'
         working-directory: spatioTemporalIndices
 
       - uses: codecov/codecov-action@v5
