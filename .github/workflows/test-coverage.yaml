@@ -31,9 +31,9 @@ jobs:
       - name: Test coverage
         run: 
           covr::codecov()
-        with:
-          working-directory: spatioTemporalIndices # path to package
+        working-directory: spatioTemporalIndices
 
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          working-directory: spatioTemporalIndices # path to package
