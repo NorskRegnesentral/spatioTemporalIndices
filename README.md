@@ -103,6 +103,8 @@ saveIndex(run,file = "index.txt", folder = "")
 
 This will save the files `index.txt` and `cov_index.Rda`, containing the indices and a list with all yearly covariance matrices.
 
+<br>
+
 # A quick runable example
 
 As a runnable example, we will use data on North East Arctic haddock collected by Norwegian vessels.
@@ -139,12 +141,12 @@ lapply(shapefile_files, function(f) download.file(paste0(base_url, f), f, mode =
 The we set up configurations for the `catch-at-length` model:
 
 ```R
-conf_l = defConf(years = 2018:2020, # years to use, 
+conf_l = defConf(years = 2018:2020, # years to use,
                  maxLength = 75, #Maximum length (plus group)
-                 minLength = 20, #Minum length used in index calculation
-                 spatioTemporal =2 , #2: Indepentent spatial fields across years
+                 minLength = 20, #Minimum length used in index calculation
+                 spatioTemporal =2 , #2: Independent spatial fields across years
                  dLength = 5, #5 cm length bins
-                 spatial =1, #1: A commom spatial field across time
+                 spatial =1, #1: A common spatial field across time
                  stratasystem = list(dsn="Vintertoktet_nye_strata.shp", layer = "Vintertoktet_nye_strata"),
                  applyALK = 1 #1: We combine with the ALK-model to construct indices-at-age
                  )
@@ -154,9 +156,9 @@ Similarly for the `age-at-length` model:
 
 ```R
 conf_alk = defConf_alk(maxAge = 10, #Maximum age (plus group) for index calculation
-                       minAge = 3, #Minimuim age 
-                       spatioTemporal = 0, #0: No spatio-temporal effect
-                       spatial =0 #0: No spatio-temporal effect
+                       minAge = 3, #Minimum age
+                       spatioTemporal = 2, #2: Independent spatial fields across years
+                       spatial =1 #1: A common spatial field across time
                        )
 ```
 
@@ -189,7 +191,6 @@ Plot structures, for example spatial CPUE-at-length, spatially averaged ALK and 
 
 ```R
 plotResults(run,what = c("space",2020,50,"length"))
-plotResults(run,what = c("ALK",2020))
 plotResults(run,what = c("space",2020,5,"age"))
 
 #Add map to plot
@@ -199,15 +200,32 @@ world_utm <- sf::st_transform(world, crs = utm_crs)
 plot(sf::st_geometry(world_utm),add = TRUE)
 ```
 <div style="display: flex;">
-  <img src="figures/cpueLength40.png" alt="CPUE at length 50" width="250"/>
-  <img src="figures/ALK2020.png" alt="spatially averaged ALK in 2020" width="250"/>
-  <img src="figures/cpueAge5.png" alt="CPUE at age 5" width="250"/>
+  <img src="figures/cpueLength40.png" alt="CPUE at length 50" width="300"/>
+  <img src="figures/cpueAge5.png" alt="CPUE at age 5" width="300"/>
 </div>
+
+We can also plot the ALK at different spatial locations. For example, here we plot the ALK in the year 2020 west of Svalbard and north of Varanger (the northern part of the Norwegian mainland). We see clear spatial differences.
+
+```R
+run$rl$logAgeIndex
+plotResults(run,what = "ALK",year =2020,lon_lat = c(13,78))
+plotResults(run,what = "ALK",year =2020,lon_lat = c(30,71.5))
+
+```
+
+<div style="display: flex;">
+  <img src="figures/ALK2020Svalbard.png" alt="spatially averaged ALK in 2020 Svalbard" width="300"/>
+  <img src="figures/ALK2020Varanger.png" alt="spatially averaged ALK in 2020 Varanger" width="300"/>
+</div>
+
+
+<br>
 
 ## Use of index and covariance structures in assessment
 
 For the use of the indices and covariance structures in the state space assessment model SAM, we refer to the SAM help file at  http://www.nielsensweb.org/configurations.html.
 
+<br>
 
 ## References
 
