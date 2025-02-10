@@ -36,4 +36,3 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          working-directory: spatioTemporalIndices # path to package
