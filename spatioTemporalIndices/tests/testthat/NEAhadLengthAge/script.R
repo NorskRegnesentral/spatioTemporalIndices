@@ -92,6 +92,9 @@ expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
 test_that("Plot runs without error", {
   expect_silent(plotResults(run, what = "sunAlt"))
   expect_silent(plotResults(run, what = "depth"))
+  expect_silent(plotResults(run, what = "ALK", year = 2020))
+  expect_silent(plotResults(run, what = "space",year = 2020, age = 5))
+  expect_silent(plotResults(run, what = "space", year = 2020, length = 40))
 })
 
 
