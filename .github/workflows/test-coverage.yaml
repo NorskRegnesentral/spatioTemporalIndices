@@ -25,11 +25,14 @@ jobs:
         with:
           extra-packages: any::covr
           needs: coverage
+          working-directory: spatioTemporalIndices # path to package
+
 
       - name: Test coverage
         run: 
           covr::codecov()
-
+        with:
+          working-directory: spatioTemporalIndices # path to package
 
       - uses: codecov/codecov-action@v5
         with:
