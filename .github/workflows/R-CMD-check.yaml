@@ -59,3 +59,9 @@ jobs:
           working-directory: spatioTemporalIndices  # path to package
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
           error-on: '"error"'   # Only fail on errors, not warnings/notes
+
+      
+      - name: Upload coverage reports to Codecov
+          uses: codecov/codecov-action@v5
+          with:
+            token: ${{ secrets.CODECOV_TOKEN }}
