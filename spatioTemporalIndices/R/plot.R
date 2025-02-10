@@ -113,10 +113,25 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
     nAges = run$data$ageRange[2]- run$data$ageRange[1] + 1
 
     col <- grDevices::rainbow(nAges, start = 0, end = 0.95)
-
     linPredMatrix = matrix(0,length(lengthInt), nAges-1)
+
+    if(!is.null(lon_lat)){
+      scale = 1/((4*pi)*exp(run$pl$logKappa_alk))
+      sigma = exp(run$pl$logSigma_alk)
+
+      lon_lat_df = data.frame(longitude = lon_lat[1],latitude = lon_lat[2])
+      point = sf::st_as_sf(lon_lat_df,coords=c("longitude","latitude"),crs="+proj=longlat")
+      pointUTM = sf::st_coordinates(sf::st_transform(point,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs")))
+      A_alk = fmesher::fm_basis(attributes(run$data)$meshS, pointUTM)
+
+      for(a in 1:(nAges-1)){
+        linPredMatrix[,a] = linPredMatrix[,a] +  (A_alk %*% run$pl$xS_alk[, a]*sigma[1]/sqrt(scale[1])  +
+                                                    A_alk %*% run$pl$xST_alk[,which(run$conf_alk$years == year), a])[1,1]*sigma[2]/sqrt(scale[1])
+      }
+    }
+
     for(a in 1:(nAges-1)){
-      linPredMatrix[,a] = run$pl$beta0_alk[which(run$conf_alk$years == year), a] + run$pl$betaLength_alk[a]*lengthInt
+      linPredMatrix[,a] = linPredMatrix[,a] + run$pl$beta0_alk[which(run$conf_alk$years == year), a] + run$pl$betaLength_alk[a]*lengthInt
     }
     ALK = matrix(0,length(lengthInt), nAges)
     for(a in 1:nAges){
@@ -135,9 +150,14 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
       }
     }
 
+    main = paste0("Spatially averaged ALK in  year ",year)
+    if(!is.null(lon_lat)){
+      main = paste0("Spatially averaged ALK in  year ",year, " at (",lon_lat[1],", ",lon_lat[2],")")
+    }
+
     plot(lengthInt,ALK[,1], type = "l", ylab = "Probability", xlab = "Length",
-         ylim = c(0,1), main = paste0("Spatially averaged ALK in  year ",year),
-         col = col[1],lwd = 3, cex.main = 1.5,cex.lab = 1.4, cex.axis =1.2)
+         ylim = c(0,1), main = main,
+         col = col[1],lwd = 3, cex.main = 1.3,cex.lab = 1.4, cex.axis =1.2)
     for(l in 2:nAges){
       lines(lengthInt,ALK[,l],col = col[l],lwd = 3)
     }
