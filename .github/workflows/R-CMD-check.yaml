@@ -46,7 +46,7 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: any::rcmdcheck, any::covr
           needs: check
           working-directory: spatioTemporalIndices # path to package
 
@@ -60,8 +60,8 @@ jobs:
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
           error-on: '"error"'   # Only fail on errors, not warnings/notes
 
-      
-      - name: Upload coverage reports to Codecov
-          uses: codecov/codecov-action@v5
-          with:
-            token: ${{ secrets.CODECOV_TOKEN }}
+      - name: Test coverage
+        run: covr::codecov()
+        env:
+        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
