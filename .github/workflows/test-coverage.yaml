@@ -29,11 +29,8 @@ jobs:
 
 
       - name: Test coverage
-        run: |
-          Rscript -e 'coverage <- covr::package_coverage(); covr::to_file(coverage, "coverage.json")'
+        run: 
+          Rscript -e 'covr::codecov(token = Sys.getenv("CODECOV_TOKEN"),quiet = FALSE) '
         working-directory: spatioTemporalIndices
-
-      - uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.json
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
