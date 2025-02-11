@@ -219,7 +219,7 @@ plotResults(run,what = "ALK",year =2020,lon_lat = c(30,71.5))
 </div>
 
 
-We can also plot the depth effect and sun-altitude effect:
+We can also plot the depth effect and sun-altitude effect on catch-at-length:
 
 ```R
 plotResults(run,what = "depth")
@@ -230,6 +230,17 @@ plotResults(run,what = "sunAlt")
 <div style="display: flex;">
   <img src="figures/depth.png" alt="spatially averaged ALK in 2020 Svalbard" width="300"/>
   <img src="figures/sun.png" alt="spatially averaged ALK in 2020 Varanger" width="300"/>
+</div>
+
+We can plot the time-varying variance of the indices. The time-varying structure can be used in the assessment.
+
+```R
+plotResults(run,what = "variance")
+
+```
+
+<div style="display: flex;">
+  <img src="figures/variance.png" alt="" width="400"/>
 </div>
 
 <br>
