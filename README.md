@@ -208,7 +208,6 @@ plot(sf::st_geometry(world_utm),add = TRUE)
 We can also plot the ALK at different spatial locations. For example, here we plot the ALK in the year 2020 west of Svalbard and north of Varanger (the northern part of the Norwegian mainland). We see clear spatial differences.
 
 ```R
-run$rl$logAgeIndex
 plotResults(run,what = "ALK",year =2020,lon_lat = c(13,78))
 plotResults(run,what = "ALK",year =2020,lon_lat = c(30,71.5))
 
@@ -219,6 +218,19 @@ plotResults(run,what = "ALK",year =2020,lon_lat = c(30,71.5))
   <img src="figures/ALK2020Varanger.png" alt="spatially averaged ALK in 2020 Varanger" width="300"/>
 </div>
 
+
+We can also plot the depth effect and sun-altitude effect:
+
+```R
+plotResults(run,what = "depth")
+plotResults(run,what = "sunAlt")
+
+```
+
+<div style="display: flex;">
+  <img src="figures/depth.png" alt="spatially averaged ALK in 2020 Svalbard" width="300"/>
+  <img src="figures/sun.png" alt="spatially averaged ALK in 2020 Varanger" width="300"/>
+</div>
 
 <br>
 
