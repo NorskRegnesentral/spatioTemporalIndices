@@ -30,7 +30,7 @@ jobs:
 
       - name: Test coverage
         run: 
-          Rscript -e 'covr::codecov(quiet = FALSE) %>% covr::to_file("coverage.json")'
+          Rscript -e 'covr::package_coverage() %>% covr::to_file("coverage.json")'
         working-directory: spatioTemporalIndices
 
       - uses: codecov/codecov-action@v5
