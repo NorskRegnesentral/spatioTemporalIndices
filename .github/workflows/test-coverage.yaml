@@ -30,8 +30,10 @@ jobs:
 
       - name: Test coverage
         run: 
-          Rscript -e 'covr::codecov(quiet = FALSE)'
+          Rscript -e 'covr::codecov(token = Sys.getenv("CODECOV_TOKEN"),quiet = FALSE)'
         working-directory: spatioTemporalIndices
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - uses: codecov/codecov-action@v5
         with:
