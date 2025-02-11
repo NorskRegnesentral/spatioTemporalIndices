@@ -2,7 +2,7 @@
 % Please edit documentation in R/posteriorMean.R
 \name{posteriorMean}
 \alias{posteriorMean}
-\title{Posterior mean}
+\title{Posterior mean. Only do the bias correction for spatial effect for catch-at-length}
 \usage{
 posteriorMean(run)
 }
@@ -10,8 +10,8 @@ posteriorMean(run)
 \item{run}{The fitted model}
 }
 \description{
-Posterior mean
+Posterior mean. Only do the bias correction for spatial effect for catch-at-length
 }
 \details{
-Return posterior mean of the index (using the bias-correction flag in TMB::sdreport for the catch-at-length random effects only)
+Return posterior mean of the index (using the bias-correction flag in TMB::sdreport for the catch-at-length spatial and spatio-temporal random effects only)
 }
