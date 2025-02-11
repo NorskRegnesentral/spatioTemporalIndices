@@ -152,7 +152,7 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
 
     main = paste0("Spatially averaged ALK in  year ",year)
     if(!is.null(lon_lat)){
-      main = paste0("Spatially averaged ALK in  year ",year, " at (",lon_lat[1],", ",lon_lat[2],")")
+      main = paste0("ALK in  year ",year, " at coordinates (",lon_lat[1],", ",lon_lat[2],")")
     }
 
     plot(lengthInt,ALK[,1], type = "l", ylab = "Probability", xlab = "Length",
@@ -170,6 +170,34 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
            col = col[i + 1],
            cex = 1.3,
            adj = 0)  # Left alignment
+    }
+  }else if(what == "variance"){
+    if(run$conf_l$applyALK==1){
+      par(mar = c(5, 4, 4, 8) + 0.1)  # Increase right margin for legend
+      par(xpd = TRUE)  # Allow legend outside the plot
+
+      sd = data.frame(run$rlSd$logAgeIndex)
+      if(length(run$conf_alk$minAge:run$conf_alk$maxAge) != dim(sd)[2]){
+        sd = sd[,-1]#Note: Youngest age is not in survey
+      }
+      sd[sd>100] = NA #Remove infinite variances.
+      var = sd^2
+      colnames(var) = run$conf_alk$minAge:run$conf_alk$maxAge
+      rownames(var) = run$conf_l$years
+      line_colors <- 1:ncol(var)
+      line_types <- 1:ncol(var)
+
+      matplot(var, xaxt = "n", main = "",ylab = "",xlab = "",
+              lwd=3, type = "l", las=1, col = line_colors, lty = line_types)
+
+      axis(side =1, at=1:dim(var)[1], labels=rownames(var))
+      mtext(text="Year",cex=1.5,side=1,line=2.1,outer=FALSE)
+      mtext(text="Variance",cex=1.5,side=2,line=2.3,outer=FALSE)
+      mtext("Variance of index-at-age", outer=FALSE,  cex=1.6, line=0.5)
+      legend("topright", inset = c(-0.3, 0), legend = colnames(var),  col = line_colors, lty = line_types, lwd = 2.8, title = "Age", cex = 1.2)
+
+    }else{
+
     }
   }
 }
