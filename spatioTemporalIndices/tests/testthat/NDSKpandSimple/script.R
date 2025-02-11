@@ -4,7 +4,7 @@ dat_l = readRDS("NDSKpandSimple/NDSKpand2018-2020_length.rds")
 
 conf_l = defConf(years = 2020:2020,
                dLength = 1, # length intervall in mm
-               maxLength = 30, # Numeric = use directly; NULL = use input data to determine
+               maxLength = 25, # Numeric = use directly; NULL = use input data to determine
                minLength = 7, # Numeric = use directly; NULL = use input data to determine
                cutoff = 20,
                spatioTemporal = 0,
@@ -20,23 +20,45 @@ conf_l = defConf(years = 2020:2020,
                applyALK=0,
                strataReport=0)
 
-confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 20)
+confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 50)
 
-# run model
-run = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
+####Covariates
+runCovariates = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
+###Length dependent covariates:
+conf_l$sunAlt=c(1,2)
+conf_lsplineDepth = c(6,2)
+confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 100)
+runLenghtDepCov = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
+
+#no Nugget
+conf_l$sunAlt=c(1,0)
+conf_lsplineDepth = c(6,0)
 conf_l$nugget = 0
-run2 = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
+runNoNugget = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
-resultsOut = list(AIC = AIC(run,run2))
+resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov))
+resultsOut$rlIndexCovariates = runCovariates$rl$logLengthIndex
+resultsOut$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
+resultsOut$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
+
 
 load("NDSKpandSimple/resultsExp.RData")
 expect_equal(resultsOut$objectiveExp, resultsExp$objectiveExp,tolerance = 1e-4)
+expect_equal(resultsOut$rlIndexCovariates, resultsExp$rlIndexCovariates,tolerance = 1e-2)
+expect_equal(resultsOut$rlIndexLenghtDepCov, resultsExp$rlIndexLenghtDepCov,tolerance = 1e-2)
+expect_equal(resultsOut$rlIndexNoNugget, resultsExp$rlIndexNoNugget,tolerance = 1e-2)
 
-
+test_that("Plot runs without error", {
+  expect_silent(plotResults(runLenghtDepCov, what = "sunAlt"))
+  expect_silent(plotResults(runLenghtDepCov, what = "depth"))
+})
 
 if(FALSE){
-  resultsExp = list(AIC = AIC(run,run2))
-  save(resultsExp,file = "tests/testthat/NDSKpandSimple/resultsExp.RData")
+  resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov))
+  resultsExp$rlIndexCovariates = runCovariates$rl$logLengthIndex
+  resultsExp$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
+  resultsExp$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
+  save(resultsExp,file = "NDSKpandSimple/resultsExp.RData")
 }
 

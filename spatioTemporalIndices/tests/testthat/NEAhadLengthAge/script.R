@@ -9,8 +9,8 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
                  spatioTemporal =0 ,
                  spatial =1,
                  rwBeta0 = 1,
-                 sunAlt = c(1,2),
-                 splineDepth = c(6,2),
+                 sunAlt = c(1,0),
+                 splineDepth = c(6,0),
                  cbound = c(18,130),
                  dLength = 5,
                  reduceLength = 3,
@@ -21,13 +21,13 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
 
 
 #Define configurations age part
-conf_alk = defConf_alk(maxAge = 10,
+conf_alk = defConf_alk(maxAge = 8,
                        minAge = 3,
                        spatioTemporal = 2,
                        spatial =1,
-                       rwBeta0 = 1)
+                       rwBeta0 = 0)
 
-confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 20)
+confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 50)
 
 # run model
 run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
@@ -68,30 +68,34 @@ expect_equal(covYearsExp,
              covYears,tolerance = 1e-2)
 
 
+#Reduce complexity for time efficency
+conf_alk$spatioTemporal = 0
+conf_alk$spatial = 0
+runSimpler = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+
+
 #test simulation
 set.seed(1)
-sim = simStudy(run,nsim = 1)
+sim = simStudy(runSimpler,nsim = 1)
 objectiveSimExp = sim[[1]]$opt$objective
 resultsOut$objectiveSimExp = objectiveSimExp
 expect_equal(resultsOut$objectiveSimExp, resultsExp$objectiveSimExp,tolerance = 1e-4)
 
 #test jitter
 set.seed(1)
-jj = jit(run,njit = 1)
+jj = jit(runSimpler,njit = 1)
 resultsJitter = jj$maxVecAll
 load("NEAhadLengthAge/resultsJitterExp.RData")
 expect_equal(resultsJitter, resultsJitterExp,tolerance = 1e-4)
 
 #Test retro
-ret = retroSTIM(run,nyears = 1)
-resultsRetro = ret[[1]]$opt$objective
+ret = retroSTIM(runSimpler,nyears = 2)
+resultsRetro = ret[[2]]$opt$objective
 load("NEAhadLengthAge/resultsRetroExp.RData")
 expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
 
 #Test no errors in plots
 test_that("Plot runs without error", {
-  expect_silent(plotResults(run, what = "sunAlt"))
-  expect_silent(plotResults(run, what = "depth"))
   expect_silent(plotResults(run, what = "ALK", year = 2020))
   expect_silent(plotResults(run, what = "space",year = 2020, age = 5))
   expect_silent(plotResults(run, what = "space", year = 2020, length = 40))
