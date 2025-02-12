@@ -126,7 +126,7 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
 
       for(a in 1:(nAges-1)){
         linPredMatrix[,a] = linPredMatrix[,a] +  (A_alk %*% run$pl$xS_alk[, a]*sigma[1]/sqrt(scale[1])  +
-                                                    A_alk %*% run$pl$xST_alk[,which(run$conf_alk$years == year), a])[1,1]*sigma[2]/sqrt(scale[1])
+                                                    A_alk %*% run$pl$xST_alk[,which(run$conf_alk$years == year), a])[1,1]*sigma[2]/sqrt(scale[2])
       }
     }
 
