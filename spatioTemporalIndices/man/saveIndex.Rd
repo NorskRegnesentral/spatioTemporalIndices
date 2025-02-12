@@ -4,7 +4,7 @@
 \alias{saveIndex}
 \title{Save indices with assosiated variance and covariance}
 \usage{
-saveIndex(run, file, folder = "")
+saveIndex(run, file, folder = "", sdrep_bc = NULL)
 }
 \arguments{
 \item{run}{stim object}
@@ -12,6 +12,8 @@ saveIndex(run, file, folder = "")
 \item{file}{name of file with index.}
 
 \item{folder}{Path to the folder the index is saved.}
+
+\item{sdrep_bc}{Output of TMB::sdreport(..., bias.correct = TRUE)}
 }
 \description{
 Save indices with assosiated variance and covariance
