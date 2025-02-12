@@ -95,14 +95,10 @@ The indices and their associated standard deviations can be accessed in the list
 run$rl$logAgeIndex
 run$rlSd$logAgeIndex
 ```
+ The indices can be save on standard ICES format with the function `write_indices_ICES_format`. Yearly covariance matrices can be save with the function `write_covriance_matrices`
 
-The indices and corresponding covariance structures can be saved by
 
-```R
-saveIndex(run,file = "index.txt", folder = "")
-```
 
-This will save the files `index.txt` and `cov_index.Rda`, containing the indices and a list with all yearly covariance matrices.
 
 <br>
 
@@ -235,13 +231,52 @@ plotResults(run,what = "sunAlt")
 We can plot the time-varying variance of the indices. The time-varying structure can be used in the assessment.
 
 ```R
-plotResults(run,what = "variance")
+plotResults(run,what = "variance") #Used conf_l$years = 1994:2020 to produce figure
 
 ```
 
 <div style="display: flex;">
   <img src="figures/variance.png" alt="" width="400"/>
 </div>
+
+#### Saving the indices
+
+Indices can be saved on standard ICES format by:
+
+```R
+write_indices_ICES_format(run,file = "indexFile.dat", name = "nameOfSurvey",digits = 0)
+
+```
+The file have standard ICES-format and looks like this: 
+```plaintext
+nameOfSurvey
+2018 2020
+1 1 0.11 0.15
+3 10
+1 3600743 1298251 880572 134994 268370 54879 55082 199206
+1 7780117 3056598 616185 312397 57086 49632 12486 56953
+1 4660653 4125865 869566 186988 105888 25585 11477 46153
+
+```
+
+
+Variance of the log-indices on the same format can be saved by:
+
+```R
+write_indices_ICES_format(run,file = "indexFileVar.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
+
+```
+
+
+A list with the estimated yearly covariance matrices can be saved by: 
+
+```R
+write_covriance_matrices(run,file = "covar.rds")
+
+```
+
+The list can be read by `readRDS(covar.rds).
+
 
 <br>
 
