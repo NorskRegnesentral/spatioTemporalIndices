@@ -45,7 +45,6 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
       abline(v=i*50,lty=3)
     }
   }else if(what[1]=="space"){
-
     xInt = run$data$xInt
     yInt = run$data$yInt
 
@@ -199,6 +198,39 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
     }else{
 
     }
+  }else if(what == "correlation"){
+    if(run$conf_l$applyALK==1){
+      ageRange = run$data$ageRange + (run$conf_alk$maxAge- run$data$ageRange[2])
+      id = which(names(run$rep$value)=="logAgeIndex")
+      cov = run$rep$cov[id,id]
+      covYears = list()
+      for(i in 1:length(run$conf_l$years)){
+        id = i + (0:(run$data$ageRange[2]-1))*length(run$conf_l$years)
+        covYears[[i]] = cov[id,id]
+        rownames(covYears[[i]]) = ageRange[1]:ageRange[2]
+        colnames(covYears[[i]]) = ageRange[1]:ageRange[2]
+        covYears[[i]] = covYears[[i]][-1,]
+        covYears[[i]] = covYears[[i]][,-1]
+      }
+      ccolors <- c("#A50F15","#DE2D26","#FB6A4A","#FCAE91","#FEE5D9","white","#EFF3FF","#BDD7E7","#6BAED6","#3182BD","#08519C")
+
+      ncols <- ceiling(sqrt(length(covYears)+1))  # Columns based on square root of n
+      nrows <- ceiling((length(covYears)+1) / ncols)  # Rows to fit the plots
+
+      mfrow = c(ncols,nrows)
+      par(oma=c(1,1,1,1),mar=c(0.5,0.5,0.0,0.0),mfrow = mfrow)
+      for(i in 1:length(covYears)){
+        xx = stats::cov2cor(covYears[[i]])
+        ellipse::plotcorr(xx, col = ccolors[5*xx+6],main =paste0("Year ", run$conf_l$years[i]) , mar = c(0,0,0.7,0.7))
+      }
+      plot(c(0,2),c(0,1),type = 'n', axes = FALSE,xlab = '', ylab = '', main = '')
+      text(x=1.3, y = seq(0,1,l=5), labels = round(seq(-1,1,l=5),2))
+      graphics::rasterImage(rev(ccolors), 0, 0, 1,1)
+    }else{
+      stop("Plot of correlation structures not implemented yet for indices-at-length")
+    }
+
+
   }
 }
 

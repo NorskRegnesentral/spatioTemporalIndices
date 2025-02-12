@@ -100,6 +100,7 @@ test_that("Plot runs without error", {
   expect_silent(plotResults(run, what = "space",year = 2020, age = 5))
   expect_silent(plotResults(run, what = "space", year = 2020, length = 40))
   expect_silent(plotResults(run, what = "variance"))
+  expect_silent(plotResults(run, what = "correlation"))
 })
 
 
