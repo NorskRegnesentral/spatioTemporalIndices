@@ -16,19 +16,17 @@ template <class Type>
         }
       }
     }else{
-//     for(int y=0;y<dat.nStationsEachYear.size();y++){
-//        for(int l=0; l<dat.numberOfLengthGroups; ++l){
-//          nll -= dnorm(par.beta0(y,l),Type(0),Type(100),true); //The regression parameters are free
-//        }
-//      }
+      //The intercepts are free model parameters
     }
     //Transform parameters
     vector<Type> sigma = exp(par.log_sigma);
     vector<Type> kappa = exp(par.log_kappa);
-    Type size= exp(par.logSize);
-    Type scale; //If apply dgamma
-    Type shape; //If apply dgamma
-    Type pTweedie;
+//    Type size= exp(par.logSize);
+
+//Only poisson distributed catch implemented currently
+//    Type scale; //If apply dgamma
+//    Type shape; //If apply dgamma
+//    Type pTweedie;
 
     vector<Type> rho_t(1);//Time correlation parameter
     rho_t(0)=Type(2)/(Type(1) + exp(-Type(2) * par.tan_rho_t(0))) - Type(1);
@@ -111,7 +109,7 @@ template <class Type>
     }
 
 
-    Type log_var_minus_mu; //Needed if applying negative binomial observation model
+//    Type log_var_minus_mu; //Needed if applying negative binomial observation model
     Type covariatesConvexW; //Coefficient in convex combination of length dependent effects
     matrix<Type> mu(dat.fishObsMatrix.rows(),dat.fishObsMatrix.cols());
     vector<Type> deltaS, deltaS2, deltaST, deltaST2; //Smoothing in length dimension
@@ -148,9 +146,9 @@ template <class Type>
         }
       }
 
-      Type muZero = 0;//Used if applying zero inflation
-      Type pZero = 0;//Used if applying zero inflation
-      Type pPos = 0;//Used if applying zero inflation
+//      Type muZero = 0;//Used if applying zero inflation
+//      Type pZero = 0;//Used if applying zero inflation
+//      Type pPos = 0;//Used if applying zero inflation
       for(int s=0; s<dat.nStationsEachYear(y);++s){
         for(int l=0; l <dat.numberOfLengthGroups;++l){
           covariatesConvexW = (dat.numberOfLengthGroups-l-1)/(dat.numberOfLengthGroups-1);
@@ -161,61 +159,62 @@ template <class Type>
             log(dat.dist(counter))+
             covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter)+
             par.nugget.col(counter)(l)*sigma(2));
-          log_var_minus_mu=log(mu(counter,l)*mu(counter,l)*size);
           if(dat.predMatrix(counter,l)==0){
             if(dat.zeroInflated !=0){//Include additional zero-probability //Under development
-              muZero = exp(par.delta_z(0) +
-                par.delta_z(1)* par.beta0.row(y)(l) +
-                par.delta_z(1)* (covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter)) +
-                par.delta_z(1)* deltaMatrixS.row(l)(s)*sigma(0)/sqrt(scaleS)+
-                par.delta_z(1)* deltaMatrixST.row(l)(s)*sigma(1)/sqrt(scaleST)+
-                par.delta_z(1)* (covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter))+
-                par.delta_z(1)* par.nugget.col(counter)(l)*sigma(2)+
-                par.delta_z(2)* log(dat.dist(counter)));
-              pZero = dpois(Type(0), muZero,true);
-              if(dat.obsModel==1){
-                pPos = dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true)  + logspace_sub(Type(0),pZero);
-              }else if (dat.obsModel==2){
-                pPos = dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true)  + logspace_sub(Type(0),pZero);
-              }else if (dat.obsModel==3){
-                //Gamma distributed response
-                if(dat.obsVector(dat.idxStart(counter) +l) >0){
-                  scale = size;
-                  shape = mu(counter,l)/scale;
-                  pPos = dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true)  + logspace_sub(Type(0),pZero);
-                }else{
-                  //Not needed, gamma cant be exactly zero
-                }
-              }else{
-                //Not implemented
-                pPos = 0;
-              }
-
-              if(dat.fishObsMatrix(counter,l)==0){
-                if(dat.obsModel==3){
-                  nll -=keep(dat.idxStart(counter) +l)*pZero;
-                }else{
-                  nll -=keep(dat.idxStart(counter) +l)*logspace_add(pZero,pPos);
-                  }
-              }else{
-                nll -=keep(dat.idxStart(counter) +l)*pPos;
-              }
+//              muZero = exp(par.delta_z(0) +
+//                par.delta_z(1)* par.beta0.row(y)(l) +
+//                par.delta_z(1)* (covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter)) +
+//                par.delta_z(1)* deltaMatrixS.row(l)(s)*sigma(0)/sqrt(scaleS)+
+//                par.delta_z(1)* deltaMatrixST.row(l)(s)*sigma(1)/sqrt(scaleST)+
+//                par.delta_z(1)* (covariatesConvexW*depthEffect1(counter) + (1-covariatesConvexW)*depthEffect2(counter))+
+//                par.delta_z(1)* par.nugget.col(counter)(l)*sigma(2)+
+//                par.delta_z(2)* log(dat.dist(counter)));
+//              pZero = dpois(Type(0), muZero,true);
+//              if(dat.obsModel==1){
+//                log_var_minus_mu=log(mu(counter,l)*mu(counter,l)*size);
+//                pPos = dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true)  + logspace_sub(Type(0),pZero);
+//              }else if (dat.obsModel==2){
+//                pPos = dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true)  + logspace_sub(Type(0),pZero);
+//              }else if (dat.obsModel==3){
+//                //Gamma distributed response
+//                if(dat.obsVector(dat.idxStart(counter) +l) >0){
+//                  scale = size;
+//                  shape = mu(counter,l)/scale;
+//                  pPos = dgamma(dat.obsVector(dat.idxStart(counter) +l), shape,scale,true)  + logspace_sub(Type(0),pZero);
+//                }else{
+//                  //Not needed, gamma cant be exactly zero
+//                }
+//              }else{
+//                //Not implemented
+//                pPos = 0;
+//              }
+//
+//              if(dat.fishObsMatrix(counter,l)==0){
+//                if(dat.obsModel==3){
+//                  nll -=keep(dat.idxStart(counter) +l)*pZero;
+//                }else{
+//                  nll -=keep(dat.idxStart(counter) +l)*logspace_add(pZero,pPos);
+//                  }
+//              }else{
+//                nll -=keep(dat.idxStart(counter) +l)*pPos;
+//              }
             }else{
               if(dat.obsModel==1){
-                nll -= keep(dat.idxStart(counter) +l)*dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true);
+//                nll -= keep(dat.idxStart(counter) +l)*dnbinom_robust(dat.obsVector(dat.idxStart(counter) +l), log(mu(counter,l)),log_var_minus_mu,true);
                 //TODO simulation
               }else if(dat.obsModel==2){
+                //Currenlty only obsModel==2 implemented
                 nll -= keep(dat.idxStart(counter) +l)*dpois(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),true);
                 SIMULATE_F(of){
                     dat.obsVector(dat.idxStart(counter) +l) = rpois(mu(counter,l));
                 }
               }else if (dat.obsModel==3){
-                //Tweedie distributed response
-                scale = size;
-                shape = mu(counter,l)/scale;
-                pTweedie =  Type(1)/(Type(1) + exp(-Type(2) * par.tweedieP(0))) + Type(1);
-                //TODO simulation
-                nll -= keep(dat.idxStart(counter) +l)*dtweedie(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),size,pTweedie,true);
+//                //Tweedie distributed response
+//                scale = size;
+//                shape = mu(counter,l)/scale;
+//                pTweedie =  Type(1)/(Type(1) + exp(-Type(2) * par.tweedieP(0))) + Type(1);
+//                //TODO simulation
+//                nll -= keep(dat.idxStart(counter) +l)*dtweedie(dat.obsVector(dat.idxStart(counter) +l), mu(counter,l),size,pTweedie,true);
               }
             }
           }

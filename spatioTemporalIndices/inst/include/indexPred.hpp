@@ -71,20 +71,21 @@ template <class Type>
       }
     }
 
-    Type  muZero;
-    Type  pZero;
-    if(dat.zeroInflated !=0){
-      for(int y=0; y<nYears; ++y){
-        for(int l =0; l<numberOfLengthGroups; ++l){
-          for(int i =0; i<nInt; ++i){
-            muZero = exp(par.delta_z(0) +
-              par.delta_z(1)*log(lengthIndexDetailed(y,l,i)));
-            pZero = dpois(Type(0), muZero);
-            lengthIndexDetailed(y,l,i) = lengthIndexDetailed(y,l,i)*(1-pZero);
-          }
-        }
-      }
-    }
+//Zero inflation not fully implemented
+//    Type  muZero;
+//    Type  pZero;
+//    if(dat.zeroInflated !=0){
+//      for(int y=0; y<nYears; ++y){
+//        for(int l =0; l<numberOfLengthGroups; ++l){
+//          for(int i =0; i<nInt; ++i){
+//            muZero = exp(par.delta_z(0) +
+//              par.delta_z(1)*log(lengthIndexDetailed(y,l,i)));
+//            pZero = dpois(Type(0), muZero);
+//            lengthIndexDetailed(y,l,i) = lengthIndexDetailed(y,l,i)*(1-pZero);
+//          }
+//        }
+//      }
+//    }
 
 
     int nAges = 2;//Dummy-number
