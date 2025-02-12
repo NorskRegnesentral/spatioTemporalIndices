@@ -1,7 +1,7 @@
 #' Run model
 #'
 #' This funtion runs the index model given the data on catch-at-length and age-at-length.
-#' Indices with corresponding covariance matrices and uncertianty estimates can be extracted using the \code{\link{saveIndex}} function.
+#' Indices with corresponding covariance matrices and uncertianty estimates can be extracted using the \code{\link{write_indices_ICES_format}} function.
 #'
 #' @importFrom TMB MakeADFun sdreport FreeADFun
 #' @importFrom stats nlminb
@@ -17,7 +17,7 @@
 #' @param silent Boolean that is sent to TMB::MakeADfun, and deactivates trace in nlminb if TRUE.
 #' @param ... Parameters sent to TMB::sdreport.
 #' @useDynLib spatioTemporalIndices
-#' @return A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{saveIndex}} function. Or manually by inspecting the fit$rl object.
+#' @return A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{write_indices_ICES_format}} function. Or manually by inspecting the fit$rl object.
 #' @details This model runs estimate the index model, and returns the fitted model.
 #' @export
 fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,mapSet = NULL,runModel = TRUE,twoStage = FALSE,silent = FALSE,...){
