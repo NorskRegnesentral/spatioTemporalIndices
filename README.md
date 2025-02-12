@@ -223,15 +223,17 @@ plotResults(run,what = "sunAlt")
   <img src="figures/sun.png" alt="spatially averaged ALK in 2020 Varanger" width="300"/>
 </div>
 
-We can plot the time-varying variance of the indices. This time-varying structure can be used in the assessment.
+We can plot the time-varying variance of the indices, and the time varying within-year correlation structure. These time-varying structures can be used in the assessment.
 
 ```R
 plotResults(run,what = "variance") #Used conf_l$years = 1994:2020 to produce figure
+plotResults(run,what = "correlation")
 
 ```
 
 <div style="display: flex;">
-  <img src="figures/variance.png" alt="" width="400"/>
+  <img src="figures/variance.png" alt="" width="300"/>
+  <img src="figures/correlation.png" alt="" width="300"/>
 </div>
 
 #### Saving the indices
