@@ -193,7 +193,7 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
       axis(side =1, at=1:dim(var)[1], labels=rownames(var))
       mtext(text="Year",cex=1.5,side=1,line=2.1,outer=FALSE)
       mtext(text="Variance",cex=1.5,side=2,line=2.3,outer=FALSE)
-      mtext("Variance of index-at-age", outer=FALSE,  cex=1.6, line=0.5)
+      mtext("Variance of log index-at-age", outer=FALSE,  cex=1.6, line=0.5)
       legend("topright", inset = c(-0.3, 0), legend = colnames(var),  col = line_colors, lty = line_types, lwd = 2.8, title = "Age", cex = 1.2)
 
     }else{
