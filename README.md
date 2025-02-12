@@ -123,7 +123,7 @@ dat_length <- readRDS("haddock2018-2020_length_ex_rus_reduced.rds")
 dat_age <- readRDS("haddock2018-2020_age_ex_rus_reduced.rds")
 ```
 
-Also download the survey domain:
+We also download the survey domain:
 
 
 ```R
@@ -135,7 +135,7 @@ shapefile_files <- c("Vintertoktet_nye_strata.shp",
 lapply(shapefile_files, function(f) download.file(paste0(base_url, f), f, mode = "wb"))
 ```
 
-The we set up configurations for the `catch-at-length` model:
+Set up configurations for the `catch-at-length` model:
 
 ```R
 conf_l = defConf(years = 2018:2020, # years to use,
@@ -159,7 +159,7 @@ conf_alk = defConf_alk(maxAge = 10, #Maximum age (plus group) for index calculat
                        )
 ```
 
-The we set up prediction configurations:
+Set up prediction configurations:
 
 ```R
 confPred = defConfPred(conf=conf_l,
@@ -167,7 +167,7 @@ confPred = defConfPred(conf=conf_l,
                        )
 ```
 
-Now everyting is set to fit the model:
+Now, everything is set to fit the model:
 
 ```R
 run = fitModel(dat_length,conf_l, 
@@ -177,17 +177,12 @@ run = fitModel(dat_length,conf_l,
                ignore.parm.uncertainty = TRUE)
 ```
 
-We can then extract the indices and plot structures:
+We can then extract the indices and plot structures.
 
+Here, we plot the spatially estimated CPUE at a length of 40 cm and age 5 for the year 2020:
+ 
 ```R
-run$rl$logAgeIndex
-#saveIndex(run,file = "index.txt", folder = "...") #Save indices and corresponding yearly covariance structures that both can be used in e.g., SAM
-```
-
-Plot structures, for example spatial CPUE-at-length, spatially averaged ALK and spatial CPUE-at-age:
-
-```R
-plotResults(run,what = c("space",2020,50,"length"))
+plotResults(run,what = c("space",2020,40,"length"))
 plotResults(run,what = c("space",2020,5,"age"))
 
 #Add map to plot
@@ -201,7 +196,7 @@ plot(sf::st_geometry(world_utm),add = TRUE)
   <img src="figures/cpueAge5.png" alt="CPUE at age 5" width="300"/>
 </div>
 
-We can also plot the ALK at different spatial locations. For example, here we plot the ALK in the year 2020 west of Svalbard and north of Varanger (the northern part of the Norwegian mainland). We see clear spatial differences.
+We can also plot the ALK at different spatial locations. For example, here we plot the ALK for the year 2020, west of Svalbard and north of Varanger (the northern part of the Norwegian mainland). We observe clear spatial differences.
 
 ```R
 plotResults(run,what = "ALK",year =2020,lon_lat = c(13,78))
@@ -228,7 +223,7 @@ plotResults(run,what = "sunAlt")
   <img src="figures/sun.png" alt="spatially averaged ALK in 2020 Varanger" width="300"/>
 </div>
 
-We can plot the time-varying variance of the indices. The time-varying structure can be used in the assessment.
+We can plot the time-varying variance of the indices. This time-varying structure can be used in the assessment.
 
 ```R
 plotResults(run,what = "variance") #Used conf_l$years = 1994:2020 to produce figure
@@ -241,13 +236,13 @@ plotResults(run,what = "variance") #Used conf_l$years = 1994:2020 to produce fig
 
 #### Saving the indices
 
-Indices can be saved on standard ICES format by:
+Indices can be saved in the standard ICES format by:
 
 ```R
 write_indices_ICES_format(run,file = "indexFile.dat", name = "nameOfSurvey",digits = 0)
 
 ```
-The file have standard ICES-format and looks like this: 
+The file follows the standard ICES format and looks like this:
 ```plaintext
 nameOfSurvey
 2018 2020
@@ -260,7 +255,7 @@ nameOfSurvey
 ```
 
 
-Variance of the log-indices on the same format can be saved by:
+The variance of the log-indices in the same format can be saved by:
 
 ```R
 write_indices_ICES_format(run,file = "indexFileVar.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
@@ -268,14 +263,14 @@ write_indices_ICES_format(run,file = "indexFileVar.dat",variance = TRUE, name = 
 ```
 
 
-A list with the estimated yearly covariance matrices can be saved by: 
+A list of the estimated yearly covariance matrices can be saved by:
 
 ```R
 write_covriance_matrices(run,file = "covar.rds")
 
 ```
 
-The list can be read by `readRDS(covar.rds).
+The list can then be read by `readRDS(covar.rds)`.
 
 
 <br>
