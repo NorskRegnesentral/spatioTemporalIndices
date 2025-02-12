@@ -95,7 +95,7 @@ The indices and their associated standard deviations can be accessed in the list
 run$rl$logAgeIndex
 run$rlSd$logAgeIndex
 ```
- The indices can be save on standard ICES format with the function `write_indices_ICES_format`. Yearly covariance matrices can be save with the function `write_covriance_matrices`
+ The indices can be save on standard ICES format with the function `write_indices_ICES_format`. Yearly covariance matrices can be save with the function `write_covariance_matrices`
 
 
 
@@ -268,7 +268,7 @@ write_indices_ICES_format(run,file = "indexFileVar.dat",variance = TRUE, name = 
 A list of the estimated yearly covariance matrices can be saved by:
 
 ```R
-write_covriance_matrices(run,file = "covar.rds")
+write_covariance_matrices(run,file = "covar.rds")
 
 ```
 

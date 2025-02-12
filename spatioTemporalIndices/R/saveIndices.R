@@ -48,7 +48,7 @@ write_indices_ICES_format = function(run,file,name,sdrep_bc = NULL,variance = FA
 ##' @param  file Name of the file. Must end with .rds
 ##' @details Saves a list with estimated yearly covariance matrices of the log-index.
 ##' @export
-write_covriance_matrices = function(run, file){
+write_covariance_matrices = function(run, file){
   if(run$conf_l$applyALK==1){
     ageRange = run$data$ageRange + (run$conf_alk$maxAge- run$data$ageRange[2])
     id = which(names(run$rep$value)=="logAgeIndex")

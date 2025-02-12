@@ -60,7 +60,7 @@ expect_equal(readLines("NEAhadLengthAge/indexFileVar.dat"),
              readLines("NEAhadLengthAge/indexFileVarExp.dat"))
 
 #Verify that save covaraince structures are as expected
-write_covriance_matrices(run,"NEAhadLengthAge/yearlyCov.rds")
+write_covariance_matrices(run,"NEAhadLengthAge/yearlyCov.rds")
 cov = readRDS("NEAhadLengthAge/yearlyCov.rds")
 covExp = readRDS("NEAhadLengthAge/yearlyCovExp.rds")
 expect_equal(cov,
@@ -113,7 +113,7 @@ if(FALSE){
 
   write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileExp.dat", name = "nameOfSurvey",digits = 0)
   write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileVarExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
-  write_covriance_matrices(run,"NEAhadLengthAge/yearlyCovExp.rds")
+  write_covariance_matrices(run,"NEAhadLengthAge/yearlyCovExp.rds")
 
   resultsJitterExp = resultsJitter
   save(resultsJitterExp,file = "NEAhadLengthAge/resultsJitterExp.RData")
