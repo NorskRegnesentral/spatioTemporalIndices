@@ -44,28 +44,27 @@ resultsOut = list(objectiveExp = objectiveExp,
                   par = par)
 
 
+#Verify all indices and parameters are as expected
 load("NEAhadLengthAge/resultsExp.RData")
 expect_equal(resultsOut$objectiveExp, resultsExp$objectiveExp,tolerance = 1e-4)
 expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-2)
 expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-2)
 expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-2)
 
+#Verify that save indices on ICES-format are as expected
+write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFile.dat", name = "nameOfSurvey",digits = 0)
+write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileVar.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
+expect_equal(readLines("NEAhadLengthAge/indexFile.dat"),
+             readLines("NEAhadLengthAge/indexFileExp.dat"))
+expect_equal(readLines("NEAhadLengthAge/indexFileVar.dat"),
+             readLines("NEAhadLengthAge/indexFileVarExp.dat"))
 
-
-saveIndex(run,file = "testthat.txt", folder = "NEAhadLengthAge/")
-
-#Verify that save indices and standard deviations are not changed
-expect_equal(read.table("NEAhadLengthAge/testthat.txt"),
-             read.table("NEAhadLengthAge/testthatExp.txt"),tolerance = 1e-2)
-expect_equal(read.table("NEAhadLengthAge/sdtestthat.txt"),
-             read.table("NEAhadLengthAge/sdtestthatExp.txt"),tolerance = 1e-2)
-
-#Verify that saved correlation structures are not changed
-load("NEAhadLengthAge/cov_testthatExp.Rda")
-covYearsExp = covYears
-load("NEAhadLengthAge/cov_testthat.Rda")
-expect_equal(covYearsExp,
-             covYears,tolerance = 1e-2)
+#Verify that save covaraince structures are as expected
+write_covriance_matrices(run,"NEAhadLengthAge/yearlyCov.rds")
+cov = readRDS("NEAhadLengthAge/yearlyCov.rds")
+covExp = readRDS("NEAhadLengthAge/yearlyCovExp.rds")
+expect_equal(cov,
+             covExp,tolerance = 1e-2)
 
 
 #Reduce complexity for time efficency
@@ -74,14 +73,14 @@ conf_alk$spatial = 0
 runSimpler = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 
-#test simulation
+#Test simulation
 set.seed(1)
 sim = simStudy(runSimpler,nsim = 1)
 objectiveSimExp = sim[[1]]$opt$objective
 resultsOut$objectiveSimExp = objectiveSimExp
 expect_equal(resultsOut$objectiveSimExp, resultsExp$objectiveSimExp,tolerance = 1e-4)
 
-#test jitter
+#Test jitter
 set.seed(1)
 jj = jit(runSimpler,njit = 1)
 resultsJitter = jj$maxVecAll
@@ -99,6 +98,7 @@ test_that("Plot runs without error", {
   expect_silent(plotResults(run, what = "ALK", year = 2020))
   expect_silent(plotResults(run, what = "space",year = 2020, age = 5))
   expect_silent(plotResults(run, what = "space", year = 2020, length = 40))
+  expect_silent(plotResults(run, what = "variance"))
 })
 
 
@@ -109,7 +109,10 @@ if(FALSE){
                     par = par,
                     objectiveSimExp = objectiveSimExp)
   save(resultsExp,file = "NEAhadLengthAge/resultsExp.RData")
-  saveIndex(run,file = "testthatExp.txt", folder = "NEAhadLengthAge/")
+
+  write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileExp.dat", name = "nameOfSurvey",digits = 0)
+  write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileVarExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
+  write_covriance_matrices(run,"NEAhadLengthAge/yearlyCovExp.rds")
 
   resultsJitterExp = resultsJitter
   save(resultsJitterExp,file = "NEAhadLengthAge/resultsJitterExp.RData")

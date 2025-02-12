@@ -33,28 +33,19 @@ resultsOut = list(objectiveExp = objectiveExp,
                   rlIndexSd = rlIndexSd,
                   par = par)
 
-
+#Verify all indices-at-length and parameters are as expected
 load("NDSKpandLength/resultsExp.RData")
 expect_equal(resultsOut$objectiveExp, resultsExp$objectiveExp,tolerance = 1e-4)
 expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-2)
 expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-2)
 expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-2)
 
+#Verify that the two-stage approach leads to the same objective
 runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncertainty = TRUE,silent = TRUE)
 expect_equal(runTwoStage$opt$objective, resultsExp$objectiveExp,tolerance = 1e-4)
 
 
-saveIndex(run,file = "testthat.txt", folder = "NDSKpandLength/")
-expect_equal(read.table("NDSKpandLength/testthat.txt"),
-             read.table("NDSKpandLength/testthatExp.txt"),tolerance = 1e-2)
-expect_equal(read.table("NDSKpandLength/sdtestthat.txt"),
-             read.table("NDSKpandLength/sdtestthatExp.txt"),tolerance = 1e-2)
-#Verify that saved correlation structures are not changed
-load("NDSKpandLength/cov_testthatExp.Rda")
-covYearsExp = covYears
-load("NDSKpandLength/cov_testthat.Rda")
-expect_equal(covYearsExp,
-             covYears,tolerance = 1e-2)
+#TODO: check "write_indices_ICES_format" and "write_covriance_matrices" for indices-at-length
 
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
@@ -62,7 +53,5 @@ if(FALSE){
                     rlIndexSd = rlIndexSd,
                     par = par)
   save(resultsExp,file = "NDSKpandLength/resultsExp.RData")
-
-  saveIndex(run,file = "testthatExp.txt", folder = "NDSKpandLength/")
 }
 
