@@ -96,6 +96,7 @@ expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
 #Test no errors in plots
 test_that("Plot runs without error", {
   expect_silent(plotResults(run, what = "ALK", year = 2020))
+  expect_silent(plotResults(run, what = "ALK", year = 2020, lon_lat = c(13,78)))
   expect_silent(plotResults(run, what = "space",year = 2020, age = 5))
   expect_silent(plotResults(run, what = "space", year = 2020, length = 40))
   expect_silent(plotResults(run, what = "variance"))
