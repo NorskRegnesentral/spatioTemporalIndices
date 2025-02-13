@@ -1,7 +1,7 @@
 Package: spatioTemporalIndices
 Type: Package
 Title: Spatio-temporal abundance indices-at-lenght and indices-at-age
-Version: 1.1.4
+Version: 1.2.1
 Authors@R: c(person(c("Olav","Nikolai"), "Breivik",role=c("aut","cre"), email="olavbr@nr.no"),
 	    person("Fredrik","Aanes",role="aut"),
             person("Fabian", "Zimmermann", role="aut", email="fabian.zimmermann@hi.no"))
