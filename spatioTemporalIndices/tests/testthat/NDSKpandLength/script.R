@@ -45,7 +45,14 @@ runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncerta
 expect_equal(runTwoStage$opt$objective, resultsExp$objectiveExp,tolerance = 1e-4)
 
 
-#TODO: check "write_indices_ICES_format" and "write_covriance_matrices" for indices-at-length
+#Verify that save covaraince structures are as expected
+write_covariance_matrices(run,"NDSKpandLength/yearlyCov.rds")
+cov = readRDS("NDSKpandLength/yearlyCov.rds")
+covExp = readRDS("NDSKpandLength/yearlyCovExp.rds")
+expect_equal(cov,
+             covExp,tolerance = 1e-3)
+#TODO: check "write_indices_ICES_format" for indices-at-length.
+
 
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
@@ -53,5 +60,7 @@ if(FALSE){
                     rlIndexSd = rlIndexSd,
                     par = par)
   save(resultsExp,file = "NDSKpandLength/resultsExp.RData")
+  write_covariance_matrices(run,"NDSKpandLength/yearlyCovExp.rds")
+
 }
 
