@@ -32,6 +32,10 @@ confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 50)
 # run model
 run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
+#Two stage age
+run_twoStage = fitModel(dat_l,conf_l, twoStage = TRUE, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+expect_equal(run$rl$logAgeIndex, run_twoStage$rl$logAgeIndex,tolerance = 1e-3)
+
 
 objectiveExp = run$opt$objective
 rlIndex = round(run$rl$logAgeIndex,5)

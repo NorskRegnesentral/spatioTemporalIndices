@@ -106,6 +106,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     if(sum(is.na(map$tan_rho_l))==0)par$tan_rho_t = 1
 
     mapStart2 = map
+    profile2 = profile
     if(conf_l$applyALK==1){#Optimal ALK model is already found
       mapStart2$beta0_alk = as.factor(pl$beta0_alk*NA)
       mapStart2$log_sigma_beta_alk = as.factor(pl$log_sigma_beta_alk*NA)
@@ -115,10 +116,14 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
       mapStart2$transRho_alk = as.factor(pl$transRho_alk*NA)
       mapStart2$xS_alk = as.factor(pl$xS_alk*NA)
       mapStart2$xST_alk = as.factor(pl$xST_alk*NA)
+      if(length(which(profile2 %in% c("beta0_alk","betaLength_alk")))>0){
+        profile2 = profile2[-which(profile2 %in% c("beta0_alk","betaLength_alk"))]
+        if(length(profile2)==0)profile2 = NULL #Profile must be NULL and not character(0)
+      }
     }
-    FreeADFun(obj)#Free memory from C-side
+    TMB::FreeADFun(obj)#Free memory from C-side
     print("Optimizing full length model, no ALK. This is the most time consuming step")
-    obj <- TMB::MakeADFun(data, par, random=random,profile = profile, DLL="spatioTemporalIndices",map = mapStart2, silent = silent)
+    obj <- TMB::MakeADFun(data, par, random=random,profile = profile2, DLL="spatioTemporalIndices",map = mapStart2, silent = silent)
     opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = trace,iter.max = 1000, eval.max = 1000))
     print("Done optimizing full length model, no ALK")
 
@@ -137,7 +142,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     plSd = as.list(rep,"Std")
     rl = as.list(rep,"Est", report = TRUE)
     rlSd = as.list(rep,"Std", report = TRUE)
-    FreeADFun(obj)#Free memory from C-side
+    TMB::FreeADFun(obj)#Free memory from C-side
     toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,
                     pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
 
