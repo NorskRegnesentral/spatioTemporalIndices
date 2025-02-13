@@ -24,13 +24,23 @@ setupData = function(dat_l,conf_l,confPred){
   #Remove too long lengths
   for(id in unique(dat_l$station)){
     index =which(dat_l$station==id & dat_l$lengthGroup>=conf_l$maxLength)
-    if(conf_l$plusGroup==1){
-      dat_l$catch[index[1]] = sum(dat_l$catch[index])
+    if(length(index)>0){
+      if(length(unique(dat_l$startdatetime[index]))>1){#More than one haul with same station id.
+        stop("Station IDs are not unique. dat_l$station must be unique for each haul.")
+      }
+      if(conf_l$plusGroup==1){
+        dat_l$catch[index[1]] = sum(dat_l$catch[index])
+      }
     }
   }
   if(length(which(dat_l$lengthGroup> conf_l$maxLength)>0)){
     dat_l = dat_l[-which(dat_l$lengthGroup> conf_l$maxLength),]
   }
+
+  if(min(tapply(dat_l$lengthGroup, dat_l$station, function(x) all(diff(x) > 0)))==0){
+    stop("Length groups are not in increasing order in dat_l")
+  }
+
 
   # Add strata polygon if none was provided
   if(is.null(conf_l$strata)) {
