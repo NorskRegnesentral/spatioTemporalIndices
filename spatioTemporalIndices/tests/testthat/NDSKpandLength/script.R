@@ -23,26 +23,35 @@ confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 20)
 # run model
 run = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
-objectiveExp = run$opt$objective
+
+
+
+objective = run$opt$objective
 rlIndex = round(run$rl$logLengthIndex,5)
 rlIndexSd = round(run$rlSd$logLengthIndex,5)
 par = round(run$opt$par,5)
 
-resultsOut = list(objectiveExp = objectiveExp,
+resultsOut = list(objective = objective,
                   rlIndex = rlIndex,
                   rlIndexSd = rlIndexSd,
                   par = par)
 
 #Verify all indices-at-length and parameters are as expected
 load("NDSKpandLength/resultsExp.RData")
-expect_equal(resultsOut$objectiveExp, resultsExp$objectiveExp,tolerance = 1e-4)
+expect_equal(resultsOut$objective, resultsExp$objective,tolerance = 1e-4)
 expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-2)
 expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-2)
 expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-2)
 
 #Verify that the two-stage approach leads to the same objective
 runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncertainty = TRUE,silent = TRUE)
-expect_equal(runTwoStage$opt$objective, resultsExp$objectiveExp,tolerance = 1e-4)
+expect_equal(runTwoStage$opt$objective, resultsExp$objective,tolerance = 1e-4)
+
+#Verify skip years
+conf_l$skipYears = 2019
+run_skip = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
+objectiveSkip = run_skip$opt$objective
+expect_equal(run_skip$opt$objective, resultsExp$objectiveSkip,tolerance = 1e-4)
 
 
 #Verify that save covaraince structures are as expected
@@ -55,10 +64,11 @@ expect_equal(cov,
 
 
 if(FALSE){
-  resultsExp = list(objectiveExp = objectiveExp,
+  resultsExp = list(objective = objective,
                     rlIndex = rlIndex,
                     rlIndexSd = rlIndexSd,
-                    par = par)
+                    par = par,
+                    objectiveSkip = objectiveSkip)
   save(resultsExp,file = "NDSKpandLength/resultsExp.RData")
   write_covariance_matrices(run,"NDSKpandLength/yearlyCovExp.rds")
 
