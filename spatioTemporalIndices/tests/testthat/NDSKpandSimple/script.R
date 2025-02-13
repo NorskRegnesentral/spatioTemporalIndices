@@ -37,10 +37,18 @@ conf_lsplineDepth = c(6,0)
 conf_l$nugget = 0
 runNoNugget = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
-resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov))
+#missing depth
+conf_l$sunAlt=c(1,0)
+conf_lsplineDepth = c(6,1)
+conf_l$nugget = 1
+dat_l$depth[which(dat_l$station==dat_l$station[1])] = NA
+runMissingDepth = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
+
+resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth))
 resultsOut$rlIndexCovariates = runCovariates$rl$logLengthIndex
 resultsOut$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
 resultsOut$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
+resultsOut$rlIndexMissingDepth = runMissingDepth$rl$logLengthIndex
 
 
 load("NDSKpandSimple/resultsExp.RData")
@@ -56,10 +64,11 @@ test_that("Plot runs without error", {
 
 
 if(FALSE){
-  resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov))
+  resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth))
   resultsExp$rlIndexCovariates = runCovariates$rl$logLengthIndex
   resultsExp$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
   resultsExp$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
+  resultsExp$rlIndexMissingDepth = runMissingDepth$rl$logLengthIndex
   save(resultsExp,file = "NDSKpandSimple/resultsExp.RData")
 }
 
