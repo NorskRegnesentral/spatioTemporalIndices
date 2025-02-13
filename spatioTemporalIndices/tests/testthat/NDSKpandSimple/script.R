@@ -27,7 +27,7 @@ runCovariates = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,si
 
 ###Length dependent covariates:
 conf_l$sunAlt=c(1,2)
-conf_lsplineDepth = c(6,2)
+conf_l$splineDepth = c(6,2)
 confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 100)
 runLenghtDepCov = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
@@ -53,6 +53,7 @@ test_that("Plot runs without error", {
   expect_silent(plotResults(runLenghtDepCov, what = "sunAlt"))
   expect_silent(plotResults(runLenghtDepCov, what = "depth"))
 })
+
 
 if(FALSE){
   resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov))
