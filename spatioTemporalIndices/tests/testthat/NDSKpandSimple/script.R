@@ -1,6 +1,7 @@
 suppressMessages(library(spatioTemporalIndices))
 
 dat_l = readRDS("NDSKpandSimple/NDSKpand2018-2020_length.rds")
+dat_l$station <- paste(format(dat_l$startdatetime,"%Y"),dat_l$station, sep = "_")
 
 conf_l = defConf(years = 2020:2020,
                dLength = 1, # length intervall in mm

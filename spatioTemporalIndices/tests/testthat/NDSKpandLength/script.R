@@ -1,6 +1,8 @@
 suppressMessages(library(spatioTemporalIndices))
 
 dat_l = readRDS("NDSKpandLength/NDSKpand2018-2020_length.rds")
+dat_l$station <- paste(format(dat_l$startdatetime,"%Y"),dat_l$station, sep = "_")
+
 
 conf_l = defConf(years = 2018:2020,
                dLength = 1, # length intervall in mm
@@ -50,7 +52,6 @@ expect_equal(runTwoStage$opt$objective, resultsExp$objective,tolerance = 1e-4)
 #Verify skip years
 conf_l$skipYears = 2019
 run_skip = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
-objectiveSkip = run_skip$opt$objective
 expect_equal(run_skip$opt$objective, resultsExp$objectiveSkip,tolerance = 1e-4)
 
 
@@ -68,7 +69,7 @@ if(FALSE){
                     rlIndex = rlIndex,
                     rlIndexSd = rlIndexSd,
                     par = par,
-                    objectiveSkip = objectiveSkip)
+                    objectiveSkip = run_skip$opt$objective)
   save(resultsExp,file = "NDSKpandLength/resultsExp.RData")
   write_covariance_matrices(run,"NDSKpandLength/yearlyCovExp.rds")
 
