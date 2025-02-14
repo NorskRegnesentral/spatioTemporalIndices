@@ -14,57 +14,71 @@
 #' @export
 setupData = function(dat_l,conf_l,confPred){
 
-  if(!(conf_l$minLength %in% dat_l$lengthGroup)){
-    stop("Set conf_l$minLength to a length that is present in the data ")
+  #Verify that conf_l$minLength and conf_l$maxLength  are present in the dat_l
+  if(!(conf_l$minLength %in% dat_l$lengthGroup & conf_l$maxLength %in% dat_l$lengthGroup )){
+    stop("conf_l$minLength and conf_l$maxLength are not present in the dat_l.")
   }
 
   #Verify that station ID's are unique
-  for(id in unique(dat_l$station)){
-    index =which(dat_l$station==id)
-    if(length(unique(dat_l$startdatetime[index]))>1){#More than one haul with same station id.
-      stop("Station ID's are not unique. dat_l$station must be unique for each haul.")
-    }
+  if(min(tapply(dat_l$startdatetime, dat_l$station, function(x) length(unique(x))==1))==0){
+    stop("Station ID's are not unique. dat_l$station must be unique for each haul.")
   }
 
   #Verify that length groups are given in increasing order
   if(min(tapply(dat_l$lengthGroup, dat_l$station, function(x) all(diff(x) > 0)))==0){
-    stop("Length groups are not in increasing order in dat_l")
+    stop("Length groups are not in increasing order in dat_l.")
   }
 
-  #Verify that length groups are given in increasing order
+  #Verify that all length group observations are given
+  if(length(unique(tapply(dat_l$lengthGroup, dat_l$station, function(x) length(x))))!=1){
+    stop("Some length group observations are missing in a haul. All observations of length groups needs to be present in dat_l. Set catch to 0 if that was the case.")
+  }
+
+  #Length group width in data and in conf_l$dLength correspond
   deltaLengthInData = unique(unlist(tapply(dat_l$lengthGroup, dat_l$station, function(x) diff(x))))
   if( length(deltaLengthInData)>1 | deltaLengthInData != conf_l$dLength){
-    stop("Length group width in data and in conf_l$dLength do not correspond")
+    stop("Length group width in data and in conf_l$dLength do not correspond.")
   }
 
+  #Verify that no catch is negative
   if(min(dat_l$catch)<0){
-    stop("Negative catch in dat_l$catch")
+    stop("Negative catch in dat_l$catch.")
   }
 
+  #Verify that no NA's are present in catch
   if(sum(is.na(dat_l$catch))>0){
-    stop("NA in dat_l$catch, not yet implemented functionality for missing catches of length groups within haul")
+    stop("NA in dat_l$catch, not yet implemented functionality for missing catches of length groups within haul.")
   }
 
+  #Verify that no distance is negative
   if(min(dat_l$distance)<0){
-    stop("Negative distance in dat_l$distance")
+    stop("Negative distance in dat_l$distance.")
+  }
+
+  #Verify that year span in conf_l corresponds with dat_l
+  yearVerify = as.integer(format(dat_l$startdatetime, format = "%Y"))
+  if(min(conf_l$years) < min(yearVerify) | max(conf_l$years) > max(yearVerify)){
+    stop("Year span in conf_l is outside of year span in dat_l. ")
   }
 
   #Remove too short lengths
-  dat_l = dat_l[dat_l$lengthGroup>=conf_l$minLength,]
-
+  if(conf_l$minLength != min(dat_l$lengthGroup)){
+    dat_l = dat_l[dat_l$lengthGroup>=conf_l$minLength,]
+  }
   #Remove too long lengths
-  for(id in unique(dat_l$station)){
-    index =which(dat_l$station==id & dat_l$lengthGroup>=conf_l$maxLength)
-    if(length(index)>0){
-      if(conf_l$plusGroup==1){
+  if(conf_l$maxLength != max(dat_l$lengthGroup)){
+    if(conf_l$plusGroup==1){
+      for(id in unique(dat_l$station)){
+        index =which(dat_l$station==id & dat_l$lengthGroup>=conf_l$maxLength)
         dat_l$catch[index[1]] = sum(dat_l$catch[index])
       }
     }
-  }
-  if(length(which(dat_l$lengthGroup> conf_l$maxLength)>0)){
     dat_l = dat_l[-which(dat_l$lengthGroup> conf_l$maxLength),]
   }
 
+  #Remove observations in years not used
+  dat_l$year = as.integer(format(dat_l$startdatetime, format = "%Y"))
+  dat_l = dat_l[dat_l$year %in% conf_l$years, ]
 
   # Add strata polygon if none was provided
   if(is.null(conf_l$strata)) {
@@ -83,9 +97,6 @@ setupData = function(dat_l,conf_l,confPred){
   dat_l$UTMX = locUTM[,1]
   dat_l$UTMY = locUTM[,2]
 
-  #Remove observations in years not used
-  dat_l$year = as.integer(format(dat_l$startdatetime, format = "%Y"))
-  dat_l = dat_l[dat_l$year %in% conf_l$years, ]
 
   #Set up structure used for the SPDE-procedure
   meshS=createMesh(conf_l)$mesh

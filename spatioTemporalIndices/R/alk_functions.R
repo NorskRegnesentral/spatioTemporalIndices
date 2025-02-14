@@ -11,13 +11,11 @@
 ##' @export
 setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
 
-  for(id in unique(dat_alk$station)){
-    index =which(dat_alk$station==id)
-    if(length(unique(dat_alk$startdatetime[index]))>1){#More than one haul with same station id.
-      stop("Station IDs are not unique. dat_alk$station must be unique for each haul.")
-    }
-  }
 
+  #Verify that station ID's are unique
+  if(min(tapply(dat_alk$startdatetime, dat_alk$station, function(x) length(unique(x))==1))==0){
+    stop("Station ID's are not unique. dat_alk$station must be unique for each haul.")
+  }
 
   #Only use relevant years
   dat_alk$year = as.integer(format(dat_alk$startdatetime, format = "%Y"))
