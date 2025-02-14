@@ -45,18 +45,38 @@ conf_l$nugget = 1
 dat_l$depth[which(dat_l$station==dat_l$station[1])] = NA
 runMissingDepth = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
-resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth))
+#Test no reduced latent space
+conf_l = defConf(years = 2018:2020,
+                 dLength = 1, # length intervall in mm
+                 maxLength = 20, # Numeric = use directly; NULL = use input data to determine
+                 minLength = 15, # Numeric = use directly; NULL = use input data to determine
+                 cutoff = 20,
+                 spatioTemporal = 2,
+                 nugget = 1,
+                 spatial = 1,
+                 reduceLength = 1,
+                 rwBeta0 = 0,
+                 stratasystem = list(dsn="NDSKpandSimple/strata/", layer = "shrimp_areas_NSSK"),
+                 trawlWidth=11.7,
+                 applyALK=0)
+runNoReducedSpace = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = FALSE)
+
+
+resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth,runNoReducedSpace))
 resultsOut$rlIndexCovariates = runCovariates$rl$logLengthIndex
 resultsOut$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
 resultsOut$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
 resultsOut$rlIndexMissingDepth = runMissingDepth$rl$logLengthIndex
+resultsOut$rlIndexNoReducedSpace = runNoReducedSpace$rl$logLengthIndex
 
 
 load("NDSKpandSimple/resultsExp.RData")
-expect_equal(resultsOut$objectiveExp, resultsExp$objectiveExp,tolerance = 1e-4)
+expect_equal(resultsOut$AIC, resultsExp$AIC,tolerance = 1e-4)
 expect_equal(resultsOut$rlIndexCovariates, resultsExp$rlIndexCovariates,tolerance = 1e-2)
 expect_equal(resultsOut$rlIndexLenghtDepCov, resultsExp$rlIndexLenghtDepCov,tolerance = 1e-2)
 expect_equal(resultsOut$rlIndexNoNugget, resultsExp$rlIndexNoNugget,tolerance = 1e-2)
+expect_equal(resultsOut$rlIndexMissingDepth, resultsExp$rlIndexMissingDepth,tolerance = 1e-2)
+expect_equal(resultsOut$rlIndexNoReducedSpace, resultsExp$rlIndexNoReducedSpace,tolerance = 1e-2)
 
 test_that("Plot runs without error", {
   expect_silent(plotResults(runLenghtDepCov, what = "sunAlt"))
@@ -65,11 +85,12 @@ test_that("Plot runs without error", {
 
 
 if(FALSE){
-  resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth))
+  resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth,runNoReducedSpace))
   resultsExp$rlIndexCovariates = runCovariates$rl$logLengthIndex
   resultsExp$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
   resultsExp$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
   resultsExp$rlIndexMissingDepth = runMissingDepth$rl$logLengthIndex
+  resultsExp$rlIndexNoReducedSpace = runNoReducedSpace$rl$logLengthIndex
   save(resultsExp,file = "NDSKpandSimple/resultsExp.RData")
 }
 
