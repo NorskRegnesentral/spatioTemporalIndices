@@ -27,9 +27,16 @@ write_indices_ICES_format = function(run,file,name,sdrep_bc = NULL,variance = FA
 
   writeLines(header_lines, file)
 
-  indices = round(exp(run$rl$logAgeIndex)[,-1],digits) #Remove youngest age that we needed when calculating the ALK
-  logIndicesVar = round((run$rlSd$logAgeIndex)[,-1]^2,digits)
-  logIndicesVar = signif(logIndicesVar,digits = digits)
+  if(run$conf_alk$minAge== min(run$dat_alk$age)){
+    indices = round(exp(run$rl$logAgeIndex),digits)
+    logIndicesVar = round((run$rlSd$logAgeIndex)^2,digits)
+    logIndicesVar = signif(logIndicesVar,digits = digits)
+  }else{#Youngest age is not in index, but was needed for calculating the ALK
+    indices = round(exp(run$rl$logAgeIndex)[,-1],digits)
+    logIndicesVar = round((run$rlSd$logAgeIndex)[,-1]^2,digits)
+    logIndicesVar = signif(logIndicesVar,digits = digits)
+  }
+
 
   if(variance){
     write.table(logIndicesVar, file, append = TRUE, col.names = FALSE,
@@ -59,8 +66,10 @@ write_covariance_matrices = function(run, file){
       covYears[[i]] = cov[id,id]
       rownames(covYears[[i]]) = ageRange[1]:ageRange[2]
       colnames(covYears[[i]]) = ageRange[1]:ageRange[2]
-      covYears[[i]] = covYears[[i]][-1,]
-      covYears[[i]] = covYears[[i]][,-1]
+      if(run$conf_alk$minAge!= min(run$dat_alk$age)){
+        covYears[[i]] = covYears[[i]][-1,]
+        covYears[[i]] = covYears[[i]][,-1]
+      }
     }
   }else{
     id = which(names(run$rep$value)=="logLengthIndex")
@@ -70,7 +79,6 @@ write_covariance_matrices = function(run, file){
     for(i in 1:length(run$conf_l$years)){
       id = i + (0:(run$data$numberOfLengthGroups-1))*length(run$conf_l$years)
       covYears[[i]] = cov[id,id]
-      covYears[[i]] = covYears[[i]]
     }
   }
 
