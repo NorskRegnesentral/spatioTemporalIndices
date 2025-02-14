@@ -107,13 +107,20 @@ test_that("Plot runs without error", {
   expect_silent(plotResults(run, what = "correlation"))
 })
 
+#Test no readability
+dat_alk$readability = NULL
+conf_alk$readability= 0
+runNoReadability = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+expect_equal(runNoReadability$opt$objective, resultsExp$objectiveNoReadability,tolerance = 1e-4)
+
 
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
                     rlIndex = rlIndex,
                     rlIndexSd = rlIndexSd,
                     par = par,
-                    objectiveSimExp = objectiveSimExp)
+                    objectiveSimExp = objectiveSimExp,
+                    objectiveNoReadability = runNoReadability$opt$objective)
   save(resultsExp,file = "NEAhadLengthAge/resultsExp.RData")
 
   write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileExp.dat", name = "nameOfSurvey",digits = 0)
