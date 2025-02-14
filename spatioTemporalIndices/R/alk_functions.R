@@ -7,6 +7,9 @@
 ##' @param conf_alk  configurations for age-at-length model
 ##' @param conf_l  configurations for length-at-age model
 ##' @details Prepare data list for the age part. This data-list will be merged with the length data-list later.
+##'
+##' The column dat_alk$readability provides information about what dat_alk$age refers to. If dat_alk$readability is missing, all ages are assumed to be measured correctly. If provided; 1: The corresponding age is assumed to be measured correctly. 5: The corresponding age is either dat_alk$age or dat_alk$age + 1.  6: the age is either dat_alk$age or dat_alk$age - 1. Any other number: Age information is not used
+##'
 ##' @return Data to be provided to TMB
 ##' @export
 setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
@@ -17,13 +20,24 @@ setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
     stop("Station ID's are not unique. dat_alk$station must be unique for each haul.")
   }
 
+  #Verify that conf$minAge and conf$maxAge corresponds with what is in data
+  if(min(dat_alk$age)> conf_alk$minAge){
+    stop("conf_alk$minAge is less than any age in the dat_alk.")
+  }
+  if(max(dat_alk$age)< conf_alk$maxAge){
+    stop("conf_alk$maxAge is larger than any age in the dat_alk.")
+  }
+
   #Only use relevant years
   dat_alk$year = as.integer(format(dat_alk$startdatetime, format = "%Y"))
   dat_alk = dat_alk[which(dat_alk$year %in%conf_alk$years),]
 
-  #Use age reading quality if false
-  if(conf_alk$readability==0){#Do not utilize age reading quality
-    dat_alk$readability[dat_alk$readability==5 | dat_alk$readability==6] = 1
+  #Set age reading quality to 1 if not given.
+  if(is.null(dat_alk$readability)){
+    dat_alk$readability = rep(1,dim(dat_alk)[1])
+  }
+  if(conf_alk$readability==0){#Do not use age reading quality.
+    dat_alk$readability[dat_alk$readability==1 | dat_alk$readability==5 | dat_alk$readability==6] = 1
   }
 
   #Truncate age

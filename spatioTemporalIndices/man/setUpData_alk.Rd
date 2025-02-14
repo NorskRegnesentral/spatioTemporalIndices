@@ -21,4 +21,6 @@ Set up age data in the format needed by TMB.
 }
 \details{
 Prepare data list for the age part. This data-list will be merged with the length data-list later.
+
+The column dat_alk$readability provides information about what dat_alk$age refers to. If dat_alk$readability is missing, all ages are assumed to be measured correctly. If provided; 1: The corresponding age is assumed to be measured correctly. 5: The corresponding age is either dat_alk$age or dat_alk$age + 1.  6: the age is either dat_alk$age or dat_alk$age - 1. Any other number: Age information is not used
 }
