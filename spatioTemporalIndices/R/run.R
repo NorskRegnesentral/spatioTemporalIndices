@@ -35,6 +35,9 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     if(is.null(dat_alk))stop("Needs age data")
     #Set up data
     conf_alk$meshSimilar = TRUE #Apply same mesh as used for length
+    if(is.null(conf_l$zone)){#Survey domain and zone was generated in setupData() and need the updated conf_l from that function
+      conf_l = attributes(data_l)$conf_l
+    }
     conf_alk$zone = conf_l$zone #Apply same UTM center
     conf_alk$years= conf_l$years #Apply same year range
     data_alk = setUpData_alk(dat_alk,conf_alk,conf_l)

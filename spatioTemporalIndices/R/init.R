@@ -41,9 +41,9 @@ setPar <- function(data,conf){
     parameters = includeDummyPar(parameters)
   }
 
-  if(conf$obsModel==3 & conf$zeroInflated==0){
-    parameters$tweedieP = 0
-  }
+#  if(conf$obsModel==3 & conf$zeroInflated==0){
+#    parameters$tweedieP = 0
+#  }
 
   return(parameters)
 }

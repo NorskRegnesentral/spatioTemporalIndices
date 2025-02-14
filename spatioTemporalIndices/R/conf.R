@@ -118,7 +118,11 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 ##' @export
 defConfPred <- function(conf,cellsize=20,Depth="Data"){
   confPred = list()
-  confPred$Strata=1:conf$strata_number
+  if(!is.null(conf$strata_number)){
+    confPred$Strata=1:conf$strata_number
+  }else{
+    confPred$Strata=1
+  }
   confPred$cellsize = cellsize
   confPred$Depth = Depth
   return(confPred)

@@ -34,7 +34,7 @@ setupData = function(dat_l,conf_l,confPred){
     stop("Some length group observations are missing in a haul. All observations of length groups needs to be present in dat_l. Set catch to 0 if that was the case.")
   }
 
-  #Length group width in data and in conf_l$dLength correspond
+  #Verify that all length group widths in data and in conf_l$dLength correspond
   deltaLengthInData = unique(unlist(tapply(dat_l$lengthGroup, dat_l$station, function(x) diff(x))))
   if( length(deltaLengthInData)>1 | deltaLengthInData != conf_l$dLength){
     stop("Length group width in data and in conf_l$dLength do not correspond.")
@@ -81,7 +81,7 @@ setupData = function(dat_l,conf_l,confPred){
   dat_l = dat_l[dat_l$year %in% conf_l$years, ]
 
   # Add strata polygon if none was provided
-  if(is.null(conf_l$strata)) {
+  if(class(conf_l$strata)[1]!="sf") {
      hullpol = sf::st_convex_hull(sf::st_union(sf::st_as_sf(dat_l,coords=c("longitude","latitude"),crs="+proj=longlat")))
      conf_l$strata = sf::st_as_sf(hullpol)
      conf_l$strata$id = 1
@@ -113,9 +113,8 @@ setupData = function(dat_l,conf_l,confPred){
   locObs = cbind(dat_l$UTMX[singleHauls],dat_l$UTMY[singleHauls])
   locObsLatLon= cbind(dat_l$longitude[singleHauls],dat_l$latitude[singleHauls])
   depth = dat_l$depth[singleHauls]
-  date =  format(dat_l$startdatetime,format="%d;%m;%Y")[singleHauls]
 
-  fishObs=dat_l$catch
+  obsVector=dat_l$catch
 
   DateTime = dat_l$startdatetime[singleHauls]
   lat = dat_l$latitude[singleHauls]; lon = dat_l$longitude[singleHauls]
@@ -159,7 +158,7 @@ setupData = function(dat_l,conf_l,confPred){
   depth[depth>conf_l$maxDepth]=conf_l$maxDepth
 
 
-  fishObsMatrix = t(matrix(fishObs,nrow = length(conf_l$lengthGroups)))#length(unique(dat_l$Station)))
+  fishObsMatrix = t(matrix(obsVector,nrow = length(conf_l$lengthGroups)))#length(unique(dat_l$Station)))
   colnames(fishObsMatrix) = as.character(seq(min(conf_l$lengthGroups),max(conf_l$lengthGroups),by = conf_l$dLength))
   rownames(fishObsMatrix) = paste0(yearObs,"-",station)
 
@@ -171,7 +170,7 @@ setupData = function(dat_l,conf_l,confPred){
     sunAltFormula = as.formula(paste( "fishObsMatrix ~ sin+cos"))
     sunAltFormulaIntRep = as.formula(paste( "sunAlt ~ sin+cos"))
   }else{
-    stop("To many basis in Fourier approximation of sun heigth effect.")
+    stop("Maximum one basis in Fourier approximation of sun heigth effect.")
   }
 
 
@@ -241,15 +240,14 @@ setupData = function(dat_l,conf_l,confPred){
   strata_utm <- sf::st_transform(conf_l$strata,crs=paste0("+proj=utm +zone=",conf_l$zone," +datum=WGS84"))
   areas <- as.numeric(sf::st_area(strata_utm))*(1/1.852)^2/1000000
 
-  #Include observations as a vector (needed for keep functionality)
-  obsVector = apply(fishObsMatrix, 1, rbind)
+  #Bookkeeping to track which elements in obsVector belong to a single haul
   idxStart = seq(0,length(fishObsMatrix), by = dim(fishObsMatrix)[2])
 
   data <- list(A_ListS = A_ListS,
                A_ListST = A_ListST,
                dist = dist,
                fishObsMatrix = fishObsMatrix,
-               obsVector = fishObs,#obsVector,
+               obsVector = obsVector,
                idxStart = idxStart,
                numberOfLengthGroups=length(conf_l$lengthGroups),
                spdeMatricesS = spdeMatricesS,
@@ -295,6 +293,7 @@ setupData = function(dat_l,conf_l,confPred){
   attributes(data)$depth = depth #Used when constructing integration points
   attributes(data)$X_sunAltIntegrate = X_sunAltIntegrate #Used when constructing integration points
   attributes(data)$sunAltTrans = sunAltTrans
+  attributes(data)$conf_l = conf_l
 
   #Include integration points
   data = includeIntPoints(data,conf_l,confPred, gamSetup_depth)
