@@ -113,6 +113,21 @@ conf_alk$readability= 0
 runNoReadability = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
 expect_equal(runNoReadability$opt$objective, resultsExp$objectiveNoReadability,tolerance = 1e-4)
 
+#Test write_indices and write_covaraince when conf_alk$minAge equals min(dat_alk$age)
+conf_alk$minAge = min(dat_alk$age)
+runMinALK = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileMA.dat", name = "nameOfSurvey",digits = 0)
+write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileVarMA.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
+expect_equal(readLines("NEAhadLengthAge/indexFileMA.dat"),
+             readLines("NEAhadLengthAge/indexFileMAExp.dat"))
+expect_equal(readLines("NEAhadLengthAge/indexFileVarMA.dat"),
+             readLines("NEAhadLengthAge/indexFileVarMAExp.dat"))
+write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMA.rds")
+cov = readRDS("NEAhadLengthAge/yearlyCovMA.rds")
+covExp = readRDS("NEAhadLengthAge/yearlyCovMAExp.rds")
+expect_equal(cov,
+             covExp,tolerance = 1e-2)
+
 
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
@@ -126,6 +141,10 @@ if(FALSE){
   write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileExp.dat", name = "nameOfSurvey",digits = 0)
   write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileVarExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
   write_covariance_matrices(run,"NEAhadLengthAge/yearlyCovExp.rds")
+
+  write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileMAExp.dat", name = "nameOfSurvey",digits = 0)
+  write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileVarMAExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
+  write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMAExp.rds")
 
   resultsJitterExp = resultsJitter
   save(resultsJitterExp,file = "NEAhadLengthAge/resultsJitterExp.RData")
