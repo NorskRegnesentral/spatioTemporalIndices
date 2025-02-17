@@ -14,7 +14,7 @@ conf_l = defConf(years = 2020:2020,
                sunAlt=c(1,1),
                splineDepth = c(6,1),
                reduceLength = 3,
-               rwBeta0 = 1,
+               rwBeta0 = 0,
                stratasystem = list(dsn="NDSKpandSimple/strata/", layer = "shrimp_areas_NSSK"),
                minDepth=50,maxDepth=600,
                trawlWidth=11.7,
@@ -27,10 +27,10 @@ confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cel
 runCovariates = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 ###Length dependent covariates:
+confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 100)
 conf_l$sunAlt=c(1,2)
 conf_l$splineDepth = c(6,2)
-confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 100)
-runLenghtDepCov = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
+runLenghtDepCov = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = FALSE)
 
 #no Nugget
 conf_l$sunAlt=c(1,0)
