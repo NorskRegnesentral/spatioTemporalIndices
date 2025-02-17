@@ -124,28 +124,23 @@ template <class Type>
       SparseMatrix<Type> As = A_ListS(y);
       SparseMatrix<Type> Ast = A_ListST(y);
       //Latent effects contribution
-      if(dat.lengthGroupsReduced(0)==dat.lengthGroupsReduced(1)){ //Length dimension is reduced
-        for(int l=0; l <dat.numberOfLengthGroups;++l){
-          deltaS = As * par.xS.col(dat.lengthGroupsReduced(l)).matrix();
+      for(int l=0; l <dat.numberOfLengthGroups;++l){
+        deltaS = As * par.xS.col(dat.lengthGroupsReduced(l)).matrix();
+        deltaST = Ast * par.xST.col(dat.lengthGroupsReduced(l)).col(y).matrix();
+        if((dat.lengthGroupsReduced(0)==dat.lengthGroupsReduced(1)) & (dat.weigthLength(l)<0.9999)){ //Length dimension is reduced and there exists longer length in dat.lengthGroupsReduced
           deltaS2 = As * par.xS.col(dat.lengthGroupsReduced(l)+1).matrix();
-          deltaST = Ast * par.xST.col(dat.lengthGroupsReduced(l)).col(y).matrix();
           deltaST2 = Ast * par.xST.col(dat.lengthGroupsReduced(l)+1).col(y).matrix();
           for(int s=0; s<dat.nStationsEachYear(y);++s){
             deltaMatrixS(l,s) = dat.weigthLength(l)*deltaS(s) + (1-dat.weigthLength(l))*deltaS2(s);
             deltaMatrixST(l,s) = dat.weigthLength(l)*deltaST(s) + (1-dat.weigthLength(l))*deltaST2(s);
           }
-        }
-      }else{
-        for(int l=0; l <dat.numberOfLengthGroups;++l){
-          deltaS = As * par.xS.col(dat.lengthGroupsReduced(l)).matrix();
-          deltaST = Ast * par.xST.col(dat.lengthGroupsReduced(l)).col(y).matrix();
+        }else{
           for(int s=0; s<dat.nStationsEachYear(y);++s){
             deltaMatrixS(l,s) = deltaS(s);
             deltaMatrixST(l,s) = deltaST(s);
           }
         }
       }
-
 //      Type muZero = 0;//Used if applying zero inflation
 //      Type pZero = 0;//Used if applying zero inflation
 //      Type pPos = 0;//Used if applying zero inflation

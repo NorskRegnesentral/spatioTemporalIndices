@@ -10,8 +10,9 @@
 setPar <- function(data,conf){
 
   if(conf$lengthGroupsReduced[1] == conf$lengthGroupsReduced[2]){ #Latent effect when reducing length dimension
-    xS = array(0.0, dim = c(dim(data$A_ListS[[1]])[2],NumberOfLengthGroups=max(conf$lengthGroupsReduced)+1))
-    xST = array(0.0, dim = c(dim(data$A_ListST[[1]])[2],length(conf$years),NumberOfLengthGroups=max(conf$lengthGroupsReduced)+1))
+    l = length(conf$lengthGroupsReduced)
+    xS = array(0.0, dim = c(dim(data$A_ListS[[1]])[2],NumberOfLengthGroups=conf$lengthGroupsReduced[l-1] + 1))
+    xST = array(0.0, dim = c(dim(data$A_ListST[[1]])[2],length(conf$years),NumberOfLengthGroups=conf$lengthGroupsReduced[l-1] + 1))
   }else{
     xS = array(0.0, dim = c(dim(data$A_ListS[[1]])[2],NumberOfLengthGroups=max(conf$lengthGroupsReduced)))
     xST = array(0.0, dim = c(dim(data$A_ListST[[1]])[2],length(conf$years),NumberOfLengthGroups=max(conf$lengthGroupsReduced)))

@@ -51,7 +51,7 @@ template <class Type>
     for(int y=0; y<nYears; ++y){
       for(int l =0; l<numberOfLengthGroups; ++l){
         Type covariatesConvexW = (numberOfLengthGroups-l-1)/(numberOfLengthGroups-1);
-        if(dat.lengthGroupsReduced(0)==dat.lengthGroupsReduced(1)){
+        if((dat.lengthGroupsReduced(0)==dat.lengthGroupsReduced(1)) & (dat.weigthLength(l)<0.9999)){//Exists longer length in dat.lengthGroupsReduced
           deltaPredS = dat.weigthLength(l)*dat.ApredS * par.xS.col(dat.lengthGroupsReduced(l)).matrix()+
             (1-dat.weigthLength(l))*dat.ApredS * par.xS.col(dat.lengthGroupsReduced(l)+1).matrix();
           deltaPredST = dat.weigthLength(l)*dat.ApredST * par.xST.col(dat.lengthGroupsReduced(l)).col(y).matrix()+
