@@ -49,8 +49,8 @@ resultsOut = list(logAgeIndex = rlALK_bc$logAgeIndex,
                   logLengthIndex = rl_bc$logLengthIndex)
 
 load("NEAhadLengthAgePosteriorMean/resultsExp.RData")
-expect_equal(resultsOut$logAgeIndex, resultsExp$logAgeIndexExp,tolerance = 1e-2)
-expect_equal(resultsOut$logLengthIndex, resultsExp$logLengthIndexExp,tolerance = 1e-2)
+expect_equal(resultsOut$logAgeIndex, resultsExp$logAgeIndexExp,tolerance = 1e-3)
+expect_equal(resultsOut$logLengthIndex, resultsExp$logLengthIndexExp,tolerance = 1e-3)
 
 if(FALSE){
   resultsExp = list(logAgeIndexExp = rlALK_bc$logAgeIndex,

@@ -38,9 +38,9 @@ expect_equal(run$rl$logAgeIndex, run_twoStage$rl$logAgeIndex,tolerance = 1e-3)
 
 
 objectiveExp = run$opt$objective
-rlIndex = round(run$rl$logAgeIndex,5)
-rlIndexSd = round(run$rlSd$logAgeIndex,5)
-par = round(run$opt$par,5)
+rlIndex = run$rl$logAgeIndex
+rlIndexSd = run$rlSd$logAgeIndex
+par = run$opt$par
 
 resultsOut = list(objectiveExp = objectiveExp,
                   rlIndex = rlIndex,
@@ -51,9 +51,9 @@ resultsOut = list(objectiveExp = objectiveExp,
 #Verify all indices and parameters are as expected
 load("NEAhadLengthAge/resultsExp.RData")
 expect_equal(resultsOut$objectiveExp, resultsExp$objectiveExp,tolerance = 1e-4)
-expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-2)
-expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-2)
+expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-3)
+expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-3)
 
 #Verify that save indices on ICES-format are as expected
 write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFile.dat", name = "nameOfSurvey",digits = 0)
@@ -68,7 +68,7 @@ write_covariance_matrices(run,"NEAhadLengthAge/yearlyCov.rds")
 cov = readRDS("NEAhadLengthAge/yearlyCov.rds")
 covExp = readRDS("NEAhadLengthAge/yearlyCovExp.rds")
 expect_equal(cov,
-             covExp,tolerance = 1e-2)
+             covExp,tolerance = 1e-3)
 
 
 #Reduce complexity for time efficency
@@ -126,7 +126,7 @@ write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMA.rds")
 cov = readRDS("NEAhadLengthAge/yearlyCovMA.rds")
 covExp = readRDS("NEAhadLengthAge/yearlyCovMAExp.rds")
 expect_equal(cov,
-             covExp,tolerance = 1e-2)
+             covExp,tolerance = 1e-3)
 
 
 if(FALSE){

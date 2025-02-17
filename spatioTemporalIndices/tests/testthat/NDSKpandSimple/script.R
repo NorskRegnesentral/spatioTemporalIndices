@@ -59,7 +59,7 @@ conf_l = defConf(years = 2018:2020,
                  stratasystem = list(dsn="NDSKpandSimple/strata/", layer = "shrimp_areas_NSSK"),
                  trawlWidth=11.7,
                  applyALK=0)
-runNoReducedSpace = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = FALSE)
+runNoReducedSpace = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 
 resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth,runNoReducedSpace))
@@ -72,11 +72,11 @@ resultsOut$rlIndexNoReducedSpace = runNoReducedSpace$rl$logLengthIndex
 
 load("NDSKpandSimple/resultsExp.RData")
 expect_equal(resultsOut$AIC, resultsExp$AIC,tolerance = 1e-4)
-expect_equal(resultsOut$rlIndexCovariates, resultsExp$rlIndexCovariates,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexLenghtDepCov, resultsExp$rlIndexLenghtDepCov,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexNoNugget, resultsExp$rlIndexNoNugget,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexMissingDepth, resultsExp$rlIndexMissingDepth,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexNoReducedSpace, resultsExp$rlIndexNoReducedSpace,tolerance = 1e-2)
+expect_equal(resultsOut$rlIndexCovariates, resultsExp$rlIndexCovariates,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexLenghtDepCov, resultsExp$rlIndexLenghtDepCov,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexNoNugget, resultsExp$rlIndexNoNugget,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexMissingDepth, resultsExp$rlIndexMissingDepth,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexNoReducedSpace, resultsExp$rlIndexNoReducedSpace,tolerance = 1e-3)
 
 test_that("Plot runs without error", {
   expect_silent(plotResults(runLenghtDepCov, what = "sunAlt"))
