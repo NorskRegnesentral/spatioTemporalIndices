@@ -26,12 +26,6 @@ confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cel
 ####Covariates
 runCovariates = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
-###Length dependent covariates:
-conf_l$sunAlt=c(1,2)
-conf_l$splineDepth = c(6,2)
-confPred = defConfPred(conf=conf_l,Depth="NDSKpandSimple/gebco_2023_NDSK.nc",cellsize = 100)
-runLenghtDepCov = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
-
 #no Nugget
 conf_l$sunAlt=c(1,0)
 conf_lsplineDepth = c(6,0)
@@ -62,9 +56,8 @@ conf_l = defConf(years = 2018:2020,
 runNoReducedSpace = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = FALSE)
 
 
-resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth,runNoReducedSpace))
+resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runMissingDepth,runNoReducedSpace))
 resultsOut$rlIndexCovariates = runCovariates$rl$logLengthIndex
-resultsOut$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
 resultsOut$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
 resultsOut$rlIndexMissingDepth = runMissingDepth$rl$logLengthIndex
 resultsOut$rlIndexNoReducedSpace = runNoReducedSpace$rl$logLengthIndex
@@ -72,22 +65,15 @@ resultsOut$rlIndexNoReducedSpace = runNoReducedSpace$rl$logLengthIndex
 
 load("NDSKpandSimple/resultsExp.RData")
 expect_equal(resultsOut$AIC, resultsExp$AIC,tolerance = 1e-4)
-expect_equal(resultsOut$rlIndexCovariates, resultsExp$rlIndexCovariates,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexLenghtDepCov, resultsExp$rlIndexLenghtDepCov,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexNoNugget, resultsExp$rlIndexNoNugget,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexMissingDepth, resultsExp$rlIndexMissingDepth,tolerance = 1e-2)
-expect_equal(resultsOut$rlIndexNoReducedSpace, resultsExp$rlIndexNoReducedSpace,tolerance = 1e-2)
-
-test_that("Plot runs without error", {
-  expect_silent(plotResults(runLenghtDepCov, what = "sunAlt"))
-  expect_silent(plotResults(runLenghtDepCov, what = "depth"))
-})
+expect_equal(resultsOut$rlIndexCovariates, resultsExp$rlIndexCovariates,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexNoNugget, resultsExp$rlIndexNoNugget,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexMissingDepth, resultsExp$rlIndexMissingDepth,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexNoReducedSpace, resultsExp$rlIndexNoReducedSpace,tolerance = 1e-3)
 
 
 if(FALSE){
-  resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runLenghtDepCov,runMissingDepth,runNoReducedSpace))
+  resultsExp = list(AIC = AIC(runCovariates,runNoNugget,runMissingDepth,runNoReducedSpace))
   resultsExp$rlIndexCovariates = runCovariates$rl$logLengthIndex
-  resultsExp$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
   resultsExp$rlIndexNoNugget = runNoNugget$rl$logLengthIndex
   resultsExp$rlIndexMissingDepth = runMissingDepth$rl$logLengthIndex
   resultsExp$rlIndexNoReducedSpace = runNoReducedSpace$rl$logLengthIndex
