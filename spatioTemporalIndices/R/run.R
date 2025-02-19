@@ -74,7 +74,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     random = c(random, "xS_alk","xST_alk")
     if(data$rwBeta0_alk==1){
       random=c(random,"beta0_alk")
-      if(conf_alk$betaLength==2){
+      if(conf_alk$betaLength==1){
         random=c(random,"betaLength_alk")
       }else{
         profile = c(profile,"betaLength_alk")

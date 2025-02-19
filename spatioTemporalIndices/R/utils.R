@@ -124,7 +124,7 @@ includeDummyAge = function(data){
   data$usePCpriorsALK = 0
   data$spatialALK = 0
   data$spatioTemporalALK = 0
-  data$betaLength = 1
+  data$betaLength = 0
 
   return(data)
 }
