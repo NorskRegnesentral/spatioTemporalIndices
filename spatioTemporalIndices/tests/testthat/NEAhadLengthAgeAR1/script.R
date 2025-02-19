@@ -34,7 +34,7 @@ resultsOut = list(objective = run$opt$objective,
 
 load("NEAhadLengthAgeAR1/resultsExp.RData")
 
-expect_equal(resultsOut$logAgeIndex, resultsExp$logAgeIndexExp,tolerance = 1e-3)
+expect_equal(resultsOut$logAgeIndex, resultsExp$logAgeIndexExp,tolerance = 1e-4)
 expect_equal(resultsOut$objective, resultsExp$objectiveExp,tolerance = 1e-4)
 
 if(FALSE){

@@ -33,7 +33,7 @@ resultsOut$rlIndexLenghtDepCov = runLenghtDepCov$rl$logLengthIndex
 
 load("NEAhadLengthSimple/resultsExp.RData")
 expect_equal(resultsOut$objective, resultsExp$objective,tolerance = 1e-4)
-expect_equal(resultsOut$rlIndexLenghtDepCov, resultsExp$rlIndexLenghtDepCov,tolerance = 1e-3)
+expect_equal(resultsOut$rlIndexLenghtDepCov, resultsExp$rlIndexLenghtDepCov,tolerance = 1e-4)
 
 test_that("Plot runs without error", {
   expect_silent(plotResults(runLenghtDepCov, what = "sunAlt"))
