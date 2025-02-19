@@ -11,7 +11,7 @@ defConf_alk(
   spatioTemporal = 0,
   spatial = 0,
   rwBeta0 = 0,
-  betaLength = 1,
+  betaLength = 0,
   meshSimilar = TRUE,
   readability = 1,
   usePCpriorsALK = 0,
@@ -32,7 +32,7 @@ defConf_alk(
 
 \item{rwBeta0}{random walk for intercelt within cohorts:  0-no 1-yes}
 
-\item{betaLength}{Time varying regression coefficients for length: 1-no, 2-yes}
+\item{betaLength}{Time varying regression coefficients for length: 0-no, 1-yes}
 
 \item{meshSimilar}{If TRUE; apply the same mesh as in the package spatitemporalIndices, this is typically the case}
 
