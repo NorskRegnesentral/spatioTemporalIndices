@@ -39,6 +39,7 @@ resultsOut = list(objective = run$opt$objective,
                   objective2 = run2$opt$objective,
                   logAgeIndex = run$rl$logAgeIndex,
                   logAgeIndex2 = run2$rl$logAgeIndex)
+resultsOut$AIC = AIC(run,run2)
 
 load("NEAhadLengthAgeRW_betaLength/resultsExp.RData")
 
@@ -46,16 +47,19 @@ expect_equal(resultsOut$logAgeIndex, resultsExp$logAgeIndexExp,tolerance = 1e-4)
 expect_equal(resultsOut$objective, resultsExp$objectiveExp,tolerance = 1e-4)
 expect_equal(resultsOut$logAgeIndex2, resultsExp$logAgeIndex2Exp,tolerance = 1e-4)
 expect_equal(resultsOut$objective2, resultsExp$objective2Exp,tolerance = 1e-4)
+expect_equal(resultsOut$AIC, resultsExp$AICExp,tolerance = 1e-4)
 
 test_that("Plot runs without error", {
   expect_silent(plotResults(run, what = "ALK", year = 2020))
 })
 
+
 if(FALSE){
   resultsExp = list(objectiveExp = run$opt$objective,
                     objective2Exp = run2$opt$objective,
                     logAgeIndexExp = run$rl$logAgeIndex,
-                    logAgeIndex2Exp = run2$rl$logAgeIndex)
+                    logAgeIndex2Exp = run2$rl$logAgeIndex,
+                    AICExp = AIC(run,run2))
   save(resultsExp,file = "NEAhadLengthAgeRW_betaLength/resultsExp.RData")
 }
 

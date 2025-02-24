@@ -8,7 +8,6 @@ logLik.stim<-function(object, ...){
 
   sunCov = 0
   if(object$conf_l$sunAlt[2]==1)sunCov = object$conf_l$sunAlt[1]*2
-  if(object$conf_l$sunAlt[2]==2)sunCov = object$conf_l$sunAlt[1]*4
 
   beta0 = 0
   if(object$conf_l$rwBeta0==0){
@@ -20,12 +19,15 @@ logLik.stim<-function(object, ...){
   betaLengthALK = 0
   if(object$conf_l$applyALK!=0){
     if(object$conf_alk$rwBeta0==0){
-      beta0 = beta0+ length(object$conf_alk$minAge:object$conf_alk$maxAge )*length(object$conf_l$years)
+      beta0 = beta0+ length(object$conf_alk$minAge:object$conf_alk$maxAge)*length(object$conf_l$years)
     }else{
       beta0 = beta0+ length(object$conf_alk$minAge:object$conf_alk$maxAge) + length(object$conf_l$years) -1
     }
-    betaLengthALK = length(object$pl$betaLength_alk)
-
+    if(object$conf_alk$betaLength!=1){
+      betaLengthALK = length(object$pl$betaLength_alk)
+    }else{
+      betaLengthALK = length(object$conf_alk$minAge:object$conf_alk$maxAge)
+    }
   }
   attr(ret,"df")<-length(object$opt$par) + beta0 + sunCov + betaLengthALK
   class(ret)<-"logLik"
