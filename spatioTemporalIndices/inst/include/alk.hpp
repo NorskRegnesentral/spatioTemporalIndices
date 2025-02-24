@@ -13,8 +13,8 @@ template <class Type>
     int nObs = dat.length.size();
     int nYears = dat.nStationsEachYear.size();
 
+    vector<Type> sigma_beta_alk = exp(par.log_sigma_beta_alk);
     if(dat.rwBeta0_alk ==1){
-      vector<Type> sigma_beta_alk = exp(par.log_sigma_beta_alk);
       for(int y=1;y<dat.idx1.size();y++){
         for(int a=1; a<(nAges-1); ++a){
           nll -= dnorm(par.beta0_alk(y,a),par.beta0_alk(y-1,a-1),sigma_beta_alk(0),true);
@@ -22,30 +22,16 @@ template <class Type>
       }
       nll -= dnorm(par.beta0_alk(0,(nAges-2)),par.beta0_alk(1,(nAges-2)),sigma_beta_alk(0),true); //random walk for oldest age in first year
       nll -= dnorm(par.beta0_alk(dat.idx1.size()-1,0),par.beta0_alk(dat.idx1.size()-2,0),sigma_beta_alk(0),true); //random walk for youngest age in last year
-
-      if(dat.betaLength==1){
-        for(int y=1;y<dat.idx1.size();y++){
-          for(int a=1; a<(nAges-1); ++a){
-            nll -= dnorm(par.betaLength_alk(y*(nAges-1) + a),par.betaLength_alk((y-1)*(nAges-1) + a-1),sigma_beta_alk(1),true);
-          }
-        }
-        nll -= dnorm(par.betaLength_alk(nAges-2),par.betaLength_alk((nAges-1) +(nAges-2)),sigma_beta_alk(1),true); //random walk for oldest age in first year
-        nll -= dnorm(par.betaLength_alk((dat.idx1.size()-1)*(nAges-1) + 0),par.betaLength_alk((dat.idx1.size()-2)*(nAges-1) + 0),sigma_beta_alk(1),true); //random walk for youngest age in last year
-      }
-    }else{
-//      for(int y=0;y<dat.idx1.size();y++){
-//        for(int a=0; a<(nAges-1); ++a){
-//          nll -= dnorm(par.beta0_alk(y,a),Type(0),Type(50),true); //Penalization, often needed for convergence
-//        }
-//      }
-//      if(dat.betaLength==1){
-//        for(int y=0;y<dat.idx1.size();y++){
-//          for(int a=0; a<(nAges-1); ++a){
-//            nll -= dnorm(par.betaLength_alk(y*(nAges-1) + a),Type(0),Type(50),true);//Penalization, often needed for convergence
-//          }
-//        }
-//      }
     }
+
+    if(dat.betaLength==1){
+      for(int y=1;y<dat.idx1.size();y++){
+        for(int a=0; a<(nAges-1); ++a){
+          nll -= dnorm(par.betaLength_alk(y*(nAges-1) + a),par.betaLength_alk((y-1)*(nAges-1) + a),sigma_beta_alk(1),true);
+        }
+      }
+    }
+
 
     vector<Type> sigma =exp(par.logSigma_alk);
     vector<Type> kappa =exp(par.logKappa_alk);
@@ -105,7 +91,7 @@ template <class Type>
             par.betaLength_alk(a)*dat.length.segment(dat.idx1(y),dat.idx2(y)-dat.idx1(y)+1) +
             deltaS*sigma(0)+
             deltaST*sigma(1);
-        }else if(dat.betaLength==1){
+        }else{
           linPredMatrix.col(a).segment(dat.idx1(y),dat.idx2(y)-dat.idx1(y)+1) = par.beta0_alk(y,a)+
             par.betaLength_alk(y*(nAges-1) + a)*dat.length.segment(dat.idx1(y),dat.idx2(y)-dat.idx1(y)+1) +
             deltaS*sigma(0)+
@@ -208,7 +194,7 @@ template <class Type>
               par.betaLength_alk(a)*(dat.lengthGroups(l) + 0.5*dat.dL(0)) +
               deltaS*sigma(0)+
               deltaST*sigma(1);
-          }else if(dat.betaLength==1){
+          }else{
             linPredArray_alk_int.col(a).col(l).col(y) =  par.beta0_alk(y,a)+
               par.betaLength_alk(y*(nAges-1) + a)*(dat.lengthGroups(l) + 0.5*dat.dL(0)) +
               deltaS*sigma(0)+
@@ -276,7 +262,7 @@ array<Type> ALKhauls(dataSet<Type> dat, paraSet<Type> par, LOSM_t<Type> A_ListST
             par.betaLength_alk(a)*(dat.lengthGroups(l) + 0.5*dat.dL(0)) +
             deltaS*sigma(0)+
             deltaST*sigma(1);
-        }else if(dat.betaLength==1){
+        }else{
           linPredArray_alk_haul.col(a).col(l).col(y).segment(0,deltaS.size()) = par.beta0_alk(y,a)+
             par.betaLength_alk(y*(nAges-1) + a)*(dat.lengthGroups(l) + 0.5*dat.dL(0)) +
             deltaS*sigma(0)+

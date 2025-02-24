@@ -74,13 +74,13 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     random = c(random, "xS_alk","xST_alk")
     if(data$rwBeta0_alk==1){
       random=c(random,"beta0_alk")
-      if(conf_alk$betaLength==1){
-        random=c(random,"betaLength_alk")
-      }else{
-        profile = c(profile,"betaLength_alk")
-      }
     }else{
-      profile = c(profile,"beta0_alk","betaLength_alk")
+      profile = c(profile,"beta0_alk")
+    }
+    if(conf_alk$betaLength==1){
+      random=c(random,"betaLength_alk")
+    }else{
+      profile = c(profile,"betaLength_alk")
     }
     if(conf_l$rwBeta0==0& data$rwBeta0_alk==0 &conf_l$nugget==0 & conf_l$spatial==0 & conf_l$spatioTemporal==0 & conf_l$splineDepth[2]==0 & conf_l$sunAlt[2]==0){
       profile = NULL#Need one parameter that is not profiled

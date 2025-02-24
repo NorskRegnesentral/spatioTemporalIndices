@@ -130,7 +130,11 @@ plotResults  <- function(run,what=NULL,year = NULL,age = NULL,length = NULL,lon_
     }
 
     for(a in 1:(nAges-1)){
-      linPredMatrix[,a] = linPredMatrix[,a] + run$pl$beta0_alk[which(run$conf_alk$years == year), a] + run$pl$betaLength_alk[a]*lengthInt
+      if(run$conf_alk$betaLength==0){
+        linPredMatrix[,a] = linPredMatrix[,a] + run$pl$beta0_alk[which(run$conf_alk$years == year), a] + run$pl$betaLength_alk[a]*lengthInt
+      }else{
+        linPredMatrix[,a] = linPredMatrix[,a] + run$pl$beta0_alk[which(run$conf_alk$years == year), a] + run$pl$betaLength_alk[(which(run$conf_alk$years == year) -1)*(nAges-1) +  a]*lengthInt
+      }
     }
     ALK = matrix(0,length(lengthInt), nAges)
     for(a in 1:nAges){
@@ -281,3 +285,33 @@ plotSunAlt<-function(run){
   abline(v=pi*3/2,lty=3)
   abline(v=2*pi,lty=3)
 }
+
+#' plotArea
+#'
+#' Plot the survey area, mesh and integration points
+#' @param run Fitted model returned by, \code{\link{fitModel}}
+#' @param add Add plot to existing plot.
+#' @param cex Sent to plot
+#' @param pch Sent to points
+#' @param extend Proportion extends xlim and ylim for visual clearity
+#' @importFrom graphics abline axis legend lines
+#' @export
+#plotArea<-function(run, add = FALSE,cex = 0.5, pch = 20, extend = 0.2){
+#  utmCRS = paste0("+proj=utm +zone=", run$conf_l$zone," +datum=WGS84 +units=km +no_defs")
+#
+#  mesh = attributes(run$data)$meshS
+#  intPoints = data.frame(UTMX = run$data$xInt, UTMY = run$data$yInt)
+#  strata_utm <- sf::st_transform(run$conf_l$strata,utmCRS)
+#
+#  xlim = range(intPoints[,1]) +c(-diff(range(intPoints[,1]))*extend, diff(range(intPoints[,1]))*extend)
+#  ylim = range(intPoints[,2]) +c(-diff(range(intPoints[,2]))*extend, diff(range(intPoints[,2]))*extend)
+#
+# if(add){
+#    points(intPoints,pch = pch,cex = cex)
+#  }else{
+#    plot(intPoints, xlim = xlim, ylim = ylim ,pch = pch,cex = cex)
+#  }
+#  plot(strata_utm,col = 0,add = TRUE)
+#  plot(mesh,add = TRUE)
+#}
+

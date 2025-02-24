@@ -30,9 +30,9 @@ defConf_alk(
 
 \item{spatial}{include spatial effect: 0-no 1-yes}
 
-\item{rwBeta0}{random walk for intercelt within cohorts:  0-no 1-yes}
+\item{rwBeta0}{random walk for intercept within cohorts:  0-no 1-yes}
 
-\item{betaLength}{Time varying regression coefficients for length: 0-no, 1-yes}
+\item{betaLength}{Time varying regression coefficients for length: 0-no, 1-yes and smoothed with random walk in time dimension, 2-yes and no smoothing}
 
 \item{meshSimilar}{If TRUE; apply the same mesh as in the package spatitemporalIndices, this is typically the case}
 

@@ -116,8 +116,8 @@ setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
 ##' @param maxAge max age
 ##' @param spatioTemporal include spatio-tempora: 0-no 1-yes 2- yes but without correlation structure in time
 ##' @param spatial include spatial effect: 0-no 1-yes
-##' @param rwBeta0 random walk for intercelt within cohorts:  0-no 1-yes
-##' @param betaLength Time varying regression coefficients for length: 0-no, 1-yes
+##' @param rwBeta0 random walk for intercept within cohorts:  0-no 1-yes
+##' @param betaLength Time varying regression coefficients for length: 0-no, 1-yes and smoothed with random walk in time dimension, 2-yes and no smoothing
 ##' @param meshSimilar If TRUE; apply the same mesh as in the package spatitemporalIndices, this is typically the case
 ##' @param readability If 1: Utilize age reading quality, if 0: Do not utilize age reading quality
 ##' @param usePCpriorsALK Use pc-priors: 0-no 1-yes. Probably never used; in case it is used, we need set pcPriorsALKRange and pcPriorsALKSD to reasonable values
@@ -183,9 +183,13 @@ setMap_alk = function(conf_alk,par_alk){
 
   if(conf_alk$rwBeta0==0){
     map$log_sigma_beta_alk = as.factor(c(NA,NA))
+    if(conf_alk$betaLength==1){
+      map$log_sigma_beta_alk = as.factor(c(NA,1))
+    }
   }else{
-    if(conf_alk$betaLength==0){
       map$log_sigma_beta_alk = as.factor(c(1,NA))
+    if(conf_alk$betaLength==1){
+      map$log_sigma_beta_alk = as.factor(c(1,2))
     }
   }
   return(map)
@@ -216,7 +220,7 @@ defpar_alk = function(data_alk, conf_alk){
              xS_alk = xS_alk,
              xST_alk = xST_alk)
 
-  if(conf_alk$betaLength == 1){
+  if(conf_alk$betaLength > 0){
     par$betaLength_alk = rep(0,(nAge-1)*length(conf_alk$years))
   }
 

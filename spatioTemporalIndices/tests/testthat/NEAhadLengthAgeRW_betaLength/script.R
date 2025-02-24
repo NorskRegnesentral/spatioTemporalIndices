@@ -30,17 +30,32 @@ confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 200)
 run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 
+#no RW for beta0 and no RW for beta_length
+conf_alk$rwBeta0 = 0
+conf_alk$betaLength = 2
+run2 = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+
 resultsOut = list(objective = run$opt$objective,
-                  logAgeIndex = run$rl$logAgeIndex)
+                  objective2 = run2$opt$objective,
+                  logAgeIndex = run$rl$logAgeIndex,
+                  logAgeIndex2 = run2$rl$logAgeIndex)
 
 load("NEAhadLengthAgeRW_betaLength/resultsExp.RData")
 
 expect_equal(resultsOut$logAgeIndex, resultsExp$logAgeIndexExp,tolerance = 1e-4)
 expect_equal(resultsOut$objective, resultsExp$objectiveExp,tolerance = 1e-4)
+expect_equal(resultsOut$logAgeIndex2, resultsExp$logAgeIndex2Exp,tolerance = 1e-4)
+expect_equal(resultsOut$objective2, resultsExp$objective2Exp,tolerance = 1e-4)
+
+test_that("Plot runs without error", {
+  expect_silent(plotResults(run, what = "ALK", year = 2020))
+})
 
 if(FALSE){
   resultsExp = list(objectiveExp = run$opt$objective,
-                    logAgeIndexExp = run$rl$logAgeIndex)
+                    objective2Exp = run2$opt$objective,
+                    logAgeIndexExp = run$rl$logAgeIndex,
+                    logAgeIndex2Exp = run2$rl$logAgeIndex)
   save(resultsExp,file = "NEAhadLengthAgeRW_betaLength/resultsExp.RData")
 }
 
