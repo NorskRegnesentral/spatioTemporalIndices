@@ -53,7 +53,7 @@ conf_l = defConf(years = 2018:2020,
                  stratasystem = list(dsn="NDSKpandSimple/strata/", layer = "shrimp_areas_NSSK"),
                  trawlWidth=11.7,
                  applyALK=0)
-runNoReducedSpace = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = FALSE)
+runNoReducedSpace = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 
 resultsOut = list(AIC = AIC(runCovariates,runNoNugget,runMissingDepth,runNoReducedSpace))
