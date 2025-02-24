@@ -226,12 +226,8 @@ setMap <- function(par, conf){
 
   if(conf$zeroInflated==0){
     map$delta_z = as.factor(rep(NA,length(par$delta_z)))
-  }else if(conf$zeroInflated==1){
-    map$delta_z = as.factor(c(0,1,NA))
-  }else if(conf$zeroInflated==2){
-    map$delta_z = as.factor(c(0,NA,NA))
   }else{
-    stop("No such zero inflation included")
+    stop("Zero inflation not included")
   }
 
   map$tan_rho_l = as.factor(map$tan_rho_l)
