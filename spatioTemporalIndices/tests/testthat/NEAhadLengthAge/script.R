@@ -1,5 +1,30 @@
 suppressMessages(library(spatioTemporalIndices))
 
+#Source function to read saved covariance matrices
+read_matrices_from_file <- function(file_name) {
+  data <- readLines(file_name)
+
+  # Initialize empty list to store matrices
+  matrices <- list()
+  current_matrix <- NULL
+  matrix_data <- NULL
+
+  for (line in data) {
+    if (grepl("# Year ", line)) {
+      current_matrix <- gsub("# Year ", "", line)
+      matrix_data <- NULL
+    } else if (line == "# ") {
+      matrices[[current_matrix]] <- as.matrix(read.table(text = matrix_data))
+    } else {
+      matrix_data <- c(matrix_data, line)
+    }
+  }
+
+  return(matrices)
+}
+
+
+
 dat_l = readRDS("NEAhadLengthAge/haddock2018-2020_length_ex_rus_reduced.rds")
 dat_alk = readRDS("NEAhadLengthAge/haddock2018-2020_age_ex_rus_reduced.rds")
 
@@ -64,9 +89,9 @@ expect_equal(readLines("NEAhadLengthAge/indexFileVar.dat"),
              readLines("NEAhadLengthAge/indexFileVarExp.dat"))
 
 #Verify that save covaraince structures are as expected
-write_covariance_matrices(run,"NEAhadLengthAge/yearlyCov.rds")
-cov = readRDS("NEAhadLengthAge/yearlyCov.rds")
-covExp = readRDS("NEAhadLengthAge/yearlyCovExp.rds")
+write_covariance_matrices(run,"NEAhadLengthAge/yearlyCov.dat")
+cov = read_matrices_from_file("NEAhadLengthAge/yearlyCov.dat")
+covExp = read_matrices_from_file("NEAhadLengthAge/yearlyCovExp.dat")
 expect_equal(cov,
              covExp,tolerance = 1e-4)
 
@@ -122,12 +147,12 @@ expect_equal(readLines("NEAhadLengthAge/indexFileMA.dat"),
              readLines("NEAhadLengthAge/indexFileMAExp.dat"))
 expect_equal(readLines("NEAhadLengthAge/indexFileVarMA.dat"),
              readLines("NEAhadLengthAge/indexFileVarMAExp.dat"))
-write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMA.rds")
-cov = readRDS("NEAhadLengthAge/yearlyCovMA.rds")
-covExp = readRDS("NEAhadLengthAge/yearlyCovMAExp.rds")
+
+write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMA.dat")
+cov = read_matrices_from_file("NEAhadLengthAge/yearlyCovMA.dat")
+covExp = read_matrices_from_file("NEAhadLengthAge/yearlyCovMAExp.dat")
 expect_equal(cov,
              covExp,tolerance = 1e-4)
-
 
 if(FALSE){
   resultsExp = list(objectiveExp = objectiveExp,
@@ -140,11 +165,11 @@ if(FALSE){
 
   write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileExp.dat", name = "nameOfSurvey",digits = 0)
   write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileVarExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
-  write_covariance_matrices(run,"NEAhadLengthAge/yearlyCovExp.rds")
+  write_covariance_matrices(run,"NEAhadLengthAge/yearlyCovExp.dat")
 
   write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileMAExp.dat", name = "nameOfSurvey",digits = 0)
   write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileVarMAExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
-  write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMAExp.rds")
+  write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMAExp.dat")
 
   resultsJitterExp = resultsJitter
   save(resultsJitterExp,file = "NEAhadLengthAge/resultsJitterExp.RData")

@@ -268,11 +268,11 @@ write_indices_ICES_format(run,file = "indexFileVar.dat",variance = TRUE, name = 
 A list of the estimated yearly covariance matrices can be saved by:
 
 ```R
-write_covariance_matrices(run,file = "covar.rds")
+write_covariance_matrices(run,file = "covar.dat")
 
 ```
 
-The list can then be read by `readRDS(covar.rds)`.
+This will save the covariance matrices in a file named `covar.dat` that can be opened in text editor. To read this file back into R, see for example the function `read_matrices_from_file` in https://github.com/NorskRegnesentral/spatioTemporalIndices/blob/main/spatioTemporalIndices/tests/testthat/NEAhadLengthAge/script.R
 
 
 <br>

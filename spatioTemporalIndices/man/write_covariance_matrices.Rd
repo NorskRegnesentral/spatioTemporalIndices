@@ -4,12 +4,14 @@
 \alias{write_covariance_matrices}
 \title{Save indices in standard ICES format}
 \usage{
-write_covariance_matrices(run, file)
+write_covariance_matrices(run, file, digits = 6)
 }
 \arguments{
 \item{run}{stim object}
 
-\item{file}{Name of the file. Must end with .rds}
+\item{file}{Name of the file. Must end with .dat}
+
+\item{digits}{Number of digits in the covariance matrix}
 }
 \description{
 Save indices in standard ICES format

@@ -52,10 +52,11 @@ write_indices_ICES_format = function(run,file,name,sdrep_bc = NULL,variance = FA
 
 ##' Save indices in standard ICES format
 ##' @param  run stim object
-##' @param  file Name of the file. Must end with .rds
+##' @param  file Name of the file. Must end with .dat
+##' @param  digits Number of digits in the covariance matrix
 ##' @details Saves a list with estimated yearly covariance matrices of the log-index.
 ##' @export
-write_covariance_matrices = function(run, file){
+write_covariance_matrices = function(run, file,digits = 6){
   if(run$conf_l$applyALK==1){
     ageRange = run$data$ageRange + (run$conf_alk$maxAge- run$data$ageRange[2])
     id = which(names(run$rep$value)=="logAgeIndex")
@@ -70,6 +71,7 @@ write_covariance_matrices = function(run, file){
         covYears[[i]] = covYears[[i]][-1,]
         covYears[[i]] = covYears[[i]][,-1]
       }
+      covYears[[i]] = round(covYears[[i]],digits = digits)
     }
   }else{
     id = which(names(run$rep$value)=="logLengthIndex")
@@ -79,9 +81,18 @@ write_covariance_matrices = function(run, file){
     for(i in 1:length(run$conf_l$years)){
       id = i + (0:(run$data$numberOfLengthGroups-1))*length(run$conf_l$years)
       covYears[[i]] = cov[id,id]
+      covYears[[i]] = round(covYears[[i]],digits = digits)
     }
   }
 
   names(covYears) = run$conf_l$years
-  saveRDS(covYears,file = file)
+
+  # Save all covariance matrices in a single .dat file
+  file_conn <- file(file, "w")
+  for (name in names(covYears)) {
+    writeLines(sprintf("# Year %s", name), file_conn)
+    write.table(covYears[[name]], file = file_conn, row.names = FALSE, col.names = FALSE)
+    writeLines("# ", file_conn)
+  }
+  close(file_conn)
 }
