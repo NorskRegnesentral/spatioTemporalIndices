@@ -36,18 +36,19 @@ setupData = function(dat_l,conf_l,confPred){
 
   #Verify that all length group widths in data and in conf_l$dLength correspond
   deltaLengthInData = unique(unlist(tapply(dat_l$lengthGroup, dat_l$station, function(x) diff(x))))
-  if( length(deltaLengthInData)>1 | deltaLengthInData != conf_l$dLength){
+  if( length(deltaLengthInData)>1 | deltaLengthInData[1] != conf_l$dLength){
     stop("Length group width in data and in conf_l$dLength do not correspond.")
+  }
+
+
+  #Verify that no NA's are present in catch
+  if(sum(is.na(dat_l$catch))>0){
+    stop("NA in dat_l$catch, not yet implemented functionality for missing catches of length groups within haul.")
   }
 
   #Verify that no catch is negative
   if(min(dat_l$catch)<0){
     stop("Negative catch in dat_l$catch.")
-  }
-
-  #Verify that no NA's are present in catch
-  if(sum(is.na(dat_l$catch))>0){
-    stop("NA in dat_l$catch, not yet implemented functionality for missing catches of length groups within haul.")
   }
 
   #Verify that no distance is negative
