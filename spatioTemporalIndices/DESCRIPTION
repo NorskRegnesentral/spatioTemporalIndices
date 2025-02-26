@@ -1,7 +1,7 @@
 Package: spatioTemporalIndices
 Type: Package
-Title: Spatio-temporal abundance indices-at-lenght and indices-at-age
-Version: 1.2.1
+Title: Spatio-Temporal Index Model (STIM)
+Version: 1.2.2
 Authors@R: c(person(c("Olav","Nikolai"), "Breivik",role=c("aut","cre"), email="olavbr@nr.no"),
 	    person("Fredrik","Aanes",role="aut"),
             person("Fabian", "Zimmermann", role="aut", email="fabian.zimmermann@hi.no"))
@@ -10,12 +10,23 @@ Author: Olav Nikolai Breivik [aut, cre],
 	Fabian Zimmermann [aut]
 Maintainer: Olav Nikolai Breivik <olavbr@nr.no>,
 	Fabian Zimmermann <fabian.zimmermann@hi.no>
-Description: Estimate indices with a spatio-temporal Gaussian model. Indices may be constructed by length which are furter converted to age with an internally estimated spatio-temporal age-length-key.
+Description: A spatio-temporal model for estimating abundance indices, both at length and at age. Indices are constructed by length using a spatio-temporal model. If aging data is provided, catch per unit effort by length is converted to catch per unit effort by age using an internally estimated spatio-temporal age-length key.
+URL: https://github.com/NorskRegnesentral/spatioTemporalIndices
+BugReports: https://github.com/NorskRegnesentral/spatioTemporalIndices/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: TRUE
-Imports: TMB, fmesher, mgcv, fields, marmap, sf, splancs, methods, ellipse
-LinkingTo: TMB, RcppEigen
+Imports: TMB, 
+    fmesher, 
+    mgcv, 
+    fields, 
+    marmap, 
+    sf, 
+    splancs, 
+    methods, 
+    ellipse
+LinkingTo: TMB, 
+    RcppEigen
 RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0)
