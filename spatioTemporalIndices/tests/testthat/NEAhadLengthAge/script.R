@@ -55,10 +55,10 @@ conf_alk = defConf_alk(maxAge = 8,
 confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 50)
 
 # run model
-run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
 
 #Two stage age
-run_twoStage = fitModel(dat_l,conf_l, twoStage = TRUE, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+run_twoStage = fitModel(dat_l,conf_l, twoStage = TRUE, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
 expect_equal(run$rl$logAgeIndex, run_twoStage$rl$logAgeIndex,tolerance = 1e-4)
 
 
@@ -99,7 +99,7 @@ expect_equal(cov,
 #Reduce complexity for time efficency
 conf_alk$spatioTemporal = 0
 conf_alk$spatial = 0
-runSimpler = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+runSimpler = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
 
 
 #Test simulation
@@ -135,12 +135,12 @@ test_that("Plot runs without error", {
 #Test no readability
 dat_alk$readability = NULL
 conf_alk$readability= 0
-runNoReadability = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+runNoReadability = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
 expect_equal(runNoReadability$opt$objective, resultsExp$objectiveNoReadability,tolerance = 1e-4)
 
 #Test write_indices and write_covaraince when conf_alk$minAge equals min(dat_alk$age)
 conf_alk$minAge = min(dat_alk$age)
-runMinALK = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+runMinALK = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
 write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileMA.dat", name = "nameOfSurvey",digits = 0)
 write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileVarMA.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
 expect_equal(readLines("NEAhadLengthAge/indexFileMA.dat"),
