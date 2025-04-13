@@ -15,12 +15,13 @@
 #' @param runModel Estimate the model if TRUE, if not we only set up the model
 #' @param twoStage Estimate the model in two steps. May reduce computation time if we use temporal correlation in spatio-temporal effect
 #' @param silent Boolean that is sent to TMB::MakeADfun, and deactivates trace in nlminb if TRUE.
+#' @param newtonsteps Integer with number of additional Newton step after nlminb to make optimization stable across OS.
 #' @param ... Parameters sent to TMB::sdreport.
 #' @useDynLib spatioTemporalIndices
 #' @return A fitted stim object. The indices with corresponding uncertainties can be extracted by using the \code{\link{write_indices_ICES_format}} function. Or manually by inspecting the fit$rl object.
 #' @details This model runs estimate the index model, and returns the fitted model.
 #' @export
-fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,mapSet = NULL,runModel = TRUE,twoStage = FALSE,silent = FALSE,...){
+fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet = NULL,mapSet = NULL,runModel = TRUE,twoStage = FALSE,silent = FALSE,newtonsteps = 0,...){
 
   print("Set up length data")
 
@@ -154,6 +155,16 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     if(runModel){
       opt <- nlminb(obj$par, obj$fn, obj$gr,
                     control = list(trace = trace,iter.max = 1000, eval.max = 1000))
+
+      he = function(par){ optimHess(par, obj$fn, obj$gr) }
+      for(i in seq_len(newtonsteps)) { # Take a few additional newton steps. Results of the optimization can vary across OS
+        g = as.numeric(obj$gr(opt$par))
+        h = stats::optimHess(opt$par, obj$fn, obj$gr)
+        opt$par = opt$par- solve(h, g)
+        opt$objective = obj$fn(opt$par)
+      }
+      opt$he = optimHess(opt$par, obj$fn, obj$gr)
+
       rep <- TMB::sdreport(obj,...)
       pl = as.list(rep,"Est")
       plSd = as.list(rep,"Std")

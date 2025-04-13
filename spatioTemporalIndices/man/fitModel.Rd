@@ -15,6 +15,7 @@ fitModel(
   runModel = TRUE,
   twoStage = FALSE,
   silent = FALSE,
+  newtonsteps = 0,
   ...
 )
 }
@@ -38,6 +39,8 @@ fitModel(
 \item{twoStage}{Estimate the model in two steps. May reduce computation time if we use temporal correlation in spatio-temporal effect}
 
 \item{silent}{Boolean that is sent to TMB::MakeADfun, and deactivates trace in nlminb if TRUE.}
+
+\item{newtonsteps}{Integer with number of additional Newton step after nlminb to make optimization stable across OS.}
 
 \item{...}{Parameters sent to TMB::sdreport.}
 }
