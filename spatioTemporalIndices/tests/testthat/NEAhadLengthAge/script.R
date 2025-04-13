@@ -67,6 +67,37 @@ print(mean(attributes(run$data)$meshS$loc[,1]))
 print(mean(attributes(run$data)$meshS$loc[,2]))
 print(".......................................")
 print(".......................................")
+print(sum(run$data$yInt))
+print(sum(run$data$xInt))
+print(".......................................")
+
+
+
+conf = conf_l
+maxEdge = c(conf$cutoff,conf$cutoff*4) # Longer distances between nodes outside if inner bounderary
+
+confPredTmp = list(cellsize = 1000)
+intPoints = constructIntPoints(conf, confPredTmp)$locUTM
+while(dim(intPoints)[1]<5000){#Set up mesh based on a fine grid of integration points
+  confPredTmp$cellsize = confPredTmp$cellsize/2
+  intPoints = constructIntPoints(conf,confPredTmp)$locUTM
+}
+print(sum(intPoints[,2]))
+print(sum(intPoints[,1]))
+print(".......................................")
+
+
+splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
+boundary <- list(
+  fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
+  fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
+mesh <- fmesher::fm_mesh_2d(boundary=boundary,
+                            max.edge=maxEdge,
+                            cutoff=conf$cutoff)
+print(mesh$n)
+print(".......................................")
+print(boundary)
+print(".......................................")
 
 
 #Two stage age
