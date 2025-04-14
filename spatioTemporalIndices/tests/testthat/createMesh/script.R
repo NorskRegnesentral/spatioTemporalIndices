@@ -1,33 +1,5 @@
 suppressMessages(library(spatioTemporalIndices))
 
-#Source function to read saved covariance matrices
-read_matrices_from_file <- function(file_name) {
-  data <- readLines(file_name)
-
-  # Initialize empty list to store matrices
-  matrices <- list()
-  current_matrix <- NULL
-  matrix_data <- NULL
-
-  for (line in data) {
-    if (grepl("# Year ", line)) {
-      current_matrix <- gsub("# Year ", "", line)
-      matrix_data <- NULL
-    } else if (line == "# ") {
-      matrices[[current_matrix]] <- as.matrix(read.table(text = matrix_data))
-    } else {
-      matrix_data <- c(matrix_data, line)
-    }
-  }
-
-  return(matrices)
-}
-
-
-
-dat_l = readRDS("NEAhadLengthAge/haddock2018-2020_length_ex_rus_reduced.rds")
-dat_alk = readRDS("NEAhadLengthAge/haddock2018-2020_age_ex_rus_reduced.rds")
-
 conf_l = defConf(years = 2018:2020, # years to use, use all years with data by default
                  maxLength = 60, # Numeric = use directly; NULL = use input data to determine
                  minLength = 20, # Numeric = use directly; NULL = use input data to determine
@@ -39,185 +11,24 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
                  cbound = c(18,130),
                  dLength = 5,
                  reduceLength = 3,
-                 stratasystem = list(dsn="NEAhadLengthAge/strata", layer = "Vintertoktet_nye_strata"),
+                 stratasystem = list(dsn="createMesh/strata", layer = "Vintertoktet_nye_strata"),
                  minDepth=150,maxDepth=400,
                  applyALK = 1,
                  cutoff =100)
 
 
-#Define configurations age part
-conf_alk = defConf_alk(maxAge = 8,
-                       minAge = 3,
-                       spatioTemporal = 2,
-                       spatial =1,
-                       rwBeta0 = 0)
+mesh = createMesh(conf_l)$mesh
 
-confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 50)
+resultsOut =list(n = mesh$n, meanX = mean(mesh$loc[,1]), meanY = mean(mesh$loc[,2]))
 
-# run model
-run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
+expect_equal(resultsOut$n, resultsExp$n,tolerance = 1e-6)
+expect_equal(resultsOut$meanX, resultsExp$meanX,tolerance = 1e-6)
+expect_equal(resultsOut$meanY, resultsExp$meanY,tolerance = 1e-6)
 
-print(".......................................")
-print(".......................................")
-print("number of mesh points")
-print(".......................................")
-print(".......................................")
-print(attributes(run$data)$meshS$n)
-print(mean(attributes(run$data)$meshS$loc[,1]))
-print(mean(attributes(run$data)$meshS$loc[,2]))
-print(".......................................")
-print(".......................................")
-print(sum(run$data$yInt))
-print(sum(run$data$xInt))
-print(".......................................")
-
-
-
-conf = conf_l
-maxEdge = c(conf$cutoff,conf$cutoff*4) # Longer distances between nodes outside if inner bounderary
-
-confPredTmp = list(cellsize = 1000)
-intPoints = constructIntPoints(conf, confPredTmp)$locUTM
-while(dim(intPoints)[1]<5000){#Set up mesh based on a fine grid of integration points
-  confPredTmp$cellsize = confPredTmp$cellsize/2
-  intPoints = constructIntPoints(conf,confPredTmp)$locUTM
-}
-print(sum(intPoints[,2]))
-print(sum(intPoints[,1]))
-print(".......................................")
-
-
-splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
-boundary <- list(
-  fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
-  fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
-mesh <- fmesher::fm_mesh_2d(boundary=boundary,
-                            max.edge=maxEdge,
-                            cutoff=conf$cutoff)
-print(mesh$n)
-print(".......................................")
-print(boundary)
-print(".......................................")
-
-
-#Two stage age
-run_twoStage = fitModel(dat_l,conf_l, twoStage = TRUE, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
-expect_equal(run$rl$logAgeIndex, run_twoStage$rl$logAgeIndex,tolerance = 1e-4)
-
-
-objectiveExp = run$opt$objective
-rlIndex = run$rl$logAgeIndex
-rlIndexSd = run$rlSd$logAgeIndex
-par = run$opt$par
-
-resultsOut = list(objectiveExp = objectiveExp,
-                  rlIndex = rlIndex,
-                  rlIndexSd = rlIndexSd,
-                  par = par)
-
-
-#Verify all indices and parameters are as expected
-load("NEAhadLengthAge/resultsExp.RData")
-expect_equal(resultsOut$objectiveExp, resultsExp$objectiveExp,tolerance = 1e-4)
-expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-4)
-expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-4)
-expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-4)
-
-#Verify that save indices on ICES-format are as expected
-write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFile.dat", name = "nameOfSurvey",digits = 0)
-write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileVar.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
-expect_equal(readLines("NEAhadLengthAge/indexFile.dat"),
-             readLines("NEAhadLengthAge/indexFileExp.dat"))
-expect_equal(readLines("NEAhadLengthAge/indexFileVar.dat"),
-             readLines("NEAhadLengthAge/indexFileVarExp.dat"))
-
-#Verify that save covaraince structures are as expected
-write_covariance_matrices(run,"NEAhadLengthAge/yearlyCov.dat")
-cov = read_matrices_from_file("NEAhadLengthAge/yearlyCov.dat")
-covExp = read_matrices_from_file("NEAhadLengthAge/yearlyCovExp.dat")
-expect_equal(cov,
-             covExp,tolerance = 1e-4)
-
-
-#Reduce complexity for time efficency
-conf_alk$spatioTemporal = 0
-conf_alk$spatial = 0
-runSimpler = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
-
-
-#Test simulation
-set.seed(1)
-sim = simStudy(runSimpler,nsim = 1)
-objectiveSimExp = sim[[1]]$opt$objective
-resultsOut$objectiveSimExp = objectiveSimExp
-expect_equal(resultsOut$objectiveSimExp, resultsExp$objectiveSimExp,tolerance = 1e-4)
-
-#Test jitter
-set.seed(1)
-jj = jit(runSimpler,njit = 1)
-resultsJitter = jj$maxVecAll
-load("NEAhadLengthAge/resultsJitterExp.RData")
-expect_equal(resultsJitter, resultsJitterExp,tolerance = 1e-4)
-
-#Test retro
-ret = retroSTIM(runSimpler,nyears = 2)
-resultsRetro = ret[[2]]$opt$objective
-load("NEAhadLengthAge/resultsRetroExp.RData")
-expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
-
-#Test no errors in plots
-test_that("Plot runs without error", {
-  expect_silent(plotResults(run, what = "ALK", year = 2020))
-  expect_silent(plotResults(run, what = "ALK", year = 2020, lon_lat = c(13,78)))
-  expect_silent(plotResults(run, what = "space",year = 2020, age = 5))
-  expect_silent(plotResults(run, what = "space", year = 2020, length = 40))
-  expect_silent(plotResults(run, what = "variance"))
-  expect_silent(plotResults(run, what = "correlation"))
-})
-
-#Test no readability
-dat_alk$readability = NULL
-conf_alk$readability= 0
-runNoReadability = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
-expect_equal(runNoReadability$opt$objective, resultsExp$objectiveNoReadability,tolerance = 1e-4)
-
-#Test write_indices and write_covaraince when conf_alk$minAge equals min(dat_alk$age)
-conf_alk$minAge = min(dat_alk$age)
-runMinALK = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
-write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileMA.dat", name = "nameOfSurvey",digits = 0)
-write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileVarMA.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
-expect_equal(readLines("NEAhadLengthAge/indexFileMA.dat"),
-             readLines("NEAhadLengthAge/indexFileMAExp.dat"))
-expect_equal(readLines("NEAhadLengthAge/indexFileVarMA.dat"),
-             readLines("NEAhadLengthAge/indexFileVarMAExp.dat"))
-
-write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMA.dat")
-cov = read_matrices_from_file("NEAhadLengthAge/yearlyCovMA.dat")
-covExp = read_matrices_from_file("NEAhadLengthAge/yearlyCovMAExp.dat")
-expect_equal(cov,
-             covExp,tolerance = 1e-4)
 
 if(FALSE){
-  resultsExp = list(objectiveExp = objectiveExp,
-                    rlIndex = rlIndex,
-                    rlIndexSd = rlIndexSd,
-                    par = par,
-                    objectiveSimExp = objectiveSimExp,
-                    objectiveNoReadability = runNoReadability$opt$objective)
-  save(resultsExp,file = "NEAhadLengthAge/resultsExp.RData")
+resultsExp =list(n = mesh$n, meanX = mean(mesh$loc[,1]), meanY = mean(mesh$loc[,2]))
 
-  write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileExp.dat", name = "nameOfSurvey",digits = 0)
-  write_indices_ICES_format(run,file = "NEAhadLengthAge/indexFileVarExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
-  write_covariance_matrices(run,"NEAhadLengthAge/yearlyCovExp.dat")
-
-  write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileMAExp.dat", name = "nameOfSurvey",digits = 0)
-  write_indices_ICES_format(runMinALK,file = "NEAhadLengthAge/indexFileVarMAExp.dat",variance = TRUE, name = "nameOfSurvey",digits = 2)
-  write_covariance_matrices(runMinALK,"NEAhadLengthAge/yearlyCovMAExp.dat")
-
-  resultsJitterExp = resultsJitter
-  save(resultsJitterExp,file = "NEAhadLengthAge/resultsJitterExp.RData")
-
-  resultsRetroExp = resultsRetro
-  save(resultsRetroExp,file = "NEAhadLengthAge/resultsRetroExp.RData")
+saveRDS(resultsExp,"createMesh/resultsExp.rds")
 
 }
