@@ -20,6 +20,7 @@ conf_l = defConf(years = 2018:2020, # years to use, use all years with data by d
 mesh = createMesh(conf_l)$mesh
 
 resultsOut =list(n = mesh$n, meanX = mean(mesh$loc[,1]), meanY = mean(mesh$loc[,2]))
+load("createMesh/resultsExp.RData")
 
 expect_equal(resultsOut$n, resultsExp$n,tolerance = 1e-6)
 expect_equal(resultsOut$meanX, resultsExp$meanX,tolerance = 1e-6)
@@ -29,6 +30,5 @@ expect_equal(resultsOut$meanY, resultsExp$meanY,tolerance = 1e-6)
 if(FALSE){
 resultsExp =list(n = mesh$n, meanX = mean(mesh$loc[,1]), meanY = mean(mesh$loc[,2]))
 
-saveRDS(resultsExp,"createMesh/resultsExp.rds")
-
-}
+save(resultsExp,file = "createMesh/resultsExp.RData")
+ }
