@@ -16,7 +16,7 @@ createMesh <- function(conf){
     confPredTmp$cellsize = confPredTmp$cellsize/2
     intPoints = constructIntPoints(conf,confPredTmp)$locUTM
   }
-  intPoints = round(intPoints,6) #The mesh can be slightly different across operating system when numbers are not rounded.
+  intPoints = round(intPoints,3) #The mesh can be slightly different across operating system when numbers are not rounded.
 
   splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
   boundary <- list(
