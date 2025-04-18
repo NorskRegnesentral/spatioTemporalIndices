@@ -129,6 +129,17 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     print("Optimizing full length model, no ALK. This is the most time consuming step")
     obj <- TMB::MakeADFun(data, par, random=random,profile = profile2, DLL="spatioTemporalIndices",map = mapStart2, silent = silent)
     opt <- nlminb(obj$par, obj$fn, obj$gr, control = list(trace = trace,iter.max = 1000, eval.max = 1000))
+
+    he = function(par){ optimHess(par, obj$fn, obj$gr) }
+    for(i in seq_len(newtonsteps)) { # Take a few additional newton steps. Results of the optimization can vary across OS
+      g = as.numeric(obj$gr(opt$par))
+      h = stats::optimHess(opt$par, obj$fn, obj$gr)
+      opt$par = opt$par- solve(h, g)
+      opt$objective = obj$fn(opt$par)
+    }
+    opt$he = optimHess(opt$par, obj$fn, obj$gr)
+
+
     print("Done optimizing full length model, no ALK")
 
     if(conf_l$applyALK==1){#Combine catch-at-length and ALK
