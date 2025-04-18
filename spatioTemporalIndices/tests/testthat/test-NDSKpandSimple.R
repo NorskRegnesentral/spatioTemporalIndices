@@ -1,1 +1,1 @@
-#source("NDSKpandSimple/script.R")
+source("NDSKpandSimple/script.R")
