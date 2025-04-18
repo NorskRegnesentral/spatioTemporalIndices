@@ -56,23 +56,6 @@ confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 50)
 
 # run model
 run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
-
-print(".......................................")
-print(".......................................")
-print("number of mesh points")
-print(".......................................")
-print(".......................................")
-print(attributes(run$data)$meshS$n)
-print(mean(attributes(run$data)$meshS$loc[,1]))
-print(mean(attributes(run$data)$meshS$loc[,2]))
-print(".......................................")
-print(".......................................")
-print(sum(run$data$yInt))
-print(sum(run$data$xInt))
-print(".......................................")
-
-
-
 conf = conf_l
 maxEdge = c(conf$cutoff,conf$cutoff*4) # Longer distances between nodes outside if inner bounderary
 
