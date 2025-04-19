@@ -28,6 +28,8 @@ confPred = defConfPred(conf=conf_l,Depth="DATA",cellsize = 200)
 # run model with random walk beta0 in ALK
 run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
+run2 = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE)
+
 #RW for beta0 and beta_length in ALK
 conf_alk$rwBeta0 = 1
 conf_alk$betaLength = 1

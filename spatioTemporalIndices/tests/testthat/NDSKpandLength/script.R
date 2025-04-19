@@ -45,14 +45,14 @@ resultsOut$rlIndexSd[which(resultsOut$rlIndexSd> 999)] = 999 # Do not care about
 resultsExp$rlIndex[which(resultsExp$rlIndex< -50)] = -50
 resultsExp$rlIndexSd[which(resultsExp$rlIndexSd> 999)] = 999
 
-expect_equal(resultsOut$objective, resultsExp$objective,tolerance = 1e-4)
+expect_equal(resultsOut$objective[1], resultsExp$objective,tolerance = 1e-4)
 expect_equal(resultsOut$rlIndex, resultsExp$rlIndex,tolerance = 1e-3)
 expect_equal(resultsOut$rlIndexSd, resultsExp$rlIndexSd,tolerance = 1e-3)
 expect_equal(resultsOut$par, resultsExp$par,tolerance = 1e-3)
 
-#Verify that the two-stage approach leads to the same objective
-runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncertainty = TRUE,silent = TRUE)
-expect_equal(runTwoStage$opt$objective, resultsExp$objective,tolerance = 1e-4)
+#Verify that the two-stage approach leads to the same objective. Have removed two stage option for simplisity.
+#runTwoStage = fitModel(dat_l,conf_l,confPred,twoStage = TRUE,ignore.parm.uncertainty = TRUE,silent = TRUE)
+#expect_equal(runTwoStage$opt$objective, resultsExp$objective,tolerance = 1e-4)
 
 #Verify skip years
 conf_l$skipYears = 2019
