@@ -1,2 +1,0 @@
-source("NEAhadTechnical/script.R")
-

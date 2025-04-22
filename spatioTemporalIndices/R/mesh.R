@@ -17,6 +17,8 @@ createMesh <- function(conf){
     intPoints = constructIntPoints(conf,confPredTmp)$locUTM
   }
 
+  intPoints = round(intPoints,3) #The mesh can be slightly different across operating system when numbers are not rounded.
+
   splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
   boundary <- list(
     fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
