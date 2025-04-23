@@ -8,11 +8,15 @@
 #'
 #' @export
 createMesh <- function(conf){
-  maxEdge = c(conf$cutoff,conf$cutoff*4) # Longer distances between nodes outside if inner bounderary
+
+  cutoff = conf$cutoff
+  if(conf$maxEdge[1]<conf$cutoff){
+    cutoff = conf$maxEdge[1] #Do not allow maxEdge shorter than cutoff. If maxEdge is provided, no neighboring nodes are distanced further apart. The option to only included cutoff is included for historical reasons.
+  }
 
   confPredTmp = list(cellsize = 1000)
   intPoints = constructIntPoints(conf, confPredTmp)$locUTM
-  while(dim(intPoints)[1]<5000){#Set up mesh based on a fine grid of integration points
+  while(dim(intPoints)[1]<5000){#Set up mesh based on a fine grid of integration points.
     confPredTmp$cellsize = confPredTmp$cellsize/2
     intPoints = constructIntPoints(conf,confPredTmp)$locUTM
   }
@@ -24,8 +28,8 @@ createMesh <- function(conf){
     fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
     fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
   mesh <- fmesher::fm_mesh_2d(boundary=boundary,
-                              max.edge=maxEdge,
-                              cutoff=conf$cutoff)
+                              max.edge=conf$maxEdge,
+                              cutoff=cutoff)
 
 
 

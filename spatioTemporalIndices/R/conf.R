@@ -15,7 +15,8 @@
 ##' @param minLength Minimum length, used when defining the minus group (probably never used)
 ##' @param dLength Length of each length group bin
 ##' @param reduceLength The resolution in length dimension used in latent effect. If 1: all length groups are included as in latent effect. If 2: latent dimension for length group is defined as every second length group... Including all length groups in latent effect often result in high memory usage and computation time.
-##' @param cutoff Cutoff used in mesh, a smaller value results in a more dense mesh.
+##' @param cutoff A numeric used as cutoff when setting up the mesh via fmesher::fm_mesh_2d. A smaller value results in a more dense mesh. Note that a dense set of spatial integration points are used when setting up the mesh. Using the actual observations from the survey when setting up the mesh with use of the cutoff is not implemented yet.
+##' @param maxEdge A numeric vector of length 2; Maximum distance between nodes in the inner and outer area in the mesh. Default is c(cutoff,4*cutoff) for historical reasons. If maxEdge in the inner area is smaller than the cutoff, then the cutoff is not used.
 ##' @param cbound boundary configurations for the mesh. The first element is how far to extend the inner boundary, and the second is for the outer boundary.
 ##' @param pcPriorRange pc-priors for spatial and spatio-temporal effect (probably never used).
 ##' @param pcPriorsd pc-priors for spatial and spatio-temporal effect (probably never used).
@@ -37,7 +38,7 @@
 ##' @export
 defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget = 1,splineDepth=c(6,0),sunAlt=c(1,0),
                     maxLength = NULL,minLength = NULL,dLength = 1, reduceLength = 3,
-                    cutoff = 100,cbound = c(18,130),
+                    cutoff = 100,maxEdge = c(cutoff,cutoff*4),cbound = c(18,130),
                     pcPriorRange = c(100,0.1),pcPriorsd = c(1,0.1), usePcPriors = 0, zeroInflated = 0,
                     stratasystem = list(),
                     obsModel = 2,rwBeta0 = 1,applyALK = 0,
@@ -84,6 +85,9 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
   if(length(conf$cbound)<2) {
     conf$cbound[2]<-conf$cbound[1]*2;print("Only one cbound value provided, re-using the first value to define mesh.")
   }
+
+  conf$maxEdge = maxEdge
+
   lTmp = rep(1:100,each = reduceLength)
   conf$lengthGroupsReduced = lTmp[1:length(conf$lengthGroups)]
   conf$reduceLength = reduceLength

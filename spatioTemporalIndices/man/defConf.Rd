@@ -17,6 +17,7 @@ defConf(
   dLength = 1,
   reduceLength = 3,
   cutoff = 100,
+  maxEdge = c(cutoff, cutoff * 4),
   cbound = c(18, 130),
   pcPriorRange = c(100, 0.1),
   pcPriorsd = c(1, 0.1),
@@ -59,7 +60,9 @@ defConf(
 
 \item{reduceLength}{The resolution in length dimension used in latent effect. If 1: all length groups are included as in latent effect. If 2: latent dimension for length group is defined as every second length group... Including all length groups in latent effect often result in high memory usage and computation time.}
 
-\item{cutoff}{Cutoff used in mesh, a smaller value results in a more dense mesh.}
+\item{cutoff}{A numeric used as cutoff when setting up the mesh via fmesher::fm_mesh_2d. A smaller value results in a more dense mesh. Note that a dense set of spatial integration points are used when setting up the mesh. Using the actual observations from the survey when setting up the mesh with use of the cutoff is not implemented yet.}
+
+\item{maxEdge}{A numeric vector of length 2; Maximum distance between nodes in the inner and outer area in the mesh. Default is c(cutoff,4*cutoff) for historical reasons. If maxEdge in the inner area is smaller than the cutoff, then the cutoff is not used.}
 
 \item{cbound}{boundary configurations for the mesh. The first element is how far to extend the inner boundary, and the second is for the outer boundary.}
 
