@@ -11,7 +11,7 @@ constructIntPoints<-function(conf,confPred){
   points = sf::st_as_sf(points)
 
   #Define data frame with integration points to be returned
-  points = sf::st_join(points,sf::st_buffer(strata_utm,1),left=FALSE)
+  points = sf::st_join(points,strata_utm,left=FALSE)
   locUTM = data.frame(sf::st_coordinates(points)) #To be returned
   colnames(locUTM) = c("UTMX", "UTMY")
   idxStrata = as.numeric(points$id)
