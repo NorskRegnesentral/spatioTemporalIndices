@@ -22,6 +22,14 @@ createMesh <- function(conf){
   combined <- sf::st_union(buffer)
   combined2 <- sf::st_union(buffer2)
 
+  #Different OS sometimes result in slightly different SPDE mesh because of high precision coordinates
+  coords <- sf::st_coordinates(combined)
+  predAreaUTMTmp <- sf::st_polygon(list(round(coords[,1:2], digits = 5)))
+  combined <- sf::st_sf(geometry = sf::st_sfc(predAreaUTMTmp), crs=utmCRS)
+  coords <- sf::st_coordinates(combined2)
+  predAreaUTMTmp <- sf::st_polygon(list(round(coords[,1:2], digits = 5)))
+  combined2 <- sf::st_sf(geometry = sf::st_sfc(predAreaUTMTmp), crs=utmCRS)
+
   mesh <- fmesher::fm_mesh_2d(max.edge =conf$maxEdge,
                               boundary = list(combined,combined2),
                               cutoff = conf$cutoff)
