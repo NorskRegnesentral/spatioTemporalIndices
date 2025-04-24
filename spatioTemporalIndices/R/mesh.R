@@ -14,24 +14,17 @@ createMesh <- function(conf){
     cutoff = conf$maxEdge[1] #Do not allow maxEdge shorter than cutoff. If maxEdge is provided, no neighboring nodes are distanced further apart. The option to only included cutoff is included for historical reasons.
   }
 
-  confPredTmp = list(cellsize = 1000)
-  intPoints = constructIntPoints(conf, confPredTmp)$locUTM
-  while(dim(intPoints)[1]<5000){#Set up mesh based on a fine grid of integration points.
-    confPredTmp$cellsize = confPredTmp$cellsize/2
-    intPoints = constructIntPoints(conf,confPredTmp)$locUTM
-  }
+  utmCRS = paste0("+proj=utm +zone=", conf$zone, " +datum=WGS84 +units=km +no_defs")
+  strata_utm <- sf::st_transform(conf$strata, utmCRS)
 
-  intPoints = round(intPoints,3) #The mesh can be slightly different across operating system when numbers are not rounded.
+  buffer = sf::st_buffer(strata_utm$geometry,conf$cbound[1])
+  buffer2 = sf::st_buffer(strata_utm$geometry,conf$cbound[2])
+  combined <- sf::st_union(buffer)
+  combined2 <- sf::st_union(buffer2)
 
-  splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
-  boundary <- list(
-    fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
-    fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
-  mesh <- fmesher::fm_mesh_2d(boundary=boundary,
-                              max.edge=conf$maxEdge,
-                              cutoff=cutoff)
-
-
+  mesh <- fmesher::fm_mesh_2d(max.edge =conf$maxEdge,
+                              boundary = list(combined,combined2),
+                              cutoff = conf$cutoff)
 
   return(list(mesh=mesh, barrier.triangles =NULL))
 }
