@@ -1,0 +1,33 @@
+name: R Package Test on Rocky Linux 9
+
+on:
+  push:
+    branches:
+      - mesh
+  pull_request:
+    branches:
+      - mesh
+
+jobs:
+  test:
+    runs-on: ubuntu-latest  # Using an Ubuntu runner to host the Docker container
+    container:
+      image: rockylinux/rockylinux:9  # Specify the Docker image for Rocky Linux 9
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install R and dependencies
+        run: |
+          dnf install -y dnf-plugins-core
+          dnf config-manager --set-enabled powertools
+          dnf install -y R
+          # Install testthat and any other dependencies your package might need
+          R -e 'install.packages("testthat", repos = "http://cran.rstudio.com/")'
+
+      - name: Install the package
+        run: R CMD INSTALL .
+
+      - name: Run tests
+        run: R -e 'testthat::test_dir("spatioTemporalIndices/tests/")'
