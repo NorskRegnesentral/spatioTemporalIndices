@@ -1,2 +1,2 @@
-#source("NEAhadLengthAgePCPriors/script.R")
+source("NEAhadLengthAgePCPriors/script.R")
 

@@ -17,10 +17,17 @@ createMesh <- function(conf){
   utmCRS = paste0("+proj=utm +zone=", conf$zone, " +datum=WGS84 +units=km +no_defs")
   strata_utm <- sf::st_transform(conf$strata, utmCRS)
 
-  buffer = sf::st_buffer(strata_utm$geometry,conf$cbound[1])
-  buffer2 = sf::st_buffer(strata_utm$geometry,conf$cbound[2])
-  combined <- sf::st_union(buffer)
-  combined2 <- sf::st_union(buffer2)
+  if(!is.null(strata_utm$geometry)){
+    buffer = sf::st_buffer(strata_utm$geometry,conf$cbound[1])
+    buffer2 = sf::st_buffer(strata_utm$geometry,conf$cbound[2])
+    combined <- sf::st_union(buffer)
+    combined2 <- sf::st_union(buffer2)
+  }else{
+    buffer = sf::st_buffer(strata_utm,conf$cbound[1])
+    buffer2 = sf::st_buffer(strata_utm,conf$cbound[2])
+    combined <- sf::st_union(buffer)
+    combined2 <- sf::st_union(buffer2)
+  }
 
   #Different OS sometimes result in slightly different SPDE mesh because of high precision coordinates
   coords <- sf::st_coordinates(combined)

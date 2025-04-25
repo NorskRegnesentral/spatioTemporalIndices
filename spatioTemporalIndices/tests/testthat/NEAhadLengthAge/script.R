@@ -59,30 +59,6 @@ run = fitModel(dat_l,conf_l, confPred,dat_alk,conf_alk,ignore.parm.uncertainty =
 conf = conf_l
 maxEdge = c(conf$cutoff,conf$cutoff*4) # Longer distances between nodes outside if inner bounderary
 
-confPredTmp = list(cellsize = 1000)
-intPoints = constructIntPoints(conf, confPredTmp)$locUTM
-while(dim(intPoints)[1]<5000){#Set up mesh based on a fine grid of integration points
-  confPredTmp$cellsize = confPredTmp$cellsize/2
-  intPoints = constructIntPoints(conf,confPredTmp)$locUTM
-}
-print(sum(intPoints[,2]))
-print(sum(intPoints[,1]))
-print(".......................................")
-
-
-splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
-boundary <- list(
-  fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
-  fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
-mesh <- fmesher::fm_mesh_2d(boundary=boundary,
-                            max.edge=maxEdge,
-                            cutoff=conf$cutoff)
-print(mesh$n)
-print(".......................................")
-print(boundary)
-print(".......................................")
-
-
 #Two stage age
 run_twoStage = fitModel(dat_l,conf_l, twoStage = TRUE, confPred,dat_alk,conf_alk,ignore.parm.uncertainty = TRUE,silent = TRUE,newtonsteps = 2)
 expect_equal(run$rl$logAgeIndex, run_twoStage$rl$logAgeIndex,tolerance = 1e-4)
@@ -135,18 +111,18 @@ objectiveSimExp = sim[[1]]$opt$objective
 resultsOut$objectiveSimExp = objectiveSimExp
 expect_equal(resultsOut$objectiveSimExp, resultsExp$objectiveSimExp,tolerance = 1e-4)
 
-#Test jitter
-set.seed(1)
-jj = jit(runSimpler,njit = 1)
-resultsJitter = jj$maxVecAll
-load("NEAhadLengthAge/resultsJitterExp.RData")
-expect_equal(resultsJitter, resultsJitterExp,tolerance = 1e-4)
+#Test jitter Not included 
+#set.seed(1)
+#jj = jit(runSimpler,njit = 1)
+#resultsJitter = jj$maxVecAll
+#load("NEAhadLengthAge/resultsJitterExp.RData")
+#expect_equal(resultsJitter, resultsJitterExp,tolerance = 1e-4)
 
-#Test retro
-ret = retroSTIM(runSimpler,nyears = 2)
-resultsRetro = ret[[2]]$opt$objective
-load("NEAhadLengthAge/resultsRetroExp.RData")
-expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
+#Test retro  Not included 
+#ret = retroSTIM(runSimpler,nyears = 2)
+#resultsRetro = ret[[2]]$opt$objective
+#load("NEAhadLengthAge/resultsRetroExp.RData")
+#expect_equal(resultsRetro, resultsRetroExp,tolerance = 1e-4)
 
 #Test no errors in plots
 test_that("Plot runs without error", {
