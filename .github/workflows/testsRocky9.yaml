@@ -27,7 +27,7 @@ jobs:
           # Installing system dependencies for R packages
           dnf install -y gdal-devel proj-devel geos-devel udunits2-devel
           # Install R packages dependencies
-          R -e 'install.packages(c("testthat","TMB", "fmesher", "fields", "marmap", "sf", "splancs", "ellipse", "RcppEigen"), repos = "http://cran.rstudio.com/")'
+          R -e 'install.packages(c("testthat","TMB", "fmesher", "fields", "marmap", "sf", "splancs", "ellipse", "RcppEigen"), dependencies = TRUE, repos = "http://cran.rstudio.com/")'
 
       - name: Install the R package and run tests
         run: |
