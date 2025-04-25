@@ -24,6 +24,31 @@ jobs:
           dnf config-manager --set-enabled devel
           dnf install -y epel-release
           dnf install -y R
+
+          # System dependencies for geospatial R packages
+          dnf install -y \
+          gdal-devel \
+          proj-devel \
+          geos-devel \
+          udunits2-devel \
+          libpng-devel \
+          libtiff-devel \
+          cairo-devel \
+          libcurl-devel \
+          openssl-devel \
+          harfbuzz-devel \
+          fribidi-devel \
+          freetype-devel \
+          fontconfig-devel \
+          mesa-libGL-devel \
+          libxml2-devel \
+          git \
+          make \
+          gcc-c++ \
+          xorg-x11-server-Xvfb \
+          xorg-x11-fonts-Type1 \
+          wget
+
           # Installing system dependencies for R packages
           dnf install -y gdal-devel proj-devel geos-devel udunits2-devel
           # Install R packages dependencies
