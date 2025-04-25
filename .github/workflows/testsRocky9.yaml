@@ -27,11 +27,9 @@ jobs:
           # Install testthat and any other dependencies your package might need
           R -e 'install.packages("testthat", repos = "http://cran.rstudio.com/")'
 
-      - name: Change to package directory
-        run: cd spatioTemporalIndices
-
-      - name: Install the package
-        run: R CMD INSTALL .
-
-      - name: Run tests
-        run: R -e 'testthat::test_dir("tests/")'
+      - name: Install the R package and run tests
+        run: |
+          cd spatioTemporalIndices  # Change directory to the package root
+          pwd  # Print working directory to verify correct path
+          R CMD INSTALL .
+          R -e 'testthat::test_dir("tests/")'
