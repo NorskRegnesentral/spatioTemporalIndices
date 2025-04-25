@@ -25,7 +25,7 @@ jobs:
           dnf install -y epel-release
           dnf install -y R
           # Installing system dependencies for R packages
-          dnf install -y gdal-devel proj-devel proj-epsg proj-nad geos-devel udunits2-devel
+          dnf install -y gdal-devel proj-devel geos-devel udunits2-devel
           # Install R packages dependencies
           R -e 'install.packages(c("testthat","TMB", "fmesher", "fields", "marmap", "sf", "splancs", "ellipse", "RcppEigen"), repos = "http://cran.rstudio.com/")'
 
