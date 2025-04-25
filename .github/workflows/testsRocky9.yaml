@@ -15,44 +15,23 @@ jobs:
       image: rockylinux/rockylinux:9  # Specify the Docker image for Rocky Linux 9
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Install R and dependencies
+      - name: Install dependencies
         run: |
-          dnf install -y dnf-plugins-core
+          dnf install -y epel-release dnf-plugins-core
           dnf config-manager --set-enabled devel
-          dnf install -y epel-release
-          dnf install -y R
+          dnf install -y R wget git gcc-c++ make \
+            gdal-devel proj-devel geos-devel udunits2-devel \
+            libcurl-devel openssl-devel libxml2-devel \
+            cairo-devel libpng-devel freetype-devel \
+            fontconfig-devel mesa-libGL-devel harfbuzz-devel fribidi-devel \
+            xorg-x11-server-Xvfb xorg-x11-fonts-Type1 dejavu-sans-fonts
 
-          # System dependencies for geospatial R packages
-          dnf install -y \
-          gdal-devel \
-          proj-devel \
-          geos-devel \
-          udunits2-devel \
-          libpng-devel \
-          libtiff-devel \
-          cairo-devel \
-          libcurl-devel \
-          openssl-devel \
-          harfbuzz-devel \
-          fribidi-devel \
-          freetype-devel \
-          fontconfig-devel \
-          mesa-libGL-devel \
-          libxml2-devel \
-          git \
-          make \
-          gcc-c++ \
-          xorg-x11-server-Xvfb \
-          xorg-x11-fonts-Type1 \
-          wget
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-          # Installing system dependencies for R packages
-          dnf install -y gdal-devel proj-devel geos-devel udunits2-devel
-          # Install R packages dependencies
-          R -e 'install.packages(c("testthat","TMB", "fmesher", "fields", "marmap", "sf", "splancs", "ellipse", "RcppEigen"), dependencies = TRUE, repos = "http://cran.rstudio.com/")'
+      - name: Install R package dependencies
+        run: |
+          R -e 'install.packages(c("testthat", "TMB", "fmesher", "fields", "marmap", "sf", "splancs", "ellipse", "RcppEigen"), dependencies = TRUE, repos = "http://cran.rstudio.com/")'
 
       - name: Install the R package and run tests
         run: |
