@@ -20,25 +20,25 @@ createMesh <- function(conf){
   if(!is.null(strata_utm$geometry)){
     buffer = sf::st_buffer(strata_utm$geometry,conf$cbound[1])
     buffer2 = sf::st_buffer(strata_utm$geometry,conf$cbound[2])
-    combined <- sf::st_union(buffer)
-    combined2 <- sf::st_union(buffer2)
+    innerArea <- sf::st_union(buffer)
+    outerArea <- sf::st_union(buffer2)
   }else{
     buffer = sf::st_buffer(strata_utm,conf$cbound[1])
     buffer2 = sf::st_buffer(strata_utm,conf$cbound[2])
-    combined <- sf::st_union(buffer)
-    combined2 <- sf::st_union(buffer2)
+    innerArea <- sf::st_union(buffer)
+    outerArea <- sf::st_union(buffer2)
   }
 
   #Different OS sometimes result in slightly different SPDE mesh because of high precision coordinates
-  coords <- sf::st_coordinates(combined)
+  coords <- sf::st_coordinates(innerArea)
   predAreaUTMTmp <- sf::st_polygon(list(round(coords[,1:2], digits = 5)))
-  combined <- sf::st_sf(geometry = sf::st_sfc(predAreaUTMTmp), crs=utmCRS)
-  coords <- sf::st_coordinates(combined2)
+  innerArea <- sf::st_sf(geometry = sf::st_sfc(predAreaUTMTmp), crs=utmCRS)
+  coords <- sf::st_coordinates(outerArea)
   predAreaUTMTmp <- sf::st_polygon(list(round(coords[,1:2], digits = 5)))
-  combined2 <- sf::st_sf(geometry = sf::st_sfc(predAreaUTMTmp), crs=utmCRS)
+  outerArea <- sf::st_sf(geometry = sf::st_sfc(predAreaUTMTmp), crs=utmCRS)
 
   mesh <- fmesher::fm_mesh_2d(max.edge =conf$maxEdge,
-                              boundary = list(combined,combined2),
+                              boundary = list(innerArea,outerArea),
                               cutoff = conf$cutoff)
 
   return(list(mesh=mesh, barrier.triangles =NULL))
