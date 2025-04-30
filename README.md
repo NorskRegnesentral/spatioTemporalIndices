@@ -182,8 +182,8 @@ We can then extract the indices and plot structures.
 Here, we plot the spatially estimated CPUE at a length of 40 cm and age 5 for the year 2020:
  
 ```R
-plotResults(run,what = c("space",2020,40,"length"))
-plotResults(run,what = c("space",2020,5,"age"))
+plotResults(run,what = "space",year = 2020,length = 40)
+plotResults(run,what = "space", year = 2020,age = 5)
 
 #Add map to plot
 world <- rnaturalearth::ne_countries(scale = "medium", returnclass = "sf")
