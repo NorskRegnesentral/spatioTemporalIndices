@@ -2,11 +2,11 @@
 
 #' plotResults Plot results
 #' @param run fitted object returned by \code{\link{fitModel}}
-#' @param what What to plot. Options in first element: "sunAlt", "depth", "ALK", or "space". If "ALK" is selected, year also must be provided, e.g., what = c("ALK",2020). If a spatial plot is selected; year and length or age must also provided. Eg.; what = c("space", 2020,5,"age") or what = c("space", 2020,50,"length").
-#' @param year year of interest
-#' @param age age of interest for spatial CPUE plot
-#' @param length length of interest for spatial CPUE plot
-#' @param lon_lat longitude and latitude of interest for age-length-key plot
+#' @param what What to plot. Currently the four different options are implemented: 1) sunAlt: plots sun altitude effect. 2) depth: Plot depth effect. 3) ALK: plot ALK. 4) space: Spatial plot of catch-per-unit effort.
+#' @param year Year of interest. Only relevant for ALK plots and spatial CPUE plots
+#' @param age Age of interest for spatial CPUE plot
+#' @param length Length of interest for spatial CPUE plot
+#' @param lon_lat Longitude and latitude of interest for age-length-key plot
 #' @param xlim optional xlim sent to fields::image.plot
 #' @param ylim optional xlim sent to fields::image.plot
 #' @param zlim optional zlim sent to fields::image.plot
