@@ -107,6 +107,8 @@ template <class Type>
     }
     array<Type> lengthIndexStrata(nYears,dat.numberOfLengthGroups,nStrata);
     lengthIndexStrata.setZero();
+    array<Type> ageIndexStrata(nYears,nAges,nStrata);
+    ageIndexStrata.setZero();
 
     vector<Type> nIntStrata(nStrata);
     nIntStrata.setZero();
@@ -121,6 +123,7 @@ template <class Type>
             for(int a = 0; a<nAges; ++a){
               ageIndex(y,a) = ageIndex(y,a) + lengthIndexDetailed(y,l,i)* ALK_int(l,a,i,y);
               ageIndexDetailed(y,a,i) = ageIndexDetailed(y,a,i) +  lengthIndexDetailed(y,l,i)*ALK_int(l,a,i,y);
+              ageIndexStrata(y,a, dat.idxStrata(i)-1) = ageIndexStrata(y,a, dat.idxStrata(i)-1) + ageIndexDetailed(y,a,i);
             }
           }
           lengthIndex(y,l) = lengthIndex(y,l) + lengthIndexDetailed(y,l,i);
@@ -141,6 +144,10 @@ template <class Type>
         for(int a = 0; a<nAges; ++a){
           ageIndex(y,a) = ageIndex(y,a) *dat.areas.sum()/nInt;
           ageIndexTotal(y) = ageIndexTotal(y) + ageIndex(y,a);
+          for(int s=0; s<nStrata; ++s){
+            ageIndexStrata(y,a,s) = ageIndexStrata(y,a,s)*dat.areas(s)/nIntStrata(s);
+          }
+
         }
       }
     }
@@ -172,9 +179,11 @@ template <class Type>
     }
 
     array<Type> logAgeIndex(nYears,nAges);
+    array<Type> logAgeIndexStrata(nYears,nAges,nStrata);
     vector<Type>  logAgeIndexTotal(nYears);
     if(dat.applyALK==1){
       logAgeIndex = log(ageIndex);
+      logAgeIndexStrata = log(ageIndexStrata);
       logAgeIndexTotal = log(ageIndexTotal);
       ADREPORT_F(logAgeIndex, of);
       REPORT_F(logAgeIndex, of);
@@ -184,7 +193,11 @@ template <class Type>
         REPORT_F(logAgeIndexTotal, of);
       }
       REPORT_F(ageIndexDetailed, of);//For plotting
+      REPORT_F(logAgeIndexStrata, of);
       REPORT_F(ALK_int, of);
+      if(dat.strataReport==1){//Optionally sdreport index-at-age in strata, this may result in high memory consumption
+        ADREPORT_F(logAgeIndexStrata, of);
+      }
     }
 
     if(dat.lowMemory==0){
