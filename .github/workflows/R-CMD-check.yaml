@@ -49,7 +49,9 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
+          extra-packages: |
+            any::rcmdcheck
+            fmesher@0.2.0
           needs: check
           working-directory: spatioTemporalIndices # path to package
 
