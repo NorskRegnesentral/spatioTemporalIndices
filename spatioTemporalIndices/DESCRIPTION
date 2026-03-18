@@ -17,7 +17,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: TRUE
 Imports: TMB, 
-    fmesher, 
+    fmesher (== 0.2.0), 
     mgcv, 
     fields, 
     marmap, 
