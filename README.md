@@ -283,6 +283,14 @@ For the use of the indices and covariance structures in the state space assessme
 
 <br>
 
+
+## Notes
+
+1. The fmesher version 0.5.0 produces a slightly different mesh compared to version 0.4.0. As a result, all tests involving the mesh have been updated accordingly, and the exact results in the paper Breivik et al. (2024) change slightly.
+
+
+<br>
+
 ## References
 
 Breivik, O. N., Aanes, F., Søvik, G., Aglen, A., Mehl, S., & Johnsen, E. (2021). Predicting abundance indices in areas without coverage with a latent spatio-temporal Gaussian model, ICES Journal of Marine Science, Volume 78, Issue 6, September 2021, Pages 2031–2042, https://doi.org/10.1093/icesjms/fsab073
