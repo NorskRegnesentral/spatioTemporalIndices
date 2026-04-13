@@ -25,8 +25,8 @@ createMesh <- function(conf){
 
   splancs::splancs()#Splancs needed in fmesher::fm_nonconvex_hull_inla
   boundary <- list(
-    fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120),
-    fmesher::fm_nonconvex_hull_inla(as.matrix(intPoints), convex  = conf$cbound[2]))
+    fmesher::fm_nonconvex_hull(as.matrix(intPoints), convex  = conf$cbound[1],resolution = 120, method = "fm", format = "fm"),
+    fmesher::fm_nonconvex_hull(as.matrix(intPoints), convex  = conf$cbound[2]))
   mesh <- fmesher::fm_mesh_2d(boundary=boundary,
                               max.edge=conf$maxEdge,
                               cutoff=cutoff)
