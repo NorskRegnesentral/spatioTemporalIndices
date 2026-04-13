@@ -328,64 +328,34 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
   data$yInt = points$locUTM[,2]
 
   #Find depth covariate
-  if(!is.null(confPred$Depth)) {
-    if(grepl(".nc",confPred$Depth)) {
-      tryCatch({
-        b <- marmap::readGEBCO.bathy(confPred$Depth,res=25)
-        bf <- marmap::fortify.bathy(b)
-        bf$z <- -1*bf$z
-        bf <- subset(bf,z < conf_l$maxDepth & z > conf_l$minDepth) #R-CMD-check notes that there are no visible binding for global variable z ?
-
-        bf = sf::st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-        bfUTM = sf::st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-
-        intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-        intPoints= sf::st_join(intPoints,bfUTM,join=sf::st_nearest_feature)
-
-        depthGEBCO = intPoints$z
-
-        depthGEBCO[depthGEBCO<conf_l$minDepth]=conf_l$minDepth
-        depthGEBCO[depthGEBCO>conf_l$maxDepth]=conf_l$maxDepth
-
-        X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthGEBCO))
-        data$X_depth_int = X_depth },
-      error = function(e) {
-        confPred$Depth=NULL
-        print("No depth data loaded, using depth information from survey stations.") })
-    }
-    # with depth data from NOAA database
-    else if(confPred$Depth == "NOAA") {
-      tryCatch({
-#        b = marmap::getNOAA.bathy(lon1 = floor(min(attributes(data)$locObsLatLon[,1])), lon2 = ceiling(max(attributes(data)$locObsLatLon[,1])),
-#                          lat1 = floor(min(attributes(data)$locObsLatLon[,2])), lat2 = ceiling(max(attributes(data)$locObsLatLon[,2])),
-#                          resolution = 3)
-#        bf = marmap::fortify.bathy(b)
-#
-#        bf = sf::st_as_sf(bf,coords=c("x","y"),crs="+proj=longlat")
-#        bfUTM = sf::st_transform(bf,crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-#
-#        intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-#        intPoints= sf::st_join(intPoints,bfUTM,join=sf::st_nearest_feature)
-#
-#        depthNOAA = -intPoints$z
-#
-#        depthNOAA[depthNOAA<conf_l$minDepth]=conf_l$minDepth
-#        depthNOAA[depthNOAA>conf_l$maxDepth]=conf_l$maxDepth
-#
-#        #NB: devtools::check() complains: includeIntPoints: no visible binding for global variable 'minDist'
-#        X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthNOAA[minDist]))
-#
-#        data$X_depth_int = X_depth
-        confPred$Depth=NULL
-        print("Using NOAA database not implemented, using depth information from survey stations.")
-        },
-        error = function(e) {
-          confPred$Depth=NULL
-          print("Not able to access NOAA database, using depth information from survey stations.") })
-    } else {
-      confPred$Depth=NULL
-    }
+  if(grepl(".nc", confPred$Depth)) {
+    ncLoaded <- tryCatch({
+      b <- marmap::readGEBCO.bathy(confPred$Depth, res = 5)
+      bf <- marmap::fortify.bathy(b)
+      bf$z <- -1 * bf$z
+      bf <- subset(bf, z < conf_l$maxDepth & z > conf_l$minDepth)
+      
+      bf = sf::st_as_sf(bf, coords = c("x", "y"), crs = "+proj=longlat")
+      bfUTM = sf::st_transform(bf, crs = paste0("+proj=utm +zone=", conf_l$zone, " +datum=WGS84 +units=km +no_defs"))
+      
+      intPoints = sf::st_as_sf(points$locUTM, coords = c("UTMX", "UTMY"), crs = paste0("+proj=utm +zone=", conf_l$zone, " +datum=WGS84 +units=km +no_defs"))
+      intPoints = sf::st_join(intPoints, bfUTM, join = sf::st_nearest_feature)
+      
+      depthGEBCO = intPoints$z
+      depthGEBCO[depthGEBCO < conf_l$minDepth] = conf_l$minDepth
+      depthGEBCO[depthGEBCO > conf_l$maxDepth] = conf_l$maxDepth
+      
+      X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]], data = data.frame(depth = depthGEBCO))
+      data$X_depth_int = X_depth
+      TRUE
+    },
+    error = function(e) {
+      print("No depth data loaded, using depth information from survey stations.")
+      FALSE
+    })
+    if (!ncLoaded) confPred$Depth <- NULL
   }
+  
   if(is.null(confPred$Depth)) {
     obs = sf::st_as_sf(data.frame(UTMX=attributes(data)$locObs[,1],UTMY=attributes(data)$locObs[,2],depth=attributes(data)$depth),coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
     intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
