@@ -350,7 +350,7 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
   }
 
   # Step 2: NOAA database (when explicitly requested or as fallback from a failed .nc load)
-  if (is.null(depthVec) && !is.null(confPred$Depth) && confPred$Depth != "Data") {
+  if (is.null(depthVec) && !is.null(confPred$Depth) && toupper(confPred$Depth) != "DATA") {
     depthVec <- tryCatch({
       bbox <- sf::st_bbox(sf::st_transform(conf_l$strata, crs = sf::st_crs(4326)))
       b <- marmap::getNOAA.bathy(lon1 = bbox["xmin"], lon2 = bbox["xmax"],
