@@ -51,7 +51,7 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
-            fmesher@0.4.0
+          #  fmesher@0.4.0
           needs: check
           working-directory: spatioTemporalIndices # path to package
 
