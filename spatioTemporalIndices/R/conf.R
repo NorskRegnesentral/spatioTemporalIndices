@@ -120,7 +120,7 @@ defConf <- function(years, skipYears=NULL,spatial = 1,spatioTemporal = 0,nugget 
 ##' @param Depth if "NOAA": use NOAA data base for estimating depth in integration points; if GEBCO (.nc) file: use file for estimating depth in integration
 ##' @details This function sets up the configurations for the predictions, i.e. the index-at-length and index-at-age.
 ##' @export
-defConfPred <- function(conf,cellsize=20,Depth="Data"){
+defConfPred <- function(conf,cellsize=20,Depth=NULL){
   confPred = list()
   if(!is.null(conf$strata_number)){
     confPred$Strata=1:conf$strata_number

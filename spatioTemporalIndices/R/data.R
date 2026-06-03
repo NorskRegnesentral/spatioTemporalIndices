@@ -328,44 +328,68 @@ includeIntPoints<-function(data,conf_l,confPred, gamSetup_depth){
   data$yInt = points$locUTM[,2]
 
   #Find depth covariate
-  if(grepl(".nc", confPred$Depth)) {
-    ncLoaded <- tryCatch({
+  utm_crs <- paste0("+proj=utm +zone=", conf_l$zone, " +datum=WGS84 +units=km +no_defs")
+  depthVec <- NULL
+
+  # Step 1: GEBCO .nc file
+  if (!is.null(confPred$Depth) && grepl(".nc", confPred$Depth, fixed = TRUE)) {
+    depthVec <- tryCatch({
       b <- marmap::readGEBCO.bathy(confPred$Depth, res = 5)
       bf <- marmap::fortify.bathy(b)
       bf$z <- -1 * bf$z
       bf <- subset(bf, z < conf_l$maxDepth & z > conf_l$minDepth)
-      
-      bf = sf::st_as_sf(bf, coords = c("x", "y"), crs = "+proj=longlat")
-      bfUTM = sf::st_transform(bf, crs = paste0("+proj=utm +zone=", conf_l$zone, " +datum=WGS84 +units=km +no_defs"))
-      
-      intPoints = sf::st_as_sf(points$locUTM, coords = c("UTMX", "UTMY"), crs = paste0("+proj=utm +zone=", conf_l$zone, " +datum=WGS84 +units=km +no_defs"))
-      intPoints = sf::st_join(intPoints, bfUTM, join = sf::st_nearest_feature)
-      
-      depthGEBCO = intPoints$z
-      depthGEBCO[depthGEBCO < conf_l$minDepth] = conf_l$minDepth
-      depthGEBCO[depthGEBCO > conf_l$maxDepth] = conf_l$maxDepth
-      
-      X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]], data = data.frame(depth = depthGEBCO))
-      data$X_depth_int = X_depth
-      TRUE
-    },
-    error = function(e) {
-      print("No depth data loaded, using depth information from survey stations.")
-      FALSE
+      bf <- sf::st_as_sf(bf, coords = c("x", "y"), crs = "+proj=longlat")
+      bfUTM <- sf::st_transform(bf, crs = utm_crs)
+      intPointsTmp <- sf::st_as_sf(points$locUTM, coords = c("UTMX", "UTMY"), crs = utm_crs)
+      intPointsTmp <- sf::st_join(intPointsTmp, bfUTM, join = sf::st_nearest_feature)
+      intPointsTmp$z
+    }, error = function(e) {
+      print("GEBCO .nc file could not be loaded, trying NOAA database.")
+      NULL
     })
-    if (!ncLoaded) confPred$Depth <- NULL
   }
-  
-  if(is.null(confPred$Depth)) {
-    obs = sf::st_as_sf(data.frame(UTMX=attributes(data)$locObs[,1],UTMY=attributes(data)$locObs[,2],depth=attributes(data)$depth),coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
-    intPoints = sf::st_as_sf(points$locUTM,coords=c("UTMX","UTMY"),crs=paste0("+proj=utm +zone=", conf_l$zone," +datum=WGS84 +units=km +no_defs"))
 
-    intPoints= sf::st_join(intPoints,obs,join=sf::st_nearest_feature)
+  # Step 2: NOAA database (when explicitly requested or as fallback from a failed .nc load)
+  if (is.null(depthVec) && !is.null(confPred$Depth) && confPred$Depth != "Data") {
+    depthVec <- tryCatch({
+      bbox <- sf::st_bbox(sf::st_transform(conf_l$strata, crs = sf::st_crs(4326)))
+      b <- marmap::getNOAA.bathy(lon1 = bbox["xmin"], lon2 = bbox["xmax"],
+                                  lat1 = bbox["ymin"], lat2 = bbox["ymax"],
+                                  resolution = 1)
+      bf <- marmap::fortify.bathy(b)
+      bf$z <- -1 * bf$z
+      bf <- subset(bf, z < conf_l$maxDepth & z > conf_l$minDepth)
+      bf <- sf::st_as_sf(bf, coords = c("x", "y"), crs = "+proj=longlat")
+      bfUTM <- sf::st_transform(bf, crs = utm_crs)
+      intPointsTmp <- sf::st_as_sf(points$locUTM, coords = c("UTMX", "UTMY"), crs = utm_crs)
+      intPointsTmp <- sf::st_join(intPointsTmp, bfUTM, join = sf::st_nearest_feature)
+      intPointsTmp$z
+    }, error = function(e) {
+      print("NOAA database not accessible, using depth from observations.")
+      NULL
+    })
+  }
 
-    depthDATA = intPoints$depth
+  if (!is.null(depthVec)) {
+    depthVec[depthVec < conf_l$minDepth] <- conf_l$minDepth
+    depthVec[depthVec > conf_l$maxDepth] <- conf_l$maxDepth
+    data$X_depth_int <- tryCatch(
+      mgcv::PredictMat(gamSetup_depth$smooth[[1]], data = data.frame(depth = depthVec)),
+      error = function(e) {
+        print("PredictMat failed on external depth data, falling back to observation depth.")
+        NULL
+      }
+    )
+  }
 
-    X_depth = mgcv::PredictMat(gamSetup_depth$smooth[[1]],data = data.frame(depth=depthDATA))
-    data$X_depth_int = X_depth
+  # Step 3: Fallback to observation depth
+  if (is.null(data$X_depth_int)) {
+    obs <- sf::st_as_sf(data.frame(UTMX = attributes(data)$locObs[,1], UTMY = attributes(data)$locObs[,2], depth = attributes(data)$depth),
+                        coords = c("UTMX","UTMY"), crs = utm_crs)
+    intPointsTmp <- sf::st_as_sf(points$locUTM, coords = c("UTMX","UTMY"), crs = utm_crs)
+    intPointsTmp <- sf::st_join(intPointsTmp, obs, join = sf::st_nearest_feature)
+    depthDATA <- intPointsTmp$depth
+    data$X_depth_int <- mgcv::PredictMat(gamSetup_depth$smooth[[1]], data = data.frame(depth = depthDATA))
     print("No depth information for prediction provided, using depth from observations.")
   }
 
