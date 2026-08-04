@@ -2,7 +2,7 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: 
+    branches:
       - main
       - fix_macos
       - unit_test
@@ -51,7 +51,7 @@ jobs:
         with:
           extra-packages: |
             any::rcmdcheck
-            fmesher@0.4.0
+            # fmesher@0.4.0
           needs: check
           working-directory: spatioTemporalIndices # path to package
 
