@@ -56,6 +56,11 @@ setupData = function(dat_l,conf_l,confPred){
     stop("Negative distance in dat_l$distance.")
   }
 
+  #Verify that the observation model is implemented
+  if(conf_l$obsModel != 2){
+    stop("Only obsModel = 2 (Poisson) is implemented.")
+  }
+
   #Verify that year span in conf_l corresponds with dat_l
   yearVerify = as.integer(format(dat_l$startdatetime, format = "%Y"))
   if(min(conf_l$years) < min(yearVerify) | max(conf_l$years) > max(yearVerify)){
@@ -80,6 +85,11 @@ setupData = function(dat_l,conf_l,confPred){
   #Remove observations in years not used
   dat_l$year = as.integer(format(dat_l$startdatetime, format = "%Y"))
   dat_l = dat_l[dat_l$year %in% conf_l$years, ]
+
+  #Sort hauls by year (keeping the order of hauls within a year), and length groups within each haul. The model
+  #assumes that hauls are ordered by year (per-year projector matrices vs. haul-level covariates and nugget) and that the
+  #rows of each haul are contiguous (conversion of catches to a haul x length matrix).
+  dat_l = dat_l[order(dat_l$year, match(dat_l$station, unique(dat_l$station)), dat_l$lengthGroup), ]
 
   # Add strata polygon if none was provided
   if(class(conf_l$strata)[1]!="sf") {

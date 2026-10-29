@@ -76,7 +76,7 @@ defConf(
 
 \item{stratasystem}{List containing dsn and layer of shapefile}
 
-\item{obsModel}{Observation model: 1- negative binomial (not fully implemented), 2-Poisson (most relevant when including a nugget effect), 3-Tweedie (not fully implemented)}
+\item{obsModel}{Observation model: 2-Poisson (only option currently implemented; most relevant when including a nugget effect). 1-negative binomial and 3-Tweedie are not implemented and give an error}
 
 \item{rwBeta0}{Include intercept of catch-at-length as a random walk? 0-No, 1-Yes}
 

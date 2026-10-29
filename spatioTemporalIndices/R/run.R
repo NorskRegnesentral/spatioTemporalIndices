@@ -107,7 +107,7 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
     pl = as.list(rep,"Est")
     par = pl
     if(sum(is.na(map$tan_rho_l))==0)par$tan_rho_l = c(1.5,1,1)
-    if(sum(is.na(map$tan_rho_l))==0)par$tan_rho_t = 1
+    if(sum(is.na(map$tan_rho_t))==0)par$tan_rho_t = 1
 
     mapStart2 = map
     profile2 = profile
@@ -156,14 +156,12 @@ fitModel<-function(dat_l,conf_l,confPred,dat_alk = NULL, conf_alk = NULL,parSet 
       opt <- nlminb(obj$par, obj$fn, obj$gr,
                     control = list(trace = trace,iter.max = 1000, eval.max = 1000))
 
-      he = function(par){ optimHess(par, obj$fn, obj$gr) }
       for(i in seq_len(newtonsteps)) { # Take a few additional newton steps. Results of the optimization can vary across OS
         g = as.numeric(obj$gr(opt$par))
         h = stats::optimHess(opt$par, obj$fn, obj$gr)
         opt$par = opt$par- solve(h, g)
         opt$objective = obj$fn(opt$par)
       }
-      opt$he = optimHess(opt$par, obj$fn, obj$gr)
 
       rep <- TMB::sdreport(obj,...)
       pl = as.list(rep,"Est")
@@ -288,25 +286,26 @@ jit<-function(run,njit,ncores = 1,sd = 0.1){
 
 
   pl = as.list(run$rep,"Est")
-  scaleS = 1/((4*3.14159265)*exp(pl$logKappa)*exp(pl$logKappa))
-  pl$xS = pl$xS/scaleS[1]* exp(pl$log_sigma[1])
-  pl$xST = pl$xST/scaleS[2]* exp(pl$log_sigma[2])
+  #Scale latent fields to their contribution in the linear predictor, as on the C-side
+  scaleS = 1/((4*pi)*exp(pl$log_kappa)*exp(pl$log_kappa))
+  pl$xS = pl$xS/sqrt(scaleS[1])* exp(pl$log_sigma[1])
+  pl$xST = pl$xST/sqrt(scaleS[2])* exp(pl$log_sigma[2])
   pl$nugget = pl$nugget* exp(pl$log_sigma[3])
 
-  scaleS_alk = 1/((4*3.14159265)*exp(pl$logKappa_alk)*exp(pl$logKappa_alk))
-  pl$xS_alk = pl$xS_alk/scaleS_alk[1]* exp(pl$logSigma_alk[1])
-  pl$xST_alk = pl$xST_alk/scaleS_alk[2]* exp(pl$logSigma_alk[2])
+  scaleS_alk = 1/((4*pi)*exp(pl$logKappa_alk)*exp(pl$logKappa_alk))
+  pl$xS_alk = pl$xS_alk/sqrt(scaleS_alk[1])* exp(pl$logSigma_alk[1])
+  pl$xST_alk = pl$xST_alk/sqrt(scaleS_alk[2])* exp(pl$logSigma_alk[2])
 
   diffPar = lapply(runs, function(f) {
     plJit = as.list(f$rep, "Est")
-    scaleS = 1/((4*3.14159265)*exp(plJit$logKappa)*exp(plJit$logKappa))
-    plJit$xS = plJit$xS/scaleS[1]* exp(plJit$log_sigma[1])
-    plJit$xST = plJit$xST/scaleS[2]* exp(plJit$log_sigma[2])
+    scaleS = 1/((4*pi)*exp(plJit$log_kappa)*exp(plJit$log_kappa))
+    plJit$xS = plJit$xS/sqrt(scaleS[1])* exp(plJit$log_sigma[1])
+    plJit$xST = plJit$xST/sqrt(scaleS[2])* exp(plJit$log_sigma[2])
     plJit$nugget = plJit$nugget* exp(plJit$log_sigma[3])
 
-    scaleS_alk = 1/((4*3.14159265)*exp(plJit$logKappa_alk)*exp(plJit$logKappa_alk))
-    plJit$xS_alk = plJit$xS_alk/scaleS_alk[1]* exp(plJit$logSigma_alk[1])
-    plJit$xST_alk = plJit$xST_alk/scaleS_alk[2]* exp(plJit$logSigma_alk[2])
+    scaleS_alk = 1/((4*pi)*exp(plJit$logKappa_alk)*exp(plJit$logKappa_alk))
+    plJit$xS_alk = plJit$xS_alk/sqrt(scaleS_alk[1])* exp(plJit$logSigma_alk[1])
+    plJit$xST_alk = plJit$xST_alk/sqrt(scaleS_alk[2])* exp(plJit$logSigma_alk[2])
 
     mpd = mapply(function(g,h){
       max(abs(g-h))

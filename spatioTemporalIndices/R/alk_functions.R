@@ -32,6 +32,15 @@ setUpData_alk = function(dat_alk, conf_alk,conf_l = NULL){
   dat_alk$year = as.integer(format(dat_alk$startdatetime, format = "%Y"))
   dat_alk = dat_alk[which(dat_alk$year %in%conf_alk$years),]
 
+  #Verify that all years have age data; the C-side indexes age data by year
+  missingYears = setdiff(conf_alk$years, dat_alk$year)
+  if(length(missingYears)>0){
+    stop(paste0("No age data in year(s) ", paste(missingYears, collapse = ", "), ". All years in conf_l$years must have age data when applyALK = 1."))
+  }
+
+  #Sort by year (stable); observations within a year must be contiguous for the bookkeeping below
+  dat_alk = dat_alk[order(dat_alk$year),]
+
   #Set age reading quality to 1 if not given.
   if(is.null(dat_alk$readability)){
     dat_alk$readability = rep(1,dim(dat_alk)[1])

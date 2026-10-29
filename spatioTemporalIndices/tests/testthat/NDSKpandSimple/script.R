@@ -28,13 +28,13 @@ runCovariates = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,si
 
 #no Nugget
 conf_l$sunAlt=c(1,0)
-conf_lsplineDepth = c(6,0)
+conf_l$splineDepth = c(6,0)
 conf_l$nugget = 0
 runNoNugget = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)
 
 #missing depth
 conf_l$sunAlt=c(1,0)
-conf_lsplineDepth = c(6,1)
+conf_l$splineDepth = c(6,1)
 conf_l$nugget = 1
 dat_l$depth[which(dat_l$station==dat_l$station[1])] = NA
 runMissingDepth = fitModel(dat_l,conf_l,confPred,ignore.parm.uncertainty = TRUE,silent = TRUE)

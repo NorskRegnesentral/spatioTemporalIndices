@@ -50,7 +50,7 @@ template <class Type>
 
     for(int y=0; y<nYears; ++y){
       for(int l =0; l<numberOfLengthGroups; ++l){
-        Type covariatesConvexW = (numberOfLengthGroups-l-1)/(numberOfLengthGroups-1);
+        Type covariatesConvexW = Type(numberOfLengthGroups-l-1)/Type(numberOfLengthGroups-1);
         if((dat.lengthGroupsReduced(0)==dat.lengthGroupsReduced(1)) & (dat.weigthLength(l)<0.9999)){//Exists longer length in dat.lengthGroupsReduced
           deltaPredS = dat.weigthLength(l)*dat.ApredS * par.xS.col(dat.lengthGroupsReduced(l)).matrix()+
             (1-dat.weigthLength(l))*dat.ApredS * par.xS.col(dat.lengthGroupsReduced(l)+1).matrix();
@@ -123,7 +123,7 @@ template <class Type>
             for(int a = 0; a<nAges; ++a){
               ageIndex(y,a) = ageIndex(y,a) + lengthIndexDetailed(y,l,i)* ALK_int(l,a,i,y);
               ageIndexDetailed(y,a,i) = ageIndexDetailed(y,a,i) +  lengthIndexDetailed(y,l,i)*ALK_int(l,a,i,y);
-              ageIndexStrata(y,a, dat.idxStrata(i)-1) = ageIndexStrata(y,a, dat.idxStrata(i)-1) + ageIndexDetailed(y,a,i);
+              ageIndexStrata(y,a, dat.idxStrata(i)-1) = ageIndexStrata(y,a, dat.idxStrata(i)-1) + lengthIndexDetailed(y,l,i)*ALK_int(l,a,i,y);
             }
           }
           lengthIndex(y,l) = lengthIndex(y,l) + lengthIndexDetailed(y,l,i);

@@ -23,7 +23,11 @@ Imports: TMB,
     marmap, 
     sf, 
     splancs, 
-    methods, 
+    methods,
+    graphics,
+    parallel,
+    stats,
+    utils,
     ellipse
 LinkingTo: TMB, 
     RcppEigen

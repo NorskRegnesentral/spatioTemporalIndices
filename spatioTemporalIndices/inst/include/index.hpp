@@ -113,7 +113,8 @@ template <class Type>
     Type covariatesConvexW; //Coefficient in convex combination of length dependent effects
     matrix<Type> mu(dat.fishObsMatrix.rows(),dat.fishObsMatrix.cols());
     vector<Type> deltaS, deltaS2, deltaST, deltaST2; //Smoothing in length dimension
-    matrix<Type> deltaMatrixS(dat.numberOfLengthGroups,999), deltaMatrixST(dat.numberOfLengthGroups,999);//Smoothed effect in length dimension
+    int maxStations = dat.nStationsEachYear.maxCoeff();
+    matrix<Type> deltaMatrixS(dat.numberOfLengthGroups,maxStations), deltaMatrixST(dat.numberOfLengthGroups,maxStations);//Smoothed effect in length dimension
     vector<Type> timeInDayLow = dat.X_sunAlt*betaSunLow;
     vector<Type> timeInDayHigh = dat.X_sunAlt*betaSunHigh;
     vector<Type> depthEffect1 = dat.X_depth*parDepth1;
@@ -146,7 +147,7 @@ template <class Type>
 //      Type pPos = 0;//Used if applying zero inflation
       for(int s=0; s<dat.nStationsEachYear(y);++s){
         for(int l=0; l <dat.numberOfLengthGroups;++l){
-          covariatesConvexW = (dat.numberOfLengthGroups-l-1)/(dat.numberOfLengthGroups-1);
+          covariatesConvexW = Type(dat.numberOfLengthGroups-l-1)/Type(dat.numberOfLengthGroups-1);
           mu(counter,l)= exp( par.beta0.row(y)(l)+
             covariatesConvexW*timeInDayLow(counter) + (1-covariatesConvexW)*timeInDayHigh(counter) +
             deltaMatrixS.row(l)(s)*sigma(0)/sqrt(scaleS)+

@@ -240,7 +240,7 @@ array<Type> ALKhauls(dataSet<Type> dat, paraSet<Type> par, LOSM_t<Type> A_ListST
 
   int nAges = dat.ageRange(1) - dat.ageRange(0) + 1;
   int nYears = dat.nStationsEachYear.size();
-  int nObs = 999;
+  int nObs = dat.nStationsEachYear.maxCoeff();
   array<Type> ALK_obs(dat.numberOfLengthGroups,nAges, nObs,nYears);
   ALK_obs.setZero();
 

@@ -23,7 +23,7 @@
 ##' @param usePcPriors If 0-No pc-priors used, 1- use pc-priors (probably never used).
 ##' @param zeroInflated If 0-No zero inflation, 1- use zero inflation (NB!! not fully implemented).
 ##' @param stratasystem List containing dsn and layer of shapefile
-##' @param obsModel Observation model: 1- negative binomial (not fully implemented), 2-Poisson (most relevant when including a nugget effect), 3-Tweedie (not fully implemented)
+##' @param obsModel Observation model: 2-Poisson (only option currently implemented; most relevant when including a nugget effect). 1-negative binomial and 3-Tweedie are not implemented and give an error
 ##' @param rwBeta0 Include intercept of catch-at-length as a random walk? 0-No, 1-Yes
 ##' @param applyALK Calculate indices-at-age by using the age-at-length model: 0-No , 1-yes
 ##' @param mapRhoL How to couple correlation parameters for length in space, space-time and nugget; For experimental use
@@ -249,7 +249,7 @@ setMap <- function(par, conf){
 
   if(length(conf$skipYears)>0) {
     if(conf$rwBeta0 ==0){ #Free beta0, and needs to not estimate these in years without data
-      skipped = which(conf$years==conf$skipYears)
+      skipped = which(conf$years %in% conf$skipYears)
       map$beta0 = matrix(data=c(1:length(par$beta0)),ncol=ncol(par$beta0),nrow=nrow(par$beta0))
       map$beta0[skipped,] <- NA
       map$beta0 = as.factor(map$beta0)
