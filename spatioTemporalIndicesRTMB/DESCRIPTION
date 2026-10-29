@@ -1,0 +1,37 @@
+Package: spatioTemporalIndicesRTMB
+Type: Package
+Title: Spatio-Temporal Index Model (STIM) Implemented in RTMB
+Version: 1.2.5.9000
+Authors@R: c(person(c("Olav","Nikolai"), "Breivik",role=c("aut","cre"), email="olavbr@nr.no"),
+	    person("Fredrik","Aanes",role="aut"),
+            person("Fabian", "Zimmermann", role="aut", email="fabian.zimmermann@hi.no"))
+Author: Olav Nikolai Breivik [aut, cre],
+	Fredik Aanes [aut],
+	Fabian Zimmermann [aut]
+Maintainer: Olav Nikolai Breivik <olavbr@nr.no>,
+	Fabian Zimmermann <fabian.zimmermann@hi.no>
+Description: RTMB implementation of the spatio-temporal index model in the package spatioTemporalIndices; the objective function is written in R instead of C++. A spatio-temporal model for estimating abundance indices, both at length and at age. Indices are constructed by length using a spatio-temporal model. If aging data is provided, catch per unit effort by length is converted to catch per unit effort by age using an internally estimated spatio-temporal age-length key.
+URL: https://github.com/NorskRegnesentral/spatioTemporalIndices
+BugReports: https://github.com/NorskRegnesentral/spatioTemporalIndices/issues
+License: GPL-3
+Encoding: UTF-8
+LazyData: TRUE
+Imports: RTMB,
+    Matrix,
+    fmesher, 
+    mgcv, 
+    fields, 
+    marmap, 
+    sf, 
+    splancs, 
+    methods,
+    graphics,
+    parallel,
+    stats,
+    utils,
+    ellipse
+Suggests: 
+    testthat (>= 3.0.0),
+    spatioTemporalIndices
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

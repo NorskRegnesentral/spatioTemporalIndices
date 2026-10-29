@@ -1,0 +1,107 @@
+#' Simulation study
+#'
+#' This function conduct a simulation study; all random effects are sampled based on their prior. Given the sampled random effects, the observations are sampled.
+#'
+#' @param run Run retruned by fitModel
+#' @param nsim Number of simulations
+#' @return A runSim object containtin all runs based on simulated data
+#' @details Not yet implemented in the RTMB version; the objective function \code{\link{nllSTIM}} has no simulation mode.
+#' @export
+simStudy = function(run,nsim = 5){
+  stop("Simulation is not yet implemented in spatioTemporalIndicesRTMB. Use the TMB version (spatioTemporalIndices) for simulation studies.")
+  simData = list()
+  simRuns = list()
+  for(i in 1:nsim){
+    simData[[i]] = run$obj$simulate()
+  }
+
+  for(i in 1:nsim){
+    simRuns[[i]] = tryCatch(
+      {
+        fitModelSim(run,simData[[i]])
+      },
+      error = function(e){
+        NA
+      }
+    )
+  }
+
+  class(simRuns)  = "stimSim"
+  attributes(simRuns)$run = run
+  attributes(simRuns)$simData = simData
+  return(simRuns)
+}
+
+#' Simulation study, run models
+#'
+#'Re-estimate the model for each sampled data set returned by simStudy.
+#'
+#' @param run Run retruned by fitModel
+#' @param simData One set of simulated data
+#' @return Returns a STIM object fitted with the simulated data
+#' @export
+fitModelSim<-function(run,simData){
+  data = run$data
+  map = run$map
+  conf_l = run$conf_l
+  confPred = run$confPred
+  dat_l = run$dat_l
+
+
+  data$obsVector = simData$obsVector
+  data$age =simData$age
+  data$readability = rep(1,length(data$readability)) #NB!!! Do not simulate readability
+  par = run$par
+  random = c("xS","xST", "nugget","betaDepth")
+  profile = NULL
+  if(conf_l$sunAlt[2]!=0){
+    profile = c("betaSun")
+  }
+  if(conf_l$rwBeta0==1){
+    random=c(random,"beta0")
+  }else{
+    profile = c(profile,"beta0")
+  }
+  if(conf_l$applyALK ==1){
+    conf_alk = run$conf_alk
+    dat_alk = run$dat_alk
+
+    random = c(random, "xS_alk","xST_alk")
+    profile = c(profile,"betaLength_alk")
+    if(data$rwBeta0_alk==1){
+      random=c(random,"beta0_alk")
+    }else{
+      profile = c(profile,"beta0_alk")
+    }
+    if(conf_l$rwBeta0==0& data$rwBeta0_alk==0 &conf_l$nugget==0 & conf_l$spatial==0 & conf_l$spatioTemporal==0 & conf_l$splineDepth[2]==0 & conf_l$sunAlt[2]==0){
+      profile = NULL#Need one parameter that is not profiled
+    }
+  }else{
+    if(conf_l$rwBeta0==0 &conf_l$nugget==0 & conf_l$spatial==0 & conf_l$spatioTemporal==0 & conf_l$splineDepth[2]==0 & conf_l$sunAlt[2]==0){
+      profile = NULL#Need one parameter that is not profiled
+    }
+  }
+
+  obj <- makeObj(data, par, random = random, profile = profile, map = map, silent = TRUE)
+
+
+
+  opt <- nlminb(obj$par, obj$fn, obj$gr,
+                control = list(trace = 0,iter.max = 1000, eval.max = 1000))
+  rep <- RTMB::sdreport(obj, ignore.parm.uncertainty = TRUE,getReportCovariance = FALSE,skip.delta.method = TRUE)
+  pl = as.list(rep,"Est")
+  plSd = NULL
+
+  rl = as.list(rep,"Est", report = TRUE)
+  rlSd = NULL
+
+  freeObj(obj)#Free memory used by the AD tapes
+
+  toReturn = list(obj = obj,opt = opt,rep = rep,conf_l = conf_l,confPred = confPred,conf_alk = conf_alk,data = data,map = map,par = par,dat_l = dat_l,dat_alk = dat_alk,
+                  pl = pl, plSd = plSd, rl = rl, rlSd = rlSd)
+  class(toReturn) = "stim"
+
+  return(toReturn)
+}
+
+
